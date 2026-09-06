@@ -33,7 +33,7 @@ function loadState() {
 }
 function save() {
   try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
-  catch (e) { toast("저장에 실패했습니다. 브라우저 저장 공간을 확인해 주세요."); }
+  catch (e) { toast("저장하지 못했습니다. 기기의 저장 공간이 부족할 수 있으니 진료실에 알려 주세요."); }
 }
 
 // =====================================================================
@@ -61,22 +61,34 @@ function applyFontScale() {
   document.documentElement.style.fontSize = `${Math.round(100 * (state.profile.fontScale || 1))}%`;
 }
 
-// 원고 본문(줄바꿈 텍스트) → HTML. 빈 줄로 문단 구분, "- " 목록, "1. " 번호 목록, 따옴표만 있는 문단은 인용.
+// 원고 본문(줄바꿈 텍스트) → HTML. 빈 줄로 문단 구분. "- " 는 목록, "1. " 는 번호 목록.
+// 한 블록 안에 제목줄과 목록이 섞여 있어도 (예: "리듬:\n- ...") 제목 + 목록으로 그린다.
 function renderBody(text) {
   if (!text) return "";
+  const isUl = (l) => /^- /.test(l), isOl = (l) => /^\d+\. /.test(l);
   return text.split(/\n\s*\n/).map((block) => {
     const lines = block.split("\n").map((l) => l.trim()).filter(Boolean);
     if (!lines.length) return "";
-    let lead = "";
-    let items = lines;
-    if (lines.length > 1 && /[:：]$/.test(lines[0]) && lines.slice(1).every((l) => /^(- |\d+\. )/.test(l))) {
-      lead = `<strong class="lead">${esc(lines[0])}</strong>`;
-      items = lines.slice(1);
-    }
-    if (items.every((l) => /^- /.test(l))) return lead + `<ul>${items.map((l) => `<li>${esc(l.slice(2))}</li>`).join("")}</ul>`;
-    if (items.every((l) => /^\d+\. /.test(l))) return lead + `<ol>${items.map((l) => `<li>${esc(l.replace(/^\d+\. /, ""))}</li>`).join("")}</ol>`;
     if (lines.length === 1 && /^["“].+["”]$/.test(lines[0])) return `<blockquote>${esc(lines[0])}</blockquote>`;
-    return `<p>${lines.map(esc).join("<br>")}</p>`;
+    const hasList = lines.some((l) => isUl(l) || isOl(l));
+    const allOl = lines.every(isOl), allUl = lines.every(isUl);
+    if (!hasList) return `<p>${lines.map(esc).join("<br>")}</p>`;
+    if (allUl) return `<ul>${lines.map((l) => `<li>${esc(l.slice(2))}</li>`).join("")}</ul>`;
+    if (allOl) return `<ol>${lines.map((l) => `<li>${esc(l.replace(/^\d+\. /, ""))}</li>`).join("")}</ol>`;
+    // 섞인 블록: 목록이 아닌 줄은 소제목(strong.lead), 이어지는 목록은 묶어서
+    let out = "", buf = [], bufType = null;
+    const flush = () => { if (!buf.length) return; out += bufType === "ol" ? `<ol>${buf.map((l) => `<li>${esc(l.replace(/^\d+\. /, ""))}</li>`).join("")}</ol>` : `<ul>${buf.map((l) => `<li>${esc(l.slice(2))}</li>`).join("")}</ul>`; buf = []; bufType = null; };
+    for (let i = 0; i < lines.length; i++) {
+      const l = lines[i];
+      const ty = isUl(l) ? "ul" : isOl(l) ? "ol" : null;
+      // 번호줄 뒤에 "- " 항목이 오면 번호줄은 소제목으로 취급
+      if (ty === "ol" && lines[i + 1] && isUl(lines[i + 1])) { flush(); out += `<strong class="lead">${esc(l)}</strong>`; continue; }
+      if (!ty) { flush(); out += `<strong class="lead">${esc(l)}</strong>`; continue; }
+      if (bufType && bufType !== ty) flush();
+      bufType = ty; buf.push(l);
+    }
+    flush();
+    return out;
   }).join("");
 }
 
@@ -102,7 +114,7 @@ function setStatus(id, st) {
 }
 function completedCount() { return P.modules.filter((m) => modStatus(m.id) === "completed").length; }
 
-const KIND_LABEL = { learn: "읽기", write: "적기", homework: "이번 주 할 일", assess: "설문", summary: "정리" };
+const KIND_LABEL = { learn: "읽기", write: "적기", homework: "숙제", assess: "설문", summary: "정리" };
 
 // =====================================================================
 //  라우터 + 화면 전환 효과
@@ -219,7 +231,7 @@ function renderHome(main) {
       </a>
       <a class="card ${today ? "" : "accent"}" href="#/today">
         <div class="eyebrow">오늘의 일기</div>
-        <h3>${today ? "오늘 기록을 마쳤습니다" : "아직 기록하지 않았어요"}</h3>
+        <h3>${today ? "오늘 기록을 마쳤습니다" : "아직 기록하지 않았습니다"}</h3>
         ${today ? `<p class="muted small">이명 크기 ${today.tinnitus} · 신경 쓰임 ${today.annoyance} · 수면 영향 ${today.sleep}<br>눌러서 수정할 수 있습니다</p>` : `<p class="muted small">1분이면 충분합니다. 이명 크기와 신경 쓰인 정도를 남겨 주세요.</p>`}
       </a>
       <a class="card" href="#/sound">
@@ -352,7 +364,7 @@ function renderModule(main, [id, idxStr, flag]) {
       </div>
       <article class="screen">
         ${showArt ? ART.week(m.week, "screen-art") : ""}
-        <div class="eyebrow">${esc(m.title)}</div>
+        ${screen.title.replace(/\s/g, "") === m.title.replace(/\s/g, "") ? "" : `<div class="eyebrow">${esc(m.title)}</div>`}
         <h1>${esc(screen.title)}</h1>
         <div class="tts no-print"><button class="btn ghost sm" id="tts-btn" type="button">🔈 소리로 듣기</button></div>
         <div class="body">${renderBody(screen.body)}</div>
@@ -439,7 +451,7 @@ function renderWorksheet(wrap, m, screen) {
     </label>`).join("")}
     <div id="edit-bar" class="notice" hidden>이전 기록을 수정하고 있습니다. <button class="btn link sm" id="edit-cancel" type="button">수정 취소</button></div>
     ${!append && data.singleAt ? `<p class="status-line" id="single-saved">저장됨 · ${fmtDateTime(data.singleAt)}</p>` : ""}
-    ${!append && hasUnsaved ? `<div class="notice" id="draft-bar">저장하지 않은 수정 내용이 있습니다. 아래 '저장'을 누르거나 <button class="btn link sm" id="draft-drop" type="button">수정 내용 버리기</button></div>` : ""}
+    ${!append && hasUnsaved ? `<div class="notice" id="draft-bar">저장하지 않은 수정 내용이 있습니다. 아래 '${esc(screen.button || "저장")}'을 누르거나 <button class="btn link sm" id="draft-drop" type="button">수정 내용 버리기</button></div>` : ""}
     ${append ? `<div class="btn-row no-print" id="append-done" ${data.entries.length ? "" : "hidden"}><button class="btn ghost" id="append-next" type="button">다 적었어요 · 다음으로 ›</button></div><div class="entries" id="entries"></div>` : ""}`;
   if ($("#draft-drop")) $("#draft-drop").onclick = () => { delete state.drafts[m.id]; save(); renderWorksheet(wrap, m, screen); };
   if ($("#append-next")) $("#append-next").onclick = () => finishModule(m, "");
@@ -592,7 +604,7 @@ function renderToday(main, [dateArg]) {
       <div class="date-nav no-print">
         <a class="btn ghost sm" href="#/today/${shiftDate(key, -1)}">‹ 전날</a>
         ${isToday ? `<span class="pill">오늘</span>` : `<a class="btn ghost sm" href="#/today">오늘로</a>`}
-        ${isToday ? "" : `<a class="btn ghost sm" href="#/today/${shiftDate(key, 1)}">다음날 ›</a>`}
+        ${isToday ? "" : `<a class="btn ghost sm" href="#/today/${shiftDate(key, 1)}">다음 날 ›</a>`}
       </div>
     </section>
     <form class="card" id="diary-form">
@@ -602,7 +614,7 @@ function renderToday(main, [dateArg]) {
       ${slider("sleep", "간밤 수면에 미친 영향", "이명이 잠드는 것을 얼마나 방해했나요", d.sleep ?? null, "전혀", "매우")}
       <hr class="divider">
       <label class="check"><input type="checkbox" id="in-mindfulness" ${d.mindfulness ? "checked" : ""}> 마음챙김 호흡을 했어요</label>
-      <label class="check"><input type="checkbox" id="in-pmr" ${d.pmr ? "checked" : ""}> 근육이완(PMR)을 했어요</label>
+      <label class="check"><input type="checkbox" id="in-pmr" ${d.pmr ? "checked" : ""}> 근육이완을 했어요</label>
       <hr class="divider">
       <label class="field"><span class="label">이명이 더 심해진 계기 <span class="muted">(선택)</span></span><input type="text" id="in-trigger" value="${esc(d.trigger || "")}" placeholder="예: 시끄러운 곳, 피로, 커피"></label>
       <label class="field"><span class="label">메모 <span class="muted">(선택)</span></span><span class="hint">오늘 느낀 점을 자유롭게. 연습한 것(이완 전후 긴장도, 잠든 시간 등)을 적어 두면 진료 때 도움이 됩니다.</span><textarea id="in-memo" placeholder="예: 근육이완 20분, 긴장도 7 → 3">${esc(d.memo || "")}</textarea></label>
@@ -775,8 +787,8 @@ function renderRecords(main) {
       <div class="section-head"><h2>일기 추이</h2><a class="more" href="#/today">오늘 일기</a></div>
       <div class="card">${days.length >= 2 ? renderChart(days) : `<p class="muted" style="margin:0">일기를 이틀 이상 기록하면 추이가 표시됩니다.</p>`}</div>
       <div class="card">
-        ${days.length ? `<div class="table-wrap"><table><thead><tr><th>날짜</th><th>크기</th><th>신경</th><th>수면</th><th>실습</th><th>메모</th></tr></thead><tbody>
-          ${days.slice().reverse().map((k) => { const d = state.diary[k]; return `<tr><td><a href="#/today/${k}">${k.slice(5).replace("-", "/")}</a></td><td class="num">${d.tinnitus}</td><td class="num">${d.annoyance}</td><td class="num">${d.sleep}</td><td>${[d.mindfulness ? "마음챙김" : "", d.pmr ? "PMR" : ""].filter(Boolean).join(", ")}</td><td class="small">${esc([d.trigger, d.memo].filter(Boolean).join(" · "))}</td></tr>`; }).join("")}
+        ${days.length ? `<div class="table-wrap"><table><thead><tr><th>날짜</th><th>크기</th><th>신경 쓰임</th><th>수면</th><th>실습</th><th>메모</th></tr></thead><tbody>
+          ${days.slice().reverse().map((k) => { const d = state.diary[k]; return `<tr><td><a href="#/today/${k}">${k.slice(5).replace("-", "/")}</a></td><td class="num">${d.tinnitus}</td><td class="num">${d.annoyance}</td><td class="num">${d.sleep}</td><td>${[d.mindfulness ? "마음챙김" : "", d.pmr ? "근육이완" : ""].filter(Boolean).join(", ")}</td><td class="small">${esc([d.trigger, d.memo].filter(Boolean).join(" · "))}</td></tr>`; }).join("")}
         </tbody></table></div>` : `<p class="muted" style="margin:0">아직 일기가 없습니다.</p>`}
       </div>
     </section>
@@ -837,7 +849,7 @@ function renderShare(main) {
     <section class="hero" style="padding-bottom:12px">
       <div class="eyebrow">진료 때</div>
       <h1>기록 전달</h1>
-      <p class="lead">이 화면을 열어 선생님께 보여 주세요. 병원 태블릿이 QR을 읽어 가며, 다 받으면 선생님이 알려 드립니다. 화면 밝기를 최대로 올려 두면 좋습니다.</p>
+      <p class="lead">이 화면을 열어 선생님께 보여 주세요. 병원 태블릿으로 QR을 읽습니다. 다 받으면 선생님이 알려 드립니다. 화면 밝기를 최대로 올려 두면 좋습니다.</p>
     </section>
     <div class="card share-card">
       <div class="qr-wrap" id="qr"><div class="muted">준비 중…</div></div>
@@ -868,7 +880,7 @@ function renderShare(main) {
     frames = f;
     $("#qr-hint").textContent = `전체 ${frames.length}조각 · ${(bytes / 1024).toFixed(1)}KB · 약 ${Math.ceil(frames.length * interval / 1000)}초에 한 바퀴`;
     start();
-  }).catch((e) => { qrEl.innerHTML = `<p class="muted">QR을 만들 수 없습니다: ${esc(e.message)}</p>`; });
+  }).catch((e) => { qrEl.innerHTML = `<p class="muted">QR을 만들지 못했습니다. 설정에서 파일로 내보내 전달해 주세요.</p>`; });
   $("#qr-slower").onclick = () => { interval = interval >= 1500 ? 700 : interval + 400; $("#qr-slower").textContent = interval >= 1500 ? "보통 속도" : "천천히"; start(); };
   $("#qr-restart").onclick = start;
 }

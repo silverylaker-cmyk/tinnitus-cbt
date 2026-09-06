@@ -13,12 +13,12 @@ OUT = ROOT / "data" / "program.js"
 # (week, kind, title, content file)  — backend/scripts/seed_program.py 의 순서 그대로
 MODULES = [
     (1, "learn",     "이명 이해하기 — 악순환과 안심 정보", "week1/psychoeducation.json"),
-    (1, "write",     "워크시트: 나의 악순환 그리기",        "week1/worksheet.json"),
+    (1, "write",     "나의 악순환 그리기",        "week1/worksheet.json"),
     (1, "homework",  "이번 주 숙제: 일기 시작하기",          "week1/homework.json"),
     (1, "assess",    "시작 평가 설문지 (THI)",              "week1/assessment.json"),
     (1, "summary",   "1주차 정리",                        "week1/summary.json"),
     (2, "learn",     "생각이 이명 경험을 바꿉니다",          "week2/psychoeducation.json"),
-    (2, "write",     "사고 기록지 작성",                    "week2/worksheet.json"),
+    (2, "write",     "사고기록지 연습",                    "week2/worksheet.json"),
     (2, "homework",  "이번 주 숙제: 사고기록지",             "week2/homework.json"),
     (2, "summary",   "2주차 정리",                        "week2/summary.json"),
     (3, "learn",     "주의는 유한한 자원입니다",             "week3/psychoeducation.json"),

@@ -76,7 +76,7 @@
     function finish(done) {
       clearInterval(timer); timer = null;
       circle.style.transform = "scale(0.6)"; word.textContent = done ? "잘하셨어요" : "준비";
-      phase.textContent = done ? "연습을 마쳤습니다. 오늘 일기의 '마음챙김' 칸에 체크해 두세요." : "시작을 누르면 원이 커졌다 작아집니다";
+      phase.textContent = done ? "연습을 마쳤습니다. 오늘 일기에 '마음챙김' 체크가 자동으로 표시되었습니다. 일기도 저장해 주세요." : "시작을 누르면 원이 커졌다 작아집니다";
       left.textContent = ""; start.hidden = false; stop.hidden = true; sel.disabled = false;
       if (done && opts.onDone) opts.onDone();
     }
@@ -125,7 +125,7 @@
       el.querySelector(".pmr").classList.remove("tense");
       countEl.textContent = ""; bar.style.width = "0%";
       partEl.innerHTML = done ? "<b>모든 부위를 마쳤습니다</b><span>1~2분간 천천히 복식호흡을 하며 전신이 무겁고 따뜻해진 느낌을 그대로 느껴보세요. 일어날 때는 천천히.</span>" : "시작을 누르면 한 부위씩 안내합니다";
-      howEl.textContent = done ? "오늘 일기의 '근육이완(PMR)' 칸에 체크하고 전후 긴장도를 메모해 두세요." : `긴장 ${TENSE}초 → 이완 ${RELAX}초.`;
+      howEl.textContent = done ? "오늘 일기에 '근육이완' 체크가 자동으로 표시되었습니다. 메모란에 전후 긴장도를 적고 저장해 주세요." : `긴장 ${TENSE}초 → 이완 ${RELAX}초.`;
       stepEl.textContent = `전신 ${parts.length}부위`;
       start.hidden = false; next.hidden = true; stop.hidden = true;
       if (done && opts.onDone) opts.onDone();

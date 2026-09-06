@@ -6,11 +6,11 @@ window.SOUNDS = {
   groups: [
     {
       id: "therapy",
-      title: "이명 사운드 요법",
+      title: "이명 소리 치료",
       desc: "클리닉에서 안내받은 소리를 선택해 재생하세요. 재생·정지 시간은 자동으로 기록됩니다.",
       items: [
         { id: "notch",   title: "노치 사운드",  desc: "이명 주파수 대역을 걸러낸 소리입니다.", youtubeId: "" },
-        { id: "cr",      title: "CR 톤",        desc: "이명 주파수 주변 4개 톤을 무작위 순서로 반복합니다. ※ CR(Coordinated Reset)은 연구 중인 요법(investigational)입니다.", youtubeId: "" },
+        { id: "cr",      title: "CR 톤",        desc: "이명 주파수 주변 4개 톤을 무작위 순서로 반복합니다. ※ CR(Coordinated Reset)은 아직 연구 중인 방법입니다.", youtubeId: "" },
         { id: "broadband", title: "광대역 소리", desc: "부드러운 배경 소리입니다.", youtubeId: "" },
       ],
     },
