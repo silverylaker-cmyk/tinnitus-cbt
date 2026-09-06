@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@300;400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
   <a class="skip" href="#main">본문으로 건너뛰기</a>
@@ -35,13 +35,16 @@
 
   <footer class="foot">
     <p>이 프로그램은 담당 의료진의 안내와 함께 사용하는 보조 도구입니다. 기록은 이 기기의 브라우저에만 저장됩니다.</p>
-    <p><a href="#/settings">설정 · 데이터 내보내기</a></p>
+    <p><a href="#/settings">설정 · 글자 크기 · 데이터 내보내기</a> · <a href="clinic.html">의료진용</a></p>
   </footer>
 
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
-  <script src="data/program.js?v=1"></script>
+  <script src="data/program.js?v=4"></script>
   <script src="data/sounds.js?v=1"></script>
-  <script src="app.js?v=3"></script>
+  <script src="vendor/qrcode.min.js"></script>
+  <script src="transfer.js?v=4"></script>
+  <script src="illustrations.js?v=4"></script>
+  <script src="app.js?v=4"></script>
 </body>
 </html>

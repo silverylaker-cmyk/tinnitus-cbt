@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F5F3EC">
+  <meta name="robots" content="noindex">
+  <title>이명 관리 프로그램 · 의료진용</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=4">
+  <style>
+    .scan { position: relative; background: #111; border-radius: var(--radius-sm); overflow: hidden; aspect-ratio: 4 / 3; max-height: 60vh; }
+    .scan video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .scan .frame { position: absolute; inset: 12%; border: 3px solid rgba(255,255,255,.75); border-radius: 12px; pointer-events: none; }
+    .scan .overlay { position: absolute; left: 0; right: 0; bottom: 0; padding: 10px 14px; background: rgba(0,0,0,.55); color: #fff; font-size: 1rem; display: flex; justify-content: space-between; gap: 12px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .chips i { display: inline-grid; place-items: center; min-width: 30px; height: 30px; border-radius: 8px; background: var(--bg-2); color: var(--ink-3); font-style: normal; font-size: .85rem; }
+    .chips i.got { background: var(--good); color: #fff; }
+    .patient-row { display: flex; align-items: center; gap: 14px; padding: 14px 6px; border-top: 1px solid var(--line); text-decoration: none; }
+    .patient-row:first-child { border-top: 0; }
+    .patient-row .pid { font-family: var(--serif); font-size: 1.2rem; min-width: 90px; }
+    .patient-row .meta { flex: 1; color: var(--ink-3); font-size: .92rem; }
+    .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+    .stat-row .card { margin: 0; padding: 16px; }
+    .stat-row .stat { font-size: 1.9rem; }
+    .topbar .nav a { min-height: 0; }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="clinic.html"><span class="brand-mark" aria-hidden="true"></span><span class="brand-name">이명 관리 프로그램 <span class="pill accent">의료진용</span></span></a>
+    <nav class="nav" aria-label="주 메뉴">
+      <a href="#/scan" data-route="scan"><span class="nav-icon" aria-hidden="true">▣</span><span>QR 받기</span></a>
+      <a href="#/patients" data-route="patients"><span class="nav-icon" aria-hidden="true">≡</span><span>환자 목록</span></a>
+      <a href="#/data" data-route="data"><span class="nav-icon" aria-hidden="true">⇅</span><span>백업</span></a>
+    </nav>
+  </header>
+  <main id="main" class="page" tabindex="-1"></main>
+  <footer class="foot">
+    <p>받은 기록은 이 태블릿의 브라우저에만 저장됩니다. 클리닉 기기에서만 사용하고, 정기적으로 백업 파일을 내려받아 두세요.</p>
+    <p><a href="./">환자용 앱으로</a></p>
+  </footer>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <script src="data/program.js?v=4"></script>
+  <script src="vendor/jsQR.js"></script>
+  <script src="transfer.js?v=4"></script>
+  <script src="clinic.js?v=4"></script>
+</body>
+</html>

@@ -24,6 +24,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
@@ -267,4 +268,111 @@ td.num { font-variant-numeric: tabular-nums; }
   .week-num { min-width: 52px; }
   .result-compare { grid-template-columns: 1fr; }
   .toast { bottom: 84px; width: calc(100% - 32px); text-align: center; }
+}
+
+/* =====================================================================
+   v2 — 전환 효과, 그림, 실습 도구, QR, 고령 사용성
+   ===================================================================== */
+
+/* ---------- 화면 전환 ---------- */
+.page.enter { animation: page-in .28s ease-out both; }
+@keyframes page-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+::view-transition-old(root) { animation: 160ms ease-in both vt-out; }
+::view-transition-new(root) { animation: 260ms ease-out both vt-in; }
+@keyframes vt-out { to { opacity: 0; transform: translateY(-6px); } }
+@keyframes vt-in { from { opacity: 0; transform: translateY(10px); } }
+
+/* ---------- 일러스트 ---------- */
+.art { display: block; }
+.art .draw { stroke-dasharray: 600; stroke-dashoffset: 600; animation: draw 1.6s ease-out forwards; }
+.art .draw.d2 { animation-delay: .35s; }
+.art .draw.d3 { animation-delay: .7s; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.hero.with-art { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; }
+.hero-art { width: 200px; height: 140px; }
+.hero-rings { width: 180px; height: 180px; }
+.hero-rings .ring { transform-origin: 100px 100px; animation: ring 8s ease-in-out infinite; }
+.hero-rings .r2 { animation-delay: -2s; } .hero-rings .r3 { animation-delay: -4s; }
+@keyframes ring { 0%, 100% { transform: scale(0.94); opacity: .7; } 50% { transform: scale(1.04); opacity: 1; } }
+.week-art { width: 64px; height: 46px; flex: none; }
+.week-art .draw { animation: none; stroke-dashoffset: 0; }
+.screen-art { width: 200px; height: 140px; margin: 0 auto 8px; }
+
+/* ---------- 악순환 고리 ---------- */
+.extra-title { margin: 28px 0 8px; }
+.cycle { margin: 0 0 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: center; }
+.cycle svg { width: 100%; max-width: 320px; margin: 0 auto; display: block; }
+.cycle .cyc-node, .cycle .cyc-arrow { animation: cyc-pulse 9s ease-in-out infinite; animation-delay: calc(var(--i) * 1.5s); opacity: .55; }
+.cycle .cyc-node circle { transition: stroke .3s; }
+@keyframes cyc-pulse { 0%, 22% { opacity: 1; } 14% { opacity: 1; } 30%, 100% { opacity: .55; } }
+.cycle-legend { list-style: none; padding: 0; margin: 0; font-size: .95rem; }
+.cycle-legend li { display: flex; gap: 10px; padding: 6px 0; align-items: baseline; animation: cyc-text 9s ease-in-out infinite; animation-delay: calc(var(--i) * 1.5s); }
+.cycle-legend li b { font-family: var(--serif); color: var(--accent); min-width: 18px; }
+@keyframes cyc-text { 0%, 22% { color: var(--ink); } 30%, 100% { color: var(--ink-3); } }
+
+/* ---------- 호흡 가이드 ---------- */
+.breath { text-align: center; padding: 8px 0 12px; }
+.breath-stage { height: 240px; display: grid; place-items: center; }
+.breath-circle { width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle at 50% 45%, #F3E2D9, #E8C9B8 70%, #D9A88F); display: grid; place-items: center; transform: scale(0.6); transition: transform .12s linear; box-shadow: 0 0 0 10px rgba(194,84,47,.08); }
+.breath-circle.live { box-shadow: 0 0 0 18px rgba(194,84,47,.08), 0 0 60px rgba(194,84,47,.15); }
+.breath-word { font-family: var(--serif); font-size: 1.5rem; color: var(--ink); }
+.breath-info { display: flex; justify-content: space-between; gap: 12px; margin: 8px 6px 4px; color: var(--ink-2); flex-wrap: wrap; }
+.btn-row.center { justify-content: center; }
+.pill-select { display: inline-flex; align-items: center; gap: 8px; }
+.pill-select select { width: auto; padding: 10px 14px; border-radius: 999px; }
+
+/* ---------- 근육이완 타이머 ---------- */
+.pmr { border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; background: var(--surface); transition: background .4s; }
+.pmr.tense { background: var(--accent-soft); }
+.pmr-head { display: flex; justify-content: space-between; align-items: baseline; }
+.pmr-count { font-family: var(--serif); font-size: 2.2rem; font-variant-numeric: tabular-nums; }
+.pmr-part { font-size: 1.25rem; margin: 12px 0 6px; min-height: 2.4em; }
+.pmr-part b { display: block; font-family: var(--serif); font-size: 1.6rem; font-weight: 400; }
+.pmr-part span { display: block; color: var(--ink-2); }
+.pmr-how { color: var(--ink-3); font-size: .95rem; margin-bottom: 12px; }
+.pmr-bar { height: 8px; background: var(--bg-2); border-radius: 4px; overflow: hidden; }
+.pmr-bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .2s linear; }
+
+/* ---------- QR ---------- */
+.share-card { text-align: center; }
+.qr-wrap { background: #fff; border-radius: var(--radius-sm); padding: 8px; display: grid; place-items: center; min-height: 280px; }
+.qr-wrap svg { width: min(100%, 420px); height: auto; display: block; }
+.qr-meta { display: flex; justify-content: space-between; gap: 12px; margin: 12px 4px 0; flex-wrap: wrap; }
+
+/* ---------- 고령 사용성: 큰 버튼, 고정 작업줄, 상태줄, 글자 크기 ---------- */
+.btn.big { padding: 15px 28px; font-size: 1.08rem; }
+.sticky-actions { position: sticky; bottom: 0; background: linear-gradient(to top, var(--bg) 70%, transparent); padding: 14px 0 10px; margin-top: 8px; z-index: 5; }
+.status-line { color: var(--ink-3); font-size: .9rem; margin: 6px 0 0; }
+.date-nav { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
+.fnum { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-ink); font-size: .8rem; margin-right: 8px; }
+.ws-note { margin-bottom: 14px; }
+.seg { display: inline-flex; border: 1px solid var(--line-2); border-radius: 999px; overflow: hidden; }
+.seg button { border: 0; background: none; padding: 12px 18px; cursor: pointer; }
+.seg button.on { background: var(--ink); color: #fff; }
+.mod { min-height: 56px; }
+.mod .t { display: flex; flex-direction: column; }
+.mod .kind { font-size: .8rem; color: var(--ink-3); }
+.mod .chev { color: var(--line-2); font-size: 1.4rem; }
+.mod.write .t::after { content: none; }
+.mod.write .t > :first-child::after { content: " ✎"; color: var(--accent); }
+.week-head { gap: 14px; }
+.week-title .week-num { display: block; font-size: .8rem; letter-spacing: .06em; color: var(--accent); }
+.q-opts label { padding: 13px 12px; min-height: 48px; }
+.viewer-top .back { font-size: 1rem; }
+.toast { font-size: 1.02rem; padding: 14px 22px; max-width: 560px; }
+
+@media (max-width: 720px) {
+  .hero.with-art { grid-template-columns: 1fr; }
+  .hero-art, .hero-rings { display: none; }
+  .cycle { grid-template-columns: 1fr; }
+  .nav a { min-height: 48px; justify-content: center; }
+  .sticky-actions { bottom: calc(64px + env(safe-area-inset-bottom)); }
+  .breath-circle { width: 170px; height: 170px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page.enter, .art .draw, .hero-rings .ring, .cycle .cyc-node, .cycle .cyc-arrow, .cycle-legend li { animation: none !important; }
+  .art .draw { stroke-dashoffset: 0; }
+  .cycle .cyc-node, .cycle .cyc-arrow { opacity: 1; }
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
 }

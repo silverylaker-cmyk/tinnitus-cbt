@@ -7,7 +7,7 @@
 import json, pathlib
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-SRC = ROOT.parent / "pwa" / "content"
+SRC = ROOT / "content"
 OUT = ROOT / "data" / "program.js"
 
 # (week, kind, title, content file)  — backend/scripts/seed_program.py 의 순서 그대로
