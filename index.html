@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@300;400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=4">
+  <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
   <a class="skip" href="#main">본문으로 건너뛰기</a>
@@ -22,11 +22,12 @@
       <span class="brand-mark" aria-hidden="true"></span>
       <span class="brand-name">이명 관리 프로그램</span>
     </a>
+    <button class="font-btn" id="font-btn" type="button" aria-label="글자 크기 바꾸기" title="글자 크기">가<small>A</small></button>
     <nav class="nav" aria-label="주 메뉴">
       <a href="#/" data-route="home"><span class="nav-icon" aria-hidden="true">⌂</span><span>홈</span></a>
       <a href="#/program" data-route="program"><span class="nav-icon" aria-hidden="true">▤</span><span>프로그램</span></a>
-      <a href="#/today" data-route="today"><span class="nav-icon" aria-hidden="true">✎</span><span>오늘</span></a>
-      <a href="#/sound" data-route="sound"><span class="nav-icon" aria-hidden="true">♫</span><span>사운드</span></a>
+      <a href="#/today" data-route="today"><span class="nav-icon" aria-hidden="true">✎</span><span>일기</span></a>
+      <a href="#/sound" data-route="sound"><span class="nav-icon" aria-hidden="true">♫</span><span>소리</span></a>
       <a href="#/records" data-route="records"><span class="nav-icon" aria-hidden="true">≡</span><span>기록</span></a>
     </nav>
   </header>
@@ -40,11 +41,11 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
-  <script src="data/program.js?v=4"></script>
+  <script src="data/program.js?v=5"></script>
   <script src="data/sounds.js?v=1"></script>
   <script src="vendor/qrcode.min.js"></script>
-  <script src="transfer.js?v=4"></script>
-  <script src="illustrations.js?v=4"></script>
-  <script src="app.js?v=4"></script>
+  <script src="transfer.js?v=5"></script>
+  <script src="illustrations.js?v=5"></script>
+  <script src="app.js?v=5"></script>
 </body>
 </html>

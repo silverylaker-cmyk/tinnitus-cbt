@@ -15,7 +15,7 @@
       if (w.entries && w.entries.length) o.e = w.entries.map((en) => [en.at, en.responses]);
       if (Object.keys(o).length) ws[id] = o;
     }
-    const diary = Object.keys(state.diary || {}).sort().map((k) => {
+    const diary = Object.keys(state.diary || {}).filter((k) => state.diary[k] && state.diary[k].at).sort().map((k) => {
       const d = state.diary[k];
       return [k, d.tinnitus, d.annoyance, d.sleep, d.mindfulness ? 1 : 0, d.pmr ? 1 : 0, d.trigger || "", d.memo || ""];
     });
