@@ -51,17 +51,18 @@ function renderScan(main) {
       <p class="lead">환자 앱의 <b>기록 전달 (QR)</b> 화면을 카메라 앞에 두세요. QR이 여러 조각으로 바뀌며 표시되고, 모두 받으면 자동으로 저장됩니다.</p>
     </section>
     <div class="card">
+      <div class="btn-row" style="margin:0 0 12px"><button class="btn" id="cam-start" type="button">카메라 켜기</button><button class="btn ghost" id="cam-flip" type="button">카메라 전환</button><button class="btn ghost" id="scan-reset" type="button">처음부터</button></div>
       <div class="scan"><video id="cam" playsinline muted autoplay></video><div class="frame"></div>
-        <div class="overlay"><span id="scan-state">카메라 준비 중…</span><span id="scan-count"></span></div></div>
+        <div class="overlay" aria-live="polite"><span id="scan-state">카메라 준비 중…</span><span id="scan-count"></span></div></div>
       <div class="chips" id="chips"></div>
-      <div class="btn-row"><button class="btn" id="cam-start" type="button">카메라 켜기</button><button class="btn ghost" id="cam-flip" type="button">카메라 전환</button><button class="btn ghost" id="scan-reset" type="button">처음부터</button></div>
       <p class="muted small" style="margin:12px 0 0">카메라가 켜지지 않으면 브라우저 주소창의 카메라 권한을 허용해 주세요. 환자가 파일로 내보낸 경우 <a href="#/data">백업</a> 화면에서 가져올 수 있습니다.</p>
     </div>
     <section class="section"><div class="section-head"><h2>최근 받은 기록</h2><a class="more" href="#/patients">전체 목록</a></div><div class="card">${recentList(5)}</div></section>`;
 
   const video = $("#cam"), stateEl = $("#scan-state"), countEl = $("#scan-count"), chips = $("#chips");
   const col = Transfer.collector();
-  let stream = null, raf = null, facing = "environment", lastScan = 0, done = false;
+  let stream = null, raf = null, facing = "environment", lastScan = 0, done = false, lock = null;
+  if (navigator.wakeLock) navigator.wakeLock.request("screen").then((l) => (lock = l)).catch(() => {}); // 스캔 중 화면 꺼짐 방지
   const canvas = document.createElement("canvas"), ctx = canvas.getContext("2d", { willReadFrequently: true });
 
   function showProgress(st) {
@@ -112,7 +113,7 @@ function renderScan(main) {
   $("#cam-start").onclick = start;
   $("#cam-flip").onclick = () => { facing = facing === "environment" ? "user" : "environment"; start(); };
   $("#scan-reset").onclick = () => { col.reset(); done = false; showProgress(null); stateEl.textContent = stream ? "QR을 비춰 주세요" : "카메라 준비 중…"; };
-  cleanup = () => { stop(); delete window.clinicTestDecode; };
+  cleanup = () => { stop(); if (lock) lock.release().catch(() => {}); delete window.clinicTestDecode; };
   if (navigator.mediaDevices?.getUserMedia) start(); else stateEl.textContent = "이 브라우저는 카메라를 지원하지 않습니다 (HTTPS 필요)";
 }
 
@@ -145,12 +146,12 @@ function chart(days, diary) {
   const last = days.slice(-56);
   const W = 720, H = 240, L = 34, R = 16, T = 16, B = 34, iw = W - L - R, ih = H - T - B;
   const x = (i) => L + (last.length === 1 ? iw / 2 : (i / (last.length - 1)) * iw), y = (v) => T + ih - (v / 10) * ih;
-  const grid = [0, 5, 10].map((v) => `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="#DBD7CB"/><text x="${L - 8}" y="${y(v) + 4}" text-anchor="end" font-size="11" fill="#7C7A73">${v}</text>`).join("");
+  const grid = [0, 5, 10].map((v) => `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="#DBD7CB"/><text x="${L - 8}" y="${y(v) + 4}" text-anchor="end" font-size="18" fill="#5F5D56">${v}</text>`).join("");
   const step = Math.max(1, Math.ceil(last.length / 7));
-  const xl = last.map((k, i) => (i % step === 0 || i === last.length - 1) ? `<text x="${x(i)}" y="${H - 10}" text-anchor="middle" font-size="11" fill="#7C7A73">${k.slice(5).replace("-", "/")}</text>` : "").join("");
+  const xl = last.map((k, i) => (i % step === 0 || i === last.length - 1) ? `<text x="${x(i)}" y="${H - 8}" text-anchor="middle" font-size="18" fill="#5F5D56">${k.slice(5).replace("-", "/")}</text>` : "").join("");
   const lines = SERIES.map((s) => `<polyline points="${last.map((k, i) => `${x(i).toFixed(1)},${y(diary[k][s.key] ?? 0).toFixed(1)}`).join(" ")}" fill="none" stroke="${s.color}" stroke-width="2" stroke-linejoin="round"/>` +
     last.map((k, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(diary[k][s.key] ?? 0).toFixed(1)}" r="3" fill="${s.color}" stroke="#FCFBF8" stroke-width="2"><title>${k} ${s.label} ${diary[k][s.key]}</title></circle>`).join("")).join("");
-  return `<div class="chart-wrap"><svg class="chart" viewBox="0 0 ${W} ${H}" role="img">${grid}${xl}${lines}</svg></div><div class="legend">${SERIES.map((s) => `<span><i style="background:${s.color}"></i>${s.label}</span>`).join("")}</div>`;
+  return `<div class="chart-wrap"><svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="일기 추이 그래프">${grid}${xl}${lines}</svg></div><div class="legend">${SERIES.map((s) => `<span><i style="background:${s.color}"></i>${s.label}</span>`).join("")}</div>`;
 }
 function avg(arr) { arr = arr.filter((v) => v != null); return arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1) : "-"; }
 
@@ -210,7 +211,7 @@ function renderPatient(main, [id]) {
       <div class="card">${ex.sounds.length ? `<div class="table-wrap"><table><thead><tr><th>날짜</th><th>주간</th><th>야간</th><th>소리</th></tr></thead><tbody>${ex.sounds.slice().reverse().slice(0, 60).map((s) => `<tr><td>${s.day.slice(2)}</td><td>${fmtDur(s.daySec)}</td><td>${fmtDur(s.nightSec)}</td><td class="small">${esc(Object.entries(s.byTitle).map(([t, sec]) => `${t} ${fmtDur(sec)}`).join(", "))}</td></tr>`).join("")}</tbody></table></div>` : `<p class="muted" style="margin:0">사용 기록이 없습니다.</p>`}</div></section>
 
     <section class="section"><div class="section-head"><h2>진료 메모</h2></div>
-      <div class="card"><textarea id="p-note" rows="4" placeholder="이 태블릿에만 저장되는 메모입니다.">${esc(db.notes[id] || "")}</textarea><div class="btn-row"><button class="btn" id="p-note-save" type="button">메모 저장</button></div></div></section>`;
+      <div class="card"><label class="field"><span class="label">메모 <span class="muted small">(이 태블릿에만 저장)</span></span><textarea id="p-note" rows="4" placeholder="다음 진료 때 볼 메모">${esc(db.notes[id] || "")}</textarea></label><div class="btn-row"><button class="btn" id="p-note-save" type="button">메모 저장</button></div></div></section>`;
   $("#p-print").onclick = () => window.print();
   $("#p-export").onclick = () => download(`이명기록_${ex.nickname || id}_${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify({ clinicExport: 1, id, ...r, note: db.notes[id] || "" }, null, 2));
   $("#p-del").onclick = () => { if (!confirm("이 환자의 기록을 이 태블릿에서 삭제할까요?")) return; delete db.patients[id]; delete db.notes[id]; save(); location.hash = "#/patients"; toast("삭제했습니다."); };
@@ -232,7 +233,7 @@ function renderData(main) {
     <div class="card"><h3>파일 가져오기</h3><p class="muted">환자가 앱에서 내보낸 파일, 이 페이지의 환자 JSON, 전체 백업 파일 모두 가져올 수 있습니다. 같은 번호의 환자는 최신 내용으로 바뀝니다.</p>
       <div class="btn-row"><button class="btn ghost" id="d-import" type="button">파일 선택</button><input type="file" id="d-file" accept="application/json,.json" multiple hidden></div></div>
     <div class="card"><h3>붙여넣기로 받기</h3><p class="muted">QR 조각 문자열을 직접 붙여넣어 시험할 수 있습니다 (개발·점검용).</p>
-      <textarea id="d-paste" rows="3" placeholder="T1|...."></textarea><div class="btn-row"><button class="btn ghost" id="d-paste-btn" type="button">조각 추가</button><span id="d-paste-st" class="muted"></span></div></div>`;
+      <label class="field"><span class="label">조각 문자열</span><textarea id="d-paste" rows="3" placeholder="T1|...."></textarea></label><div class="btn-row"><button class="btn ghost" id="d-paste-btn" type="button">조각 추가</button><span id="d-paste-st" class="muted"></span></div></div>`;
   $("#d-export").onclick = () => download(`이명클리닉_백업_${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify({ clinicBackup: 1, ...db }, null, 2));
   $("#d-import").onclick = () => $("#d-file").click();
   $("#d-file").onchange = async (e) => {

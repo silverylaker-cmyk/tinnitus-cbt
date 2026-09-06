@@ -134,6 +134,7 @@ function paint() {
   if (cleanup) { try { cleanup(); } catch (e) {} cleanup = null; }
   main.innerHTML = "";
   fn(main, rest);
+  const h1 = $("h1", main); document.title = (h1 ? h1.textContent.trim() + " · " : "") + "이명 관리 프로그램";
   main.focus({ preventScroll: true });
   document.querySelectorAll(".nav a").forEach((a) => {
     const r = a.dataset.route;
@@ -142,10 +143,9 @@ function paint() {
   window.scrollTo({ top: 0 });
 }
 function route() {
-  if (document.startViewTransition && !reduceMotion()) {
-    const t = document.startViewTransition(paint);
-    for (const k of ["ready", "finished", "updateCallbackDone"]) if (t[k]) t[k].catch(() => {}); // 탭이 숨겨졌거나 연속 이동 시 전환이 중단되는 것은 정상
-  } else { paint(); const m = $("#main"); m.classList.remove("enter"); void m.offsetWidth; m.classList.add("enter"); }
+  // 화면 전환: CSS 애니메이션 (View Transitions API는 숨겨진 탭·일부 브라우저에서 콜백이 지연되어 사용하지 않음)
+  paint();
+  if (!reduceMotion()) { const m = $("#main"); m.classList.remove("enter"); void m.offsetWidth; m.classList.add("enter"); }
 }
 window.addEventListener("hashchange", route);
 window.addEventListener("load", () => {
@@ -307,12 +307,12 @@ function renderProgram(main) {
     const div = document.createElement("div");
     div.className = "week" + (open ? "" : " locked");
     div.innerHTML = `
-      <button class="week-head" aria-expanded="${expanded}" ${open ? "" : "disabled"}>
+      <h3><button class="week-head" aria-expanded="${expanded}" aria-controls="wb-${wk.week}" ${open ? "" : "disabled"}>
         ${ART.week(wk.week, "week-art")}
-        <span class="week-title"><span class="week-num">${wk.week}주차</span><h3>${esc(wk.title)}</h3><span class="sub">${esc(wk.subtitle)}</span></span>
+        <span class="week-title"><span class="week-num">${wk.week}주차</span><span class="week-h">${esc(wk.title)}</span><span class="sub">${esc(wk.subtitle)}</span></span>
         <span class="week-status">${open ? (doneN === mods.length ? "완료 ✓" : `${doneN}/${mods.length}`) : `🔒 잠김<span class="week-open">${fmtDate(shiftDate(state.profile.startDate, (wk.week - 1) * 7)).slice(6)}에 열림</span>`}</span>
-      </button>
-      <div class="week-body" ${expanded ? "" : "hidden"}>${renderModuleList(mods)}</div>`;
+      </button></h3>
+      <div class="week-body" id="wb-${wk.week}" ${expanded ? "" : "hidden"}>${renderModuleList(mods)}</div>`;
     const head = $(".week-head", div), body = $(".week-body", div);
     head.onclick = () => { body.hidden = !body.hidden; head.setAttribute("aria-expanded", String(!body.hidden)); };
     wrap.appendChild(div);
@@ -355,6 +355,7 @@ function renderModule(main, [id, idxStr, flag]) {
   const isLast = idx === m.screens.length - 1;
   const steps = m.screens.map((_, i) => `<i class="${i <= idx ? "on" : ""}"></i>`).join("");
   const showArt = idx === 0 && m.kind !== "write" && screen.type === "text";
+  const artSeen = sessionStorage.getItem("art-" + m.week); sessionStorage.setItem("art-" + m.week, "1");
   const extra = EXTRAS[`${m.id}:${idx}`];
   const backMode = flag === "back" || flag === "entries";
   const already = modStatus(m.id) === "completed";
@@ -363,12 +364,12 @@ function renderModule(main, [id, idxStr, flag]) {
   main.innerHTML = `
     <div class="viewer">
       <div class="viewer-top">
-        ${backMode ? `<a href="#" class="back" id="back-top">‹ 돌아가기</a>` : `<a href="#/program" class="back">‹ 목록</a>`}
+        ${backMode ? `<a href="#" class="back" id="back-top"><span aria-hidden="true">‹</span> 돌아가기</a>` : `<a href="#/program" class="back"><span aria-hidden="true">‹</span> 목록</a>`}
         <span>${m.week}주차 · ${KIND_LABEL[m.kind]} · ${idx + 1}/${m.screens.length}</span>
         <span class="steps" aria-hidden="true">${steps}</span>
       </div>
       <article class="screen">
-        ${showArt ? ART.week(m.week, "screen-art") : ""}
+        ${showArt ? ART.week(m.week, "screen-art" + (artSeen ? " seen" : "")) : ""}
         ${screen.title.replace(/\s/g, "") === m.title.replace(/\s/g, "") ? "" : `<div class="eyebrow">${esc(m.title)}</div>`}
         <h1>${esc(screen.title)}</h1>
         <div class="tts no-print"><button class="btn ghost sm" id="tts-btn" type="button">🔈 소리로 듣기</button></div>
@@ -376,7 +377,7 @@ function renderModule(main, [id, idxStr, flag]) {
         <div id="extra"></div>
         <div id="fields"></div>
         <div class="btn-row between no-print sticky-actions">
-          ${backMode ? `<button class="btn ghost" id="back-btn" type="button">‹ 돌아가기</button>` : idx > 0 ? `<a class="btn ghost" href="#/module/${m.id}/${idx - 1}">‹ 이전</a>` : `<a class="btn ghost" href="#/program">목록</a>`}
+          ${backMode ? `<button class="btn ghost" id="back-btn" type="button"><span aria-hidden="true">‹</span> 돌아가기</button>` : idx > 0 ? `<a class="btn ghost" href="#/module/${m.id}/${idx - 1}"><span aria-hidden="true">‹</span> 이전</a>` : `<a class="btn ghost" href="#/program">목록</a>`}
           <button class="btn accent big" id="next-btn" type="button">${esc(nextLabel)}${isLast || screen.type !== "text" ? "" : " ›"}</button>
         </div>
       </article>
@@ -433,15 +434,22 @@ let speaking = false;
 function toggleTTS(text) {
   if (!("speechSynthesis" in window)) return toast("이 브라우저는 소리로 듣기를 지원하지 않습니다.");
   if (speaking) return stopTTS();
-  const u = new SpeechSynthesisUtterance(text.replace(/[-—•]/g, " "));
-  u.lang = "ko-KR"; u.rate = 0.92;
-  const voice = speechSynthesis.getVoices().find((v) => v.lang.replace("_", "-").startsWith("ko"));
-  if (voice) u.voice = voice;
-  u.onend = u.onerror = () => { speaking = false; const b = $("#tts-btn"); if (b) b.textContent = "🔈 소리로 듣기"; };
-  speechSynthesis.cancel(); speechSynthesis.speak(u);
-  speaking = true; $("#tts-btn").textContent = "■ 멈추기";
+  const clean = text.replace(/[-—•]/g, " ");
+  const chunks = clean.split(/(?<=[.!?。])\s+|\n+/).map((s) => s.trim()).filter(Boolean); // 문장 단위로 나눠 긴 본문도 끊기지 않게
+  const voice = speechSynthesis.getVoices().find((v) => v.lang.replace("_", "-").toLowerCase().startsWith("ko"));
+  const done = () => { speaking = false; const b = $("#tts-btn"); if (b) { b.textContent = "🔈 소리로 듣기"; b.setAttribute("aria-pressed", "false"); } };
+  speechSynthesis.cancel();
+  chunks.forEach((c, i) => {
+    const u = new SpeechSynthesisUtterance(c);
+    u.lang = "ko-KR"; u.rate = 0.92; if (voice) u.voice = voice;
+    if (i === chunks.length - 1) u.onend = done;
+    u.onerror = () => { done(); toast("이 기기에서 한국어 읽어주기를 사용할 수 없습니다."); };
+    speechSynthesis.speak(u);
+  });
+  speaking = true; $("#tts-btn").textContent = "■ 멈추기"; $("#tts-btn").setAttribute("aria-pressed", "true");
 }
 function stopTTS() { if ("speechSynthesis" in window && speaking) { speechSynthesis.cancel(); speaking = false; } }
+window.speechSynthesis?.addEventListener?.("voiceschanged", () => {}); // iOS/Android에서 음성 목록을 미리 채움
 
 // --- 워크시트 ---
 function wsData(id) {
@@ -554,12 +562,13 @@ function renderQuestionnaire(wrap, m, screen) {
   wrap.innerHTML = `
     ${prev ? `<div class="notice ok">이미 ${fmtDateTime(prev.at)}에 제출한 설문입니다 (총점 ${prev.total}점). 이전 답이 채워져 있으니 고칠 문항만 바꾸고 다시 제출하면 새 결과로 바뀝니다. <a href="#/results">결과 보기</a></div>` : ""}
     <div class="card"><p class="muted" style="margin:0">${esc(q.instruction)}</p><p class="muted small" style="margin:8px 0 0">답한 내용은 자동으로 보관되어, 중간에 나갔다 와도 이어서 할 수 있습니다.</p></div>
-    <div class="q-progress muted small" id="q-progress"></div>
+    <div class="q-progress muted small" id="q-progress" aria-live="polite"></div>
     ${q.items.map((it, i) => `
-      <div class="q-item" data-key="${it.key}">
-        <div class="q-text"><span class="q-num">${i + 1}</span>${esc(it.text)}</div>
+      <div class="q-item" data-key="${it.key}"><fieldset>
+        <legend class="q-text"><span class="q-num">${i + 1}</span>${esc(it.text)}</legend>
         <div class="q-opts">${q.options.map((o) => `<label><input type="radio" name="${it.key}" value="${o.value}" ${String(draft[it.key]) === String(o.value) ? "checked" : ""}><span>${esc(o.label)}</span></label>`).join("")}</div>
-      </div>`).join("")}`;
+        <p class="err" role="alert" hidden>이 문항에 답해 주세요</p>
+      </fieldset></div>`).join("")}`;
   const updateProgress = () => { const n = q.items.filter((it) => document.querySelector(`input[name="${it.key}"]:checked`)).length; $("#q-progress").textContent = `${n} / ${q.items.length} 문항 답함`; };
   wrap.querySelectorAll("input[type=radio]").forEach((r) => r.addEventListener("change", () => { const d = state.drafts[m.id] || (state.drafts[m.id] = {}); d[r.name] = r.value; save(); updateProgress(); }));
   updateProgress();
@@ -573,13 +582,13 @@ function submitQuestionnaire(m, screen) {
   const q = P.questionnaires[screen.questionnaire_type];
   if (!q) { setStatus(m.id, "completed"); location.hash = "#/program"; return; }
   const answers = {}; let firstMissing = null;
-  document.querySelectorAll(".q-item").forEach((div) => div.classList.remove("missing"));
+  document.querySelectorAll(".q-item").forEach((div) => { div.classList.remove("missing"); $(".err", div).hidden = true; });
   for (const it of q.items) {
     const c = document.querySelector(`input[name="${it.key}"]:checked`);
-    if (!c) { const div = document.querySelector(`.q-item[data-key="${it.key}"]`); div.classList.add("missing"); firstMissing ||= div; continue; }
+    if (!c) { const div = document.querySelector(`.q-item[data-key="${it.key}"]`); div.classList.add("missing"); $(".err", div).hidden = false; firstMissing ||= div; continue; }
     answers[it.key] = Number(c.value);
   }
-  if (firstMissing) { toast("아직 답하지 않은 문항이 있습니다. 붉게 표시된 문항을 확인해 주세요."); firstMissing.scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "center" }); return; }
+  if (firstMissing) { toast("아직 답하지 않은 문항이 있습니다. 붉게 표시된 문항을 확인해 주세요.", 8000); firstMissing.scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "center" }); return; }
   const total = Object.values(answers).reduce((a, b) => a + b, 0);
   state.questionnaires = state.questionnaires.filter((r) => !(r.type === q.type && r.timepoint === screen.timepoint_label));
   state.questionnaires.push({ type: q.type, timepoint: screen.timepoint_label, at: new Date().toISOString(), answers, total, severity: thiSeverity(total) });
@@ -621,7 +630,7 @@ function renderToday(main, [dateArg]) {
   const slider = (id, label, hint, val, lo, hi) => `
     <div class="slider ${val == null ? "unset" : ""}" id="sl-${id}">
       <div class="slider-head"><span class="label" style="font-weight:500">${label}</span><span class="val"><output id="out-${id}">${val ?? "–"}</output><small> / 10</small></span></div>
-      <div class="scale" role="radiogroup" aria-label="${label}">${Array.from({ length: 11 }, (_, v) => `<button type="button" class="${val === v ? "on" : ""}" data-id="${id}" data-v="${v}" aria-pressed="${val === v}">${v}</button>`).join("")}</div>
+      <div class="scale" role="radiogroup" aria-label="${label}">${Array.from({ length: 11 }, (_, v) => `<button type="button" role="radio" class="${val === v ? "on" : ""}" data-id="${id}" data-v="${v}" aria-checked="${val === v}" tabindex="${(val ?? 0) === v ? 0 : -1}">${v}</button>`).join("")}</div>
       <div class="ends"><span>0 = ${lo}</span><span>10 = ${hi}</span></div>
       ${hint ? `<div class="muted small">${hint}</div>` : ""}
     </div>`;
@@ -653,13 +662,18 @@ function renderToday(main, [dateArg]) {
   const vals = { tinnitus: d.tinnitus ?? null, annoyance: d.annoyance ?? null, sleep: d.sleep ?? null };
   main.querySelectorAll(".scale button").forEach((b) => b.onclick = () => {
     const id = b.dataset.id, v = Number(b.dataset.v); vals[id] = v;
-    b.parentElement.querySelectorAll("button").forEach((x) => { x.classList.toggle("on", x === b); x.setAttribute("aria-pressed", String(x === b)); });
+    b.parentElement.querySelectorAll("button").forEach((x) => { x.classList.toggle("on", x === b); x.setAttribute("aria-checked", String(x === b)); x.tabIndex = x === b ? 0 : -1; });
     $(`#out-${id}`).textContent = v; $(`#sl-${id}`).classList.remove("unset");
   });
+  main.querySelectorAll(".scale").forEach((g) => g.addEventListener("keydown", (e) => { // 방향키로 이동
+    if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)) return;
+    const btns = [...g.querySelectorAll("button")], i = btns.indexOf(document.activeElement); if (i < 0) return;
+    const j = Math.min(10, Math.max(0, i + (["ArrowRight", "ArrowUp"].includes(e.key) ? 1 : -1))); btns[j].focus(); btns[j].click(); e.preventDefault();
+  }));
   $("#diary-form").onsubmit = (e) => {
     e.preventDefault();
     const missing = ["tinnitus", "annoyance", "sleep"].find((k) => vals[k] == null);
-    if (missing) { toast("세 가지 점수를 모두 골라 주세요."); $(`#sl-${missing}`).scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "center" }); return; }
+    if (missing) { toast("세 가지 점수를 모두 골라 주세요.", 8000); $(`#sl-${missing}`).scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "center" }); return; }
     state.diary[key] = {
       tinnitus: vals.tinnitus, annoyance: vals.annoyance, sleep: vals.sleep,
       mindfulness: $("#in-mindfulness").checked, pmr: $("#in-pmr").checked,
@@ -819,7 +833,7 @@ function renderRecords(main) {
       <div class="section-head"><h2>일기 추이</h2><a class="more" href="#/today">오늘 일기</a></div>
       <div class="card">${chartDays.length >= 2 ? renderChart(chartDays) : `<p class="muted" style="margin:0">일기를 이틀 이상 기록하면 추이가 표시됩니다.</p>`}</div>
       <div class="card">
-        ${days.length ? `<div class="table-wrap"><table><thead><tr><th>날짜</th><th>크기</th><th>신경 쓰임</th><th>수면</th><th>실습</th><th>메모</th><th class="no-print"></th></tr></thead><tbody>
+        ${days.length ? `<div class="table-wrap"><table><thead><tr><th scope="col">날짜</th><th scope="col">크기</th><th scope="col">신경 쓰임</th><th scope="col">수면</th><th scope="col">실습</th><th scope="col">메모</th><th scope="col" class="no-print"><span class="sr-only">고치기</span></th></tr></thead><tbody>
           ${days.slice().reverse().map((k) => { const d = state.diary[k]; return `<tr class="rowlink" data-href="#/today/${k}"><td><a href="#/today/${k}">${k.slice(2)}</a></td><td class="num">${d.tinnitus ?? "–"}</td><td class="num">${d.annoyance ?? "–"}</td><td class="num">${d.sleep ?? "–"}</td><td>${[d.mindfulness ? "마음챙김" : "", d.pmr ? "근육이완" : ""].filter(Boolean).join(", ")}</td><td class="small">${esc([d.trigger, d.memo].filter(Boolean).join(" · "))}</td><td class="no-print"><a class="btn ghost sm" href="#/today/${k}">고치기</a></td></tr>`; }).join("")}
         </tbody></table></div>` : `<p class="muted" style="margin:0">아직 일기가 없습니다.</p>`}
       </div>
@@ -858,17 +872,18 @@ const SERIES = [
 ];
 function renderChart(days, diary = state.diary) {
   const last = days.slice(-42); // 최근 6주
-  const W = 720, H = 240, L = 34, R = 16, T = 16, B = 34;
+  const W = 720, H = 260, L = 40, R = 16, T = 16, B = 40;
   const iw = W - L - R, ih = H - T - B;
   const x = (i) => L + (last.length === 1 ? iw / 2 : (i / (last.length - 1)) * iw);
   const y = (v) => T + ih - (v / 10) * ih;
-  const grid = [0, 5, 10].map((v) => `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="#DBD7CB" stroke-width="1"/><text x="${L - 8}" y="${y(v) + 4}" text-anchor="end" font-size="11" fill="#7C7A73">${v}</text>`).join("");
+  const grid = [0, 5, 10].map((v) => `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="#DBD7CB" stroke-width="1"/><text x="${L - 8}" y="${y(v) + 6}" text-anchor="end" font-size="18" fill="#5F5D56">${v}</text>`).join("");
   const step = Math.max(1, Math.ceil(last.length / 6));
-  const xlabels = last.map((k, i) => (i % step === 0 || i === last.length - 1) ? `<text x="${x(i)}" y="${H - 10}" text-anchor="middle" font-size="11" fill="#7C7A73">${k.slice(5).replace("-", "/")}</text>` : "").join("");
-  const lines = SERIES.map((s) => {
+  const xlabels = last.map((k, i) => (i % step === 0 || i === last.length - 1) ? `<text x="${x(i)}" y="${H - 8}" text-anchor="middle" font-size="18" fill="#5F5D56">${k.slice(5).replace("-", "/")}</text>` : "").join("");
+  const dashes = ["", "8 5", "2 5"]; // 흑백 인쇄·색각 이상에서도 구분
+  const lines = SERIES.map((s, si) => {
     const pts = last.map((k, i) => `${x(i).toFixed(1)},${y(diary[k][s.key]).toFixed(1)}`).join(" ");
     const dots = last.map((k, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(diary[k][s.key]).toFixed(1)}" r="3.5" fill="${s.color}" stroke="#FCFBF8" stroke-width="2"><title>${k} ${s.label} ${diary[k][s.key]}</title></circle>`).join("");
-    return `<polyline points="${pts}" fill="none" stroke="${s.color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>${dots}`;
+    return `<polyline points="${pts}" fill="none" stroke="${s.color}" stroke-width="2.5" stroke-dasharray="${dashes[si]}" stroke-linejoin="round" stroke-linecap="round"/>${dots}`;
   }).join("");
   return `<div class="chart-wrap"><svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="최근 일기 추이 그래프">${grid}${xlabels}${lines}</svg></div>
     <div class="legend">${SERIES.map((s) => `<span><i style="background:${s.color}"></i>${s.label}</span>`).join("")}</div>`;

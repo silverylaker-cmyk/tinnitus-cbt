@@ -32,7 +32,7 @@
     const nodes = pts.map(([x, y], i) => `<g class="cyc-node" style="--i:${i}"><circle cx="${x}" cy="${y}" r="26" fill="#FCFBF8" stroke="${LINE}" stroke-width="1.5"/><text x="${x}" y="${y + 6}" text-anchor="middle" font-size="18" font-family="Noto Serif KR, serif" fill="${INK}">${i + 1}</text></g>`).join("");
     const arrows = pts.map(([x, y], i) => { const [nx, ny] = pts[(i + 1) % pts.length]; const dx = nx - x, dy = ny - y, L = Math.hypot(dx, dy), ux = dx / L, uy = dy / L; return `<line class="cyc-arrow" style="--i:${i}" x1="${x + ux * 30}" y1="${y + uy * 30}" x2="${nx - ux * 32}" y2="${ny - uy * 32}" stroke="${ACC}" stroke-width="2" marker-end="url(#cyc-head)"/>`; }).join("");
     return `<figure class="cycle">
-      <svg viewBox="0 0 320 300" aria-label="이명 악순환 고리">
+      <svg viewBox="0 0 320 300" role="img" aria-label="이명 악순환 고리">
         <defs><marker id="cyc-head" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="${ACC}"/></marker></defs>
         <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${SOFT}" stroke-width="1" stroke-dasharray="4 6"/>
         ${arrows}${nodes}
@@ -51,7 +51,7 @@
     el.innerHTML = `
       <div class="breath">
         <div class="breath-stage"><div class="breath-circle"><span class="breath-word">준비</span></div></div>
-        <div class="breath-info"><span class="breath-phase">시작을 누르면 원이 커졌다 작아집니다</span><span class="breath-left"></span></div>
+        <div class="breath-info"><span class="breath-phase">시작을 누르면 원이 커졌다 작아집니다</span><span class="breath-left"></span></div><div class="sr-only" aria-live="polite" data-live></div>
         <div class="btn-row center">
           <label class="pill-select">시간
             <select class="breath-min">${mins.map((m) => `<option value="${m}" ${m === mins[1] ? "selected" : ""}>${m}분</option>`).join("")}</select></label>
@@ -68,7 +68,7 @@
       const t = ((now - cycleStart) / 1000) % (IN + OUT);
       const inhale = t < IN;
       circle.style.transform = `scale(${inhale ? 0.6 + 0.4 * (t / IN) : 1 - 0.4 * ((t - IN) / OUT)})`;
-      word.textContent = inhale ? "들이쉬기" : (cue || "내쉬기");
+      const wt = inhale ? "들이쉬기" : (cue || "내쉬기"); if (word.textContent !== wt) { word.textContent = wt; const lv = el.querySelector("[data-live]"); if (lv) lv.textContent = wt; }
       phase.textContent = inhale ? `코로 천천히 들이쉽니다 (${Math.ceil(IN - t)})` : `길게 내쉽니다 (${Math.ceil(IN + OUT - t)})`;
       const remain = Math.ceil((endAt - now) / 1000);
       left.textContent = `${Math.floor(remain / 60)}:${String(remain % 60).padStart(2, "0")} 남음`;
@@ -91,7 +91,7 @@
     el.innerHTML = `
       <div class="pmr">
         <div class="pmr-head"><span class="pmr-step">전신 ${parts.length}부위</span><span class="pmr-count"></span></div>
-        <div class="pmr-part">시작을 누르면 한 부위씩 안내합니다</div>
+        <div class="pmr-part" aria-live="polite">시작을 누르면 한 부위씩 안내합니다</div>
         <div class="pmr-how">긴장 ${TENSE}초 → 이완 ${RELAX}초. 아프지 않을 정도(70~80% 힘)로만 조입니다.</div>
         <div class="pmr-bar"><i></i></div>
         <div class="btn-row center">
