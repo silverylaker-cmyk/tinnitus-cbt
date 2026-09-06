@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F5F3EC">
+  <meta name="description" content="이명 인지행동치료 8주 프로그램 — 학습, 워크시트, 일기, 소리 치료">
+  <title>이명 관리 프로그램</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=1">
+</head>
+<body>
+  <a class="skip" href="#main">본문으로 건너뛰기</a>
+
+  <header class="topbar">
+    <a class="brand" href="#/">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">이명 관리 프로그램</span>
+    </a>
+    <nav class="nav" aria-label="주 메뉴">
+      <a href="#/" data-route="home"><span class="nav-icon" aria-hidden="true">⌂</span><span>홈</span></a>
+      <a href="#/program" data-route="program"><span class="nav-icon" aria-hidden="true">▤</span><span>프로그램</span></a>
+      <a href="#/today" data-route="today"><span class="nav-icon" aria-hidden="true">✎</span><span>오늘</span></a>
+      <a href="#/sound" data-route="sound"><span class="nav-icon" aria-hidden="true">♫</span><span>사운드</span></a>
+      <a href="#/records" data-route="records"><span class="nav-icon" aria-hidden="true">≡</span><span>기록</span></a>
+    </nav>
+  </header>
+
+  <main id="main" class="page" tabindex="-1"></main>
+
+  <footer class="foot">
+    <p>이 프로그램은 담당 의료진의 안내와 함께 사용하는 보조 도구입니다. 기록은 이 기기의 브라우저에만 저장됩니다.</p>
+    <p><a href="#/settings">설정 · 데이터 내보내기</a></p>
+  </footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="data/program.js?v=1"></script>
+  <script src="data/sounds.js?v=1"></script>
+  <script src="app.js?v=1"></script>
+</body>
+</html>

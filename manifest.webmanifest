@@ -1,0 +1,9 @@
+{
+  "name": "이명 관리 프로그램",
+  "short_name": "이명 관리",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#F5F3EC",
+  "theme_color": "#F5F3EC",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}
