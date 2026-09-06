@@ -21,7 +21,7 @@
     });
     const sounds = {};
     for (const s of state.soundSessions || []) {
-      const day = s.startedAt.slice(0, 10);
+      const dt = new Date(s.startedAt); const day = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}-${String(dt.getDate()).padStart(2, "0")}`; // 현지 날짜 기준
       const rec = sounds[day] || (sounds[day] = [0, 0, {}]);
       rec[s.timeOfDay === "night" ? 1 : 0] += s.durationSec;
       rec[2][s.title] = (rec[2][s.title] || 0) + s.durationSec;
@@ -37,13 +37,15 @@
   };
 
   // 압축 표현 → 의료진 화면에서 쓰기 좋은 형태
+  const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
   T.expand = function (c) {
+    const str = (v, n = 40) => String(v ?? "").slice(0, n);
     return {
-      id: c.id, nickname: c.n, startDate: c.s, receivedAt: c.at, done: c.done || [],
+      id: str(c.id, 20), nickname: str(c.n, 20), startDate: DATE_RE.test(c.s || "") ? c.s : "", receivedAt: str(c.at, 30), done: Array.isArray(c.done) ? c.done.map((d) => str(d, 40)) : [],
       worksheets: Object.fromEntries(Object.entries(c.w || {}).map(([id, o]) => [id, { single: o.s || {}, singleAt: o.t || null, entries: (o.e || []).map(([at, responses]) => ({ at, responses })) }])),
-      questionnaires: (c.q || []).map(([type, timepoint, at, total, severity, answers]) => ({ type, timepoint, at, total, severity, answers })),
-      diary: Object.fromEntries((c.d || []).map(([k, t, a, s, m, p, trigger, memo]) => [k, { tinnitus: t, annoyance: a, sleep: s, mindfulness: !!m, pmr: !!p, trigger, memo }])),
-      sounds: (c.ss || []).map(([day, daySec, nightSec, byTitle]) => ({ day, daySec, nightSec, byTitle: byTitle || {} })),
+      questionnaires: (c.q || []).map(([type, timepoint, at, total, severity, answers]) => ({ type: str(type, 10), timepoint: ["baseline", "week8"].includes(timepoint) ? timepoint : "other", at: str(at, 30), total: Number(total) || 0, severity: str(severity, 20), answers: str(answers, 60) })),
+      diary: Object.fromEntries((c.d || []).filter((r) => Array.isArray(r) && DATE_RE.test(r[0] || "")).map(([k, t, a, s, m, p, trigger, memo]) => [k, { tinnitus: t == null ? null : Number(t), annoyance: a == null ? null : Number(a), sleep: s == null ? null : Number(s), mindfulness: !!m, pmr: !!p, trigger: str(trigger, 200), memo: str(memo, 2000) }])),
+      sounds: (c.ss || []).filter((r) => Array.isArray(r) && DATE_RE.test(r[0] || "")).map(([day, daySec, nightSec, byTitle]) => ({ day, daySec: Number(daySec) || 0, nightSec: Number(nightSec) || 0, byTitle: byTitle && typeof byTitle === "object" ? byTitle : {} })),
     };
   };
 
@@ -71,9 +73,9 @@
 
   // ---------- 프레임 ----------
   // 형식: T1|<세션id>|<번호>/<전체>|<z|r>|<base64 조각>
-  T.encode = async function (state) {
+  T.encode = async function (state, opts = {}) {
     const c = T.compact(state);
-    const { mode, bytes } = await deflate(enc.encode(JSON.stringify(c)));
+    const { mode, bytes } = opts.raw ? { mode: "r", bytes: enc.encode(JSON.stringify(c)) } : await deflate(enc.encode(JSON.stringify(c)));
     const body = b64(bytes);
     const sid = Math.random().toString(36).slice(2, 6);
     const n = Math.max(1, Math.ceil(body.length / FRAME_PAYLOAD));
@@ -88,21 +90,26 @@
   };
   // 조각 수집기: add(text) → {sid, got, n, complete}
   T.collector = function () {
-    let sid = null, n = 0, parts = {}, mode = "z";
+    const sessions = new Map(); // sid → {n, mode, parts}  (두 폰이 번갈아 잡혀도 서로 지우지 않음)
+    let doneSid = null;
     return {
       add(text) {
         const f = T.parseFrame(text); if (!f) return null;
-        if (f.sid !== sid) { sid = f.sid; n = f.n; parts = {}; mode = f.mode; }
-        parts[f.i] = f.payload;
-        const got = Object.keys(parts).length;
-        return { sid, got, n, complete: got === n, missing: Array.from({ length: n }, (_, k) => k + 1).filter((k) => !parts[k]) };
+        let s = sessions.get(f.sid);
+        if (!s || s.n !== f.n) { s = { n: f.n, mode: f.mode, parts: {} }; sessions.set(f.sid, s); }
+        s.parts[f.i] = f.payload;
+        const got = Object.keys(s.parts).length;
+        if (got === s.n) doneSid = f.sid;
+        return { sid: f.sid, got, n: s.n, mode: s.mode, complete: got === s.n, missing: Array.from({ length: s.n }, (_, k) => k + 1).filter((k) => !s.parts[k]) };
       },
+      canInflate(mode) { return mode === "r" || typeof DecompressionStream !== "undefined"; },
       async result() {
-        let body = ""; for (let i = 1; i <= n; i++) body += parts[i];
-        const bytes = await inflate(mode, unb64(body));
+        const s = sessions.get(doneSid); if (!s) throw new Error("아직 모든 조각을 받지 못했습니다.");
+        let body = ""; for (let i = 1; i <= s.n; i++) body += s.parts[i];
+        const bytes = await inflate(s.mode, unb64(body));
         return JSON.parse(dec.decode(bytes));
       },
-      reset() { sid = null; n = 0; parts = {}; },
+      reset() { sessions.clear(); doneSid = null; },
     };
   };
 

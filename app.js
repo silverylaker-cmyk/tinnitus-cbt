@@ -5,6 +5,7 @@
 //  저장소
 // =====================================================================
 const STORE_KEY = "tinnitus_cbt_v1";
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const newId = () => Math.random().toString(36).slice(2, 8).toUpperCase();
 const DEFAULT_STATE = () => ({
   version: 1,
@@ -25,11 +26,28 @@ function loadState() {
     const raw = localStorage.getItem(STORE_KEY);
     const base = DEFAULT_STATE();
     if (!raw) return base;
-    const s = JSON.parse(raw);
-    const merged = Object.assign(base, s, { profile: Object.assign(base.profile, s.profile || {}) });
-    if (!merged.profile.id) merged.profile.id = newId();
-    return merged;
-  } catch (e) { return DEFAULT_STATE(); }
+    return normalize(JSON.parse(raw));
+  } catch (e) {
+    // 읽기에 실패해도 원본을 덮어쓰지 않도록 따로 보관해 둔다
+    try { localStorage.setItem(STORE_KEY + "_backup_" + Date.now(), localStorage.getItem(STORE_KEY) || ""); } catch (e2) {}
+    return DEFAULT_STATE();
+  }
+}
+// 저장된 형태가 예전 버전이거나 일부가 빠져 있어도 화면이 깨지지 않도록 모양을 맞춘다
+function normalize(s) {
+  const base = DEFAULT_STATE();
+  if (!s || typeof s !== "object") return base;
+  const st = Object.assign(base, s);
+  st.profile = Object.assign(DEFAULT_STATE().profile, s.profile || {});
+  if (!st.profile.id) st.profile.id = newId();
+  if (st.profile.startDate && !DATE_RE.test(st.profile.startDate)) st.profile.startDate = null;
+  for (const k of ["progress", "resume", "drafts", "worksheets", "diary"]) if (!st[k] || typeof st[k] !== "object") st[k] = {};
+  for (const k of ["questionnaires", "soundSessions"]) if (!Array.isArray(st[k])) st[k] = [];
+  for (const [id, w] of Object.entries(st.worksheets)) { if (!w || typeof w !== "object") { delete st.worksheets[id]; continue; } w.single ||= {}; w.entries = Array.isArray(w.entries) ? w.entries.filter((e) => e && e.at && e.responses) : []; }
+  st.questionnaires = st.questionnaires.filter((q) => q && q.at && q.type).map((q) => ({ ...q, answers: q.answers || {}, total: Number(q.total) || 0 }));
+  for (const [k, d] of Object.entries(st.diary)) if (!DATE_RE.test(k) || !d || typeof d !== "object") delete st.diary[k];
+  st.soundSessions = st.soundSessions.filter((x) => x && x.startedAt && Number(x.durationSec) > 0);
+  return st;
 }
 function save() {
   try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
@@ -194,7 +212,8 @@ function renderHome(main) {
       `;
     $("#start-btn").onclick = () => {
       const v = $("#start-date").value;
-      if (!v) return toast("시작일을 선택해 주세요.");
+      if (!v || !DATE_RE.test(v)) return toast("시작일을 선택해 주세요.");
+      if (v > dateKey() && !confirm("시작일이 오늘보다 뒤입니다. 그날까지는 1주차만 열립니다. 계속할까요?")) return;
       state.profile.startDate = v;
       state.profile.nickname = $("#nickname").value.trim();
       save(); route();
@@ -756,7 +775,7 @@ async function playSound(id) {
   yt.player = new YT.Player("yt-player", {
     host: "https://www.youtube-nocookie.com",
     videoId: item.youtubeId,
-    playerVars: { autoplay: 1, loop: 1, playlist: item.youtubeId, rel: 0, modestbranding: 1, playsinline: 1 },
+    playerVars: { autoplay: 1, loop: 1, playlist: item.youtubeId, rel: 0, modestbranding: 1, playsinline: 1, origin: location.origin },
     events: { onStateChange: onPlayerState },
   });
 }
@@ -776,7 +795,7 @@ function onPlayerState(e) {
 function startSession() {
   const sb = $("#stop-btn"); if (sb) sb.hidden = false;
   if (yt.session || !yt.current) return;
-  yt.session = { soundId: yt.current.id, title: yt.current.title, startedAt: new Date().toISOString() };
+  yt.session = { soundId: yt.current.id, title: yt.current.title, startedAt: new Date().toISOString(), timeOfDay: timeOfDayNow() };
   clearInterval(yt.tick); yt.tick = setInterval(updateTimer, 1000);
 }
 function endSession() {
@@ -786,7 +805,7 @@ function endSession() {
   const ended = new Date();
   const dur = Math.round((ended - new Date(s.startedAt)) / 1000);
   if (dur >= 10) {
-    state.soundSessions.push({ ...s, endedAt: ended.toISOString(), durationSec: dur, timeOfDay: timeOfDayNow() });
+    state.soundSessions.push({ ...s, endedAt: ended.toISOString(), durationSec: dur, timeOfDay: s.timeOfDay || timeOfDayNow() });
     save();
     const log = $("#sound-log"); if (log) log.innerHTML = renderSoundLog(7);
   }
@@ -882,7 +901,7 @@ function renderChart(days, diary = state.diary) {
   const dashes = ["", "8 5", "2 5"]; // 흑백 인쇄·색각 이상에서도 구분
   const lines = SERIES.map((s, si) => {
     const pts = last.map((k, i) => `${x(i).toFixed(1)},${y(diary[k][s.key]).toFixed(1)}`).join(" ");
-    const dots = last.map((k, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(diary[k][s.key]).toFixed(1)}" r="3.5" fill="${s.color}" stroke="#FCFBF8" stroke-width="2"><title>${k} ${s.label} ${diary[k][s.key]}</title></circle>`).join("");
+    const dots = last.map((k, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(diary[k][s.key]).toFixed(1)}" r="3.5" fill="${s.color}" stroke="#FCFBF8" stroke-width="2"><title>${esc(k)} ${s.label} ${esc(diary[k][s.key])}</title></circle>`).join("");
     return `<polyline points="${pts}" fill="none" stroke="${s.color}" stroke-width="2.5" stroke-dasharray="${dashes[si]}" stroke-linejoin="round" stroke-linecap="round"/>${dots}`;
   }).join("");
   return `<div class="chart-wrap"><svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="최근 일기 추이 그래프">${grid}${xlabels}${lines}</svg></div>
@@ -905,6 +924,7 @@ function renderShare(main) {
       <details class="staff no-print"><summary>직원용 조절</summary><div class="btn-row center">
         <button class="btn ghost sm" id="qr-slower" type="button">천천히</button>
         <button class="btn ghost sm" id="qr-restart" type="button">처음부터</button>
+        <button class="btn ghost sm" id="qr-raw" type="button">압축 없이</button>
       </div></details>
     </div>
     <div class="card tint">
@@ -924,11 +944,14 @@ function renderShare(main) {
   function start() { clearInterval(timer); i = 0; draw(); timer = setInterval(draw, interval); }
   let lock = null; if (navigator.wakeLock) navigator.wakeLock.request("screen").then((l) => (lock = l)).catch(() => {}); // 보여주는 동안 화면이 꺼지지 않게
   cleanup = () => { clearInterval(timer); if (lock) lock.release().catch(() => {}); };
-  Transfer.encode(state).then(({ frames: f, bytes }) => {
+  let raw = false;
+  const build = () => Transfer.encode(state, { raw }).then(({ frames: f, bytes }) => {
     frames = f;
     $("#qr-hint").textContent = `전체 ${frames.length}조각 · ${(bytes / 1024).toFixed(1)}KB · 약 ${Math.ceil(frames.length * interval / 1000)}초에 한 바퀴`;
     start();
   }).catch((e) => { qrEl.innerHTML = `<p class="muted">QR을 만들지 못했습니다. 설정에서 파일로 내보내 전달해 주세요.</p>`; });
+  build();
+  $("#qr-raw").onclick = () => { raw = !raw; $("#qr-raw").textContent = raw ? "압축해서" : "압축 없이"; build(); };
   $("#qr-slower").onclick = () => { interval = interval >= 1500 ? 700 : interval + 400; $("#qr-slower").textContent = interval >= 1500 ? "보통 속도" : "천천히"; start(); };
   $("#qr-restart").onclick = start;
 }
@@ -941,8 +964,8 @@ function stateFromCompact(c) {
   for (const id of ex.done) st.progress[id] = "completed";
   st.worksheets = Object.fromEntries(Object.entries(ex.worksheets).map(([k, w]) => [k, { single: w.single, entries: w.entries, singleAt: w.singleAt || undefined }]));
   st.questionnaires = ex.questionnaires.map((q) => ({ ...q, answers: Object.fromEntries(String(q.answers || "").split("").map((v, i) => ["q" + (i + 1), Number(v)])) }));
-  for (const [k, d] of Object.entries(ex.diary)) st.diary[k] = { ...d, at: k + "T12:00:00.000Z" };
-  st.soundSessions = ex.sounds.flatMap((s) => [["day", s.daySec], ["night", s.nightSec]].filter(([, sec]) => sec > 0).map(([tod, sec]) => ({ soundId: "restored", title: "복원된 기록", startedAt: s.day + (tod === "day" ? "T12:00:00.000Z" : "T23:00:00.000Z"), endedAt: null, durationSec: sec, timeOfDay: tod })));
+  for (const [k, d] of Object.entries(ex.diary)) st.diary[k] = d.tinnitus == null ? { ...d, at: null, partial: true } : { ...d, at: new Date(k + "T12:00:00").toISOString() };
+  st.soundSessions = ex.sounds.flatMap((s) => [["day", s.daySec], ["night", s.nightSec]].filter(([, sec]) => sec > 0).map(([tod, sec]) => ({ soundId: "restored", title: "복원된 기록", startedAt: new Date(s.day + (tod === "day" ? "T12:00:00" : "T21:00:00")).toISOString(), endedAt: null, durationSec: sec, timeOfDay: tod })));
   return st;
 }
 
@@ -984,7 +1007,8 @@ function renderSettings(main) {
     $("#font-seg").querySelectorAll("button").forEach((x) => x.classList.toggle("on", x === b));
   });
   $("#s-save").onclick = () => {
-    p.startDate = $("#s-start").value || p.startDate; p.nickname = $("#s-name").value.trim(); p.unlockAll = $("#s-unlock").checked;
+    const sd = $("#s-start").value; if (sd && !DATE_RE.test(sd)) return toast("시작일 형식이 올바르지 않습니다.");
+    p.startDate = sd || p.startDate; p.nickname = $("#s-name").value.trim(); p.unlockAll = $("#s-unlock").checked;
     save(); toast("저장했습니다 ✓");
   };
   $("#s-export").onclick = () => {
@@ -999,7 +1023,7 @@ function renderSettings(main) {
     try {
       const data = JSON.parse(await f.text());
       let next = null;
-      if (data && data.profile) next = Object.assign(DEFAULT_STATE(), data);
+      if (data && data.profile) next = normalize(data);
       else if (data && data.compact) next = stateFromCompact(data.compact); // 병원 태블릿에서 내려받은 사본
       if (!next) throw new Error();
       if (!confirm("현재 기기의 기록을 이 파일의 내용으로 바꿀까요?")) return;

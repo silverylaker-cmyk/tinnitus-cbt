@@ -426,3 +426,5 @@ input[type=date], select { -webkit-appearance: none; appearance: none; }
 .art.seen .draw { animation: none; stroke-dashoffset: 0; }
 @media (max-width: 720px) { .nav a { min-height: 48px; } }
 @media (min-width: 721px) { .nav a { min-height: 48px; } }
+.week-h { display: block; font-family: var(--serif); font-size: 1.2rem; line-height: 1.3; }
+.week-title .sub { display: block; }
