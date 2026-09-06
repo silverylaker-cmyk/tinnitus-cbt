@@ -248,7 +248,8 @@ td.num { font-variant-numeric: tabular-nums; }
 /* ---------- 모바일 ---------- */
 @media (max-width: 720px) {
   body { font-size: 16.5px; }
-  .topbar { padding: 0 16px; height: 56px; }
+  /* backdrop-filter는 fixed 요소의 기준(containing block)이 되므로 모바일에서는 끔 — 하단 탭바가 화면 아래에 붙도록 */
+  .topbar { padding: 0 16px; height: 56px; backdrop-filter: none; -webkit-backdrop-filter: none; background: var(--bg); }
   .brand-name { font-size: 1.05rem; }
   .nav {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
