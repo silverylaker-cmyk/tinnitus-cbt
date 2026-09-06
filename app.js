@@ -198,11 +198,11 @@ function renderHome(main) {
       </section>
       <div class="card tint" style="margin-bottom:24px">
         <h3>프로그램 시작</h3>
+        <div class="notice">휴대폰에서는 먼저 브라우저 메뉴의 <b>'홈 화면에 추가'</b>를 한 뒤, 그 앱 아이콘을 열어 시작해 주세요. iPhone은 사파리와 홈 화면 앱의 기록이 따로 저장되고, 홈 화면 앱이 기록을 더 안전하게 보관합니다. 진료실에서 도와드립니다.</div>
         <p class="muted">시작일을 기준으로 매주 다음 내용이 열립니다. 클리닉에서 안내받은 날짜가 있다면 그 날짜로 맞춰 주세요.</p>
         <label class="field"><span class="label">시작일</span><input type="date" id="start-date" value="${dateKey()}"></label>
         <label class="field"><span class="label">이름 또는 별칭 <span class="muted">(진료 때 기록을 전달할 때 표시됩니다)</span></span><input type="text" id="nickname" placeholder="예: 홍길동" maxlength="20"></label>
         <button class="btn accent big" id="start-btn">시작하기</button>
-        <p class="muted small" style="margin:12px 0 0">휴대폰에서는 브라우저 메뉴의 '홈 화면에 추가'를 눌러 두면 앱처럼 열 수 있고 기록도 더 안전하게 보관됩니다. 진료실에서 도와드립니다.</p>
       </div>
       <div class="grid">
         <div class="card"><div class="eyebrow">매주</div><h3>짧은 읽기와 적기</h3><p class="muted">매주 새로운 내용이 열리고, 워크시트에 내 이야기를 직접 적어봅니다.</p></div>
@@ -232,7 +232,9 @@ function renderHome(main) {
   const resumeIdx = next ? state.resume[next.id] : 0;
   const resumable = next && (resumeIdx || state.drafts[next.id]);
 
+  const iosSafari = navigator.standalone === false && /iPhone|iPad/.test(navigator.userAgent);
   main.innerHTML = `
+    ${iosSafari ? `<div class="notice small">지금은 사파리에서 열려 있습니다. 홈 화면에 추가한 앱으로 열면 기록이 따로 저장되니, 앞으로도 같은 방법(사파리 또는 홈 화면 앱)으로만 열어 주세요. 기록을 옮기려면 설정의 '파일로 내보내기'를 쓰세요.</div>` : ""}
     <section class="hero with-art">
       <div>
         <div class="eyebrow">${weekdayKo[new Date().getDay()]}요일 · ${fmtDate(dateKey())}</div>
