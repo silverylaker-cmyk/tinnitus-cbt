@@ -11,11 +11,11 @@
     const ws = {};
     for (const [id, w] of Object.entries(state.worksheets || {})) {
       const o = {};
-      if (w.single && Object.keys(w.single).length) o.s = w.single;
+      if (w.single && Object.keys(w.single).length) { o.s = w.single; if (w.singleAt) o.t = w.singleAt; }
       if (w.entries && w.entries.length) o.e = w.entries.map((en) => [en.at, en.responses]);
       if (Object.keys(o).length) ws[id] = o;
     }
-    const diary = Object.keys(state.diary || {}).filter((k) => state.diary[k] && state.diary[k].at).sort().map((k) => {
+    const diary = Object.keys(state.diary || {}).filter((k) => state.diary[k] && (state.diary[k].at || state.diary[k].partial)).sort().map((k) => {
       const d = state.diary[k];
       return [k, d.tinnitus, d.annoyance, d.sleep, d.mindfulness ? 1 : 0, d.pmr ? 1 : 0, d.trigger || "", d.memo || ""];
     });
@@ -40,7 +40,7 @@
   T.expand = function (c) {
     return {
       id: c.id, nickname: c.n, startDate: c.s, receivedAt: c.at, done: c.done || [],
-      worksheets: Object.fromEntries(Object.entries(c.w || {}).map(([id, o]) => [id, { single: o.s || {}, entries: (o.e || []).map(([at, responses]) => ({ at, responses })) }])),
+      worksheets: Object.fromEntries(Object.entries(c.w || {}).map(([id, o]) => [id, { single: o.s || {}, singleAt: o.t || null, entries: (o.e || []).map(([at, responses]) => ({ at, responses })) }])),
       questionnaires: (c.q || []).map(([type, timepoint, at, total, severity, answers]) => ({ type, timepoint, at, total, severity, answers })),
       diary: Object.fromEntries((c.d || []).map(([k, t, a, s, m, p, trigger, memo]) => [k, { tinnitus: t, annoyance: a, sleep: s, mindfulness: !!m, pmr: !!p, trigger, memo }])),
       sounds: (c.ss || []).map(([day, daySec, nightSec, byTitle]) => ({ day, daySec, nightSec, byTitle: byTitle || {} })),

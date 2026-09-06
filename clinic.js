@@ -19,6 +19,10 @@ function toast(msg, ms = 4000) { const t = $("#toast"); t.textContent = msg; t.h
 function storeRecord(compact) {
   const id = compact.id || ("NOID-" + (compact.n || "?"));
   const prev = db.patients[id];
+  if (prev) {
+    const oldN = (prev.compact.d || []).length, newN = (compact.d || []).length;
+    if (newN < oldN && !confirm(`이전에 받은 기록(일기 ${oldN}일)보다 적은 기록(일기 ${newN}일)입니다. 환자 폰의 기록이 지워졌을 수 있습니다. 그래도 바꿀까요? (취소하면 이전 기록을 유지합니다)`)) return id;
+  }
   db.patients[id] = { compact, receivedAt: new Date().toISOString(), history: [...(prev?.history || []), new Date().toISOString()].slice(-20) };
   save();
   return id;
@@ -148,13 +152,14 @@ function chart(days, diary) {
     last.map((k, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(diary[k][s.key] ?? 0).toFixed(1)}" r="3" fill="${s.color}" stroke="#FCFBF8" stroke-width="2"><title>${k} ${s.label} ${diary[k][s.key]}</title></circle>`).join("")).join("");
   return `<div class="chart-wrap"><svg class="chart" viewBox="0 0 ${W} ${H}" role="img">${grid}${xl}${lines}</svg></div><div class="legend">${SERIES.map((s) => `<span><i style="background:${s.color}"></i>${s.label}</span>`).join("")}</div>`;
 }
-function avg(arr) { return arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1) : "-"; }
+function avg(arr) { arr = arr.filter((v) => v != null); return arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1) : "-"; }
 
 function renderPatient(main, [id]) {
   const r = db.patients[id];
   if (!r) { location.hash = "#/patients"; return; }
   const ex = Transfer.expand(r.compact);
   const days = Object.keys(ex.diary).sort();
+  const scored = days.filter((k) => ex.diary[k].tinnitus != null);
   const last14 = days.slice(-14), prev14 = days.slice(-28, -14);
   const thi = P.questionnaires.THI;
   const modTitle = Object.fromEntries(P.modules.map((m) => [m.id, m]));
@@ -185,7 +190,7 @@ function renderPatient(main, [id]) {
     <section class="section"><div class="section-head"><h2>진행</h2></div><div class="card"><p style="margin:0">${doneByWeek}</p></div></section>
 
     <section class="section"><div class="section-head"><h2>일기 추이</h2></div>
-      <div class="card">${days.length >= 2 ? chart(days, ex.diary) : `<p class="muted" style="margin:0">일기가 2일 미만입니다.</p>`}</div>
+      <div class="card">${scored.length >= 2 ? chart(scored, ex.diary) : `<p class="muted" style="margin:0">일기가 2일 미만입니다.</p>`}</div>
       ${days.length ? `<div class="card"><div class="table-wrap"><table><thead><tr><th>날짜</th><th>크기</th><th>신경</th><th>수면</th><th>실습</th><th>트리거 · 메모</th></tr></thead><tbody>
         ${days.slice().reverse().map((k) => { const d = ex.diary[k]; return `<tr><td>${k.slice(2)}</td><td class="num">${d.tinnitus ?? "-"}</td><td class="num">${d.annoyance ?? "-"}</td><td class="num">${d.sleep ?? "-"}</td><td>${[d.mindfulness ? "마음챙김" : "", d.pmr ? "PMR" : ""].filter(Boolean).join(", ")}</td><td class="small">${esc([d.trigger, d.memo].filter(Boolean).join(" · "))}</td></tr>`; }).join("")}
       </tbody></table></div></div>` : ""}

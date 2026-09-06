@@ -134,6 +134,7 @@ function paint() {
   if (cleanup) { try { cleanup(); } catch (e) {} cleanup = null; }
   main.innerHTML = "";
   fn(main, rest);
+  main.focus({ preventScroll: true });
   document.querySelectorAll(".nav a").forEach((a) => {
     const r = a.dataset.route;
     a.classList.toggle("active", r === (name || "home") || (name === "module" && r === "program") || (["results", "share"].includes(name) && r === "records"));
@@ -210,6 +211,7 @@ function renderHome(main) {
   const allDone = done === P.modules.length;
   const crisis = state.worksheets["week8_worksheet"]?.single;
   const resumeIdx = next ? state.resume[next.id] : 0;
+  const resumable = next && (resumeIdx || state.drafts[next.id]);
 
   main.innerHTML = `
     <section class="hero with-art">
@@ -225,7 +227,7 @@ function renderHome(main) {
       <a class="card" href="#/${next ? "module/" + next.id + (resumeIdx ? "/" + resumeIdx : "") : "program"}">
         <div class="eyebrow">${behind ? `${next.week}주차에 남은 것` : "이번 주 프로그램"}</div>
         <h3>${next ? esc(next.title) : "이번 주 내용을 모두 마쳤습니다"}</h3>
-        <p class="muted small">${next ? KIND_LABEL[next.kind] + (resumeIdx ? " · 보던 곳부터 이어서" : " · 시작하기") : "프로그램 목록에서 지난 내용을 다시 볼 수 있습니다"}</p>
+        <p class="muted small">${next ? KIND_LABEL[next.kind] + (resumable ? " · 하던 곳부터 이어서" : " · 시작하기") : "프로그램 목록에서 지난 내용을 다시 볼 수 있습니다"}</p>
         <div class="progress"><i style="width:${pct}%"></i></div>
         <div class="small muted">전체 ${done} / ${P.modules.length} 완료</div>
       </a>
@@ -248,7 +250,7 @@ function renderHome(main) {
 
     ${crisis && Object.keys(crisis).length ? `
     <section class="section">
-      <div class="section-head"><h2>나의 위기 대응 카드</h2><a class="more" href="#/module/week8_worksheet">수정하기</a></div>
+      <div class="section-head"><h2>나의 위기 대응 카드</h2><a class="more" href="#/module/week8_worksheet/0/back">수정하기</a></div>
       <div class="card tint">${renderCrisisCard(crisis)}</div>
     </section>` : ""}
 
@@ -260,7 +262,7 @@ function renderHome(main) {
 
 function renderCrisisCard(c) {
   const labels = { warning_signs: "나의 경고 신호", first_action: "첫 번째 행동", helpful_thoughts: "효과 있었던 생각", backup_plan: "그래도 힘들면" };
-  return Object.entries(labels).filter(([k]) => c[k]).map(([k, l]) => `<p><span class="eyebrow" style="display:block;margin:0">${l}</span>${esc(c[k])}</p>`).join("");
+  return Object.entries(labels).filter(([k]) => c[k]).map(([k, l]) => `<p style="white-space:pre-wrap"><span class="eyebrow" style="display:block;margin:0">${l}</span>${esc(c[k])}</p>`).join("");
 }
 
 function soundSummaryLine() {
@@ -287,7 +289,7 @@ function renderModuleList(mods) {
 //  프로그램 목록
 // =====================================================================
 function renderProgram(main) {
-  if (!state.profile.startDate) { toast("먼저 홈에서 '시작하기'를 눌러 주세요."); location.hash = "#/"; return; }
+  if (!state.profile.startDate) { toast("먼저 홈에서 '시작하기'를 눌러 주세요."); location.replace("#/"); return; }
   const cw = currentWeek();
   main.innerHTML = `
     <section class="hero" style="padding-bottom:20px">
@@ -342,8 +344,8 @@ function finishModule(m, label) {
 }
 function renderModule(main, [id, idxStr, flag]) {
   const m = moduleById(id);
-  if (!m) { location.hash = "#/program"; return; }
-  if (!isWeekOpen(m.week)) { toast("아직 열리지 않은 주차입니다."); location.hash = "#/program"; return; }
+  if (!m) { location.replace("#/program"); return; }
+  if (!isWeekOpen(m.week)) { toast("아직 열리지 않은 주차입니다."); location.replace("#/program"); return; }
   const idx = Math.min(Math.max(Number(idxStr) || 0, 0), m.screens.length - 1);
   viewer = { module: m, index: idx };
   if (modStatus(m.id) === "not_started") setStatus(m.id, "in_progress");
@@ -354,11 +356,14 @@ function renderModule(main, [id, idxStr, flag]) {
   const steps = m.screens.map((_, i) => `<i class="${i <= idx ? "on" : ""}"></i>`).join("");
   const showArt = idx === 0 && m.kind !== "write" && screen.type === "text";
   const extra = EXTRAS[`${m.id}:${idx}`];
-  const nextLabel = screen.button || (isLast ? "완료" : "다음");
+  const backMode = flag === "back" || flag === "entries";
+  const already = modStatus(m.id) === "completed";
+  const singleEdit = screen.type === "worksheet" && screen.mode !== "append" && already; // 이미 마친 워크시트를 고치는 중
+  const nextLabel = singleEdit ? "저장" : (screen.button || (isLast ? "완료" : "다음"));
   main.innerHTML = `
     <div class="viewer">
       <div class="viewer-top">
-        <a href="#/program" class="back">‹ 목록</a>
+        ${backMode ? `<a href="#" class="back" id="back-top">‹ 돌아가기</a>` : `<a href="#/program" class="back">‹ 목록</a>`}
         <span>${m.week}주차 · ${KIND_LABEL[m.kind]} · ${idx + 1}/${m.screens.length}</span>
         <span class="steps" aria-hidden="true">${steps}</span>
       </div>
@@ -371,7 +376,7 @@ function renderModule(main, [id, idxStr, flag]) {
         <div id="extra"></div>
         <div id="fields"></div>
         <div class="btn-row between no-print sticky-actions">
-          ${idx > 0 ? `<a class="btn ghost" href="#/module/${m.id}/${idx - 1}">‹ 이전</a>` : `<a class="btn ghost" href="#/program">목록</a>`}
+          ${backMode ? `<button class="btn ghost" id="back-btn" type="button">‹ 돌아가기</button>` : idx > 0 ? `<a class="btn ghost" href="#/module/${m.id}/${idx - 1}">‹ 이전</a>` : `<a class="btn ghost" href="#/program">목록</a>`}
           <button class="btn accent big" id="next-btn" type="button">${esc(nextLabel)}${isLast || screen.type !== "text" ? "" : " ›"}</button>
         </div>
       </article>
@@ -384,12 +389,19 @@ function renderModule(main, [id, idxStr, flag]) {
   if (screen.type === "questionnaire") renderQuestionnaire(fields, m, screen);
 
   $("#next-btn").onclick = () => {
-    if (screen.type === "worksheet") { if (!submitWorksheet(m, screen)) return; if (screen.mode === "append") return; }
+    if (screen.type === "worksheet") {
+      if (!submitWorksheet(m, screen)) return;
+      if (screen.mode === "append") return;
+      if (singleEdit) { if (backMode && history.length > 1) history.back(); return; } // 고친 내용만 저장하고 머무름
+    }
     if (screen.type === "questionnaire") { submitQuestionnaire(m, screen); return; }
     if (isLast) finishModule(m, nextLabel);
     else location.hash = `#/module/${m.id}/${idx + 1}`;
   };
   if (flag === "entries") setTimeout(() => $("#entries")?.scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" }), 50);
+  const goBack = (e) => { e.preventDefault(); if (history.length > 1) history.back(); else location.hash = "#/program"; };
+  if ($("#back-btn")) $("#back-btn").onclick = goBack;
+  if ($("#back-top")) $("#back-top").onclick = goBack;
 }
 
 function mountExtra(kind, el, screen) {
@@ -399,20 +411,21 @@ function mountExtra(kind, el, screen) {
   } else if (kind === "breath" || kind === "breath-cue") {
     const cue = kind === "breath-cue" ? (state.worksheets.week6_worksheet?.single?.cue_word || "") : "";
     el.innerHTML = `<h3 class="extra-title">${kind === "breath-cue" ? "호흡–단서어 연습" : "지금 바로 연습하기"}</h3><p class="muted">${kind === "breath-cue" ? (cue ? `내쉴 때 단서어 <b>'${esc(cue)}'</b>가 표시됩니다.` : "다음 워크시트에서 단서어를 정하면 내쉴 때 그 단어가 표시됩니다.") : "원이 커질 때 들이쉬고, 작아질 때 내쉽니다. 이명이 들려도 그대로 두고 호흡으로 돌아오면 됩니다."}</p><div id="breath"></div>`;
-    cleanup = ART.mountBreath($("#breath"), { cue, onDone: () => markPractice("mindfulness") });
+    cleanup = ART.mountBreath($("#breath"), { cue, onDone: () => markPractice("mindfulness", el) });
   } else if (kind === "pmr") {
     const parts = ART.parsePMRParts(screen.body);
     el.innerHTML = `<h3 class="extra-title">안내에 따라 해보기</h3><p class="muted">시작을 누르면 부위마다 긴장·이완 시간을 세어 줍니다. 순서는 위 목록과 같습니다.</p><div id="pmr"></div>`;
-    cleanup = ART.mountPMR($("#pmr"), parts, { onDone: () => markPractice("pmr") });
+    cleanup = ART.mountPMR($("#pmr"), parts, { onDone: () => markPractice("pmr", el) });
   }
 }
 // 실습을 마치면 오늘 일기에 자동 체크
-function markPractice(key) {
+function markPractice(key, el) {
   const k = dateKey();
   const d = state.diary[k] || { tinnitus: null, annoyance: null, sleep: null, mindfulness: false, pmr: false, trigger: "", memo: "", at: null };
   d[key] = true; if (!d.at) d.partial = true;
   state.diary[k] = d; save();
   toast(`오늘 일기에 '${key === "pmr" ? "근육이완" : "마음챙김"}' 체크가 표시되었습니다 ✓`);
+  if (el && !$("#go-diary", el)) { const b = document.createElement("div"); b.className = "btn-row center"; b.innerHTML = `<a class="btn" id="go-diary" href="#/today">오늘 일기 쓰러 가기 ›</a>`; el.appendChild(b); }
 }
 
 // --- 소리로 듣기 (브라우저 음성 합성) ---
@@ -444,22 +457,29 @@ function renderWorksheet(wrap, m, screen) {
   const hasUnsaved = !append && screen.fields.some((f) => draft[f.key] !== undefined && (draft[f.key] || "") !== (data.single[f.key] || ""));
   wrap.innerHTML = `
     <div class="ws-note muted small">${append ? "저장을 누르면 아래에 기록이 하나씩 쌓입니다. 쓰다 만 글은 자동으로 보관됩니다." : "저장을 누르면 내용이 보관되고, 언제든 다시 열어 고칠 수 있습니다."}</div>
+    <div id="edit-bar" class="notice" hidden>이전에 쓴 기록을 고치고 있습니다. 고친 뒤 아래 '수정한 내용 저장'을 누르세요. <button class="btn link sm" id="edit-cancel" type="button">고치기 취소</button></div>
     ${screen.fields.map((f, i) => `
     <label class="field">
       <span class="label"><span class="fnum">${i + 1}</span>${esc(f.label)}</span>
       <textarea data-key="${esc(f.key)}" placeholder="${esc(f.placeholder || "")}" rows="3">${esc(initial(f))}</textarea>
     </label>`).join("")}
-    <div id="edit-bar" class="notice" hidden>이전 기록을 수정하고 있습니다. <button class="btn link sm" id="edit-cancel" type="button">수정 취소</button></div>
     ${!append && data.singleAt ? `<p class="status-line" id="single-saved">저장됨 · ${fmtDateTime(data.singleAt)}</p>` : ""}
     ${!append && hasUnsaved ? `<div class="notice" id="draft-bar">저장하지 않은 수정 내용이 있습니다. 아래 '${esc(screen.button || "저장")}'을 누르거나 <button class="btn link sm" id="draft-drop" type="button">수정 내용 버리기</button></div>` : ""}
     ${append ? `<div class="btn-row no-print" id="append-done" ${data.entries.length ? "" : "hidden"}><button class="btn ghost" id="append-next" type="button">다 적었어요 · 다음으로 ›</button></div><div class="entries" id="entries"></div>` : ""}`;
   if ($("#draft-drop")) $("#draft-drop").onclick = () => { delete state.drafts[m.id]; save(); renderWorksheet(wrap, m, screen); };
   if ($("#append-next")) $("#append-next").onclick = () => finishModule(m, "");
   wrap.querySelectorAll("textarea").forEach((ta) => {
-    ta.addEventListener("input", () => { if (editingAt) return; const d = state.drafts[m.id] || (state.drafts[m.id] = {}); d[ta.dataset.key] = ta.value; save(); });
+    ta.addEventListener("input", () => {
+      if (editingAt) { const e = state.drafts[m.id + "@edit"] || (state.drafts[m.id + "@edit"] = { at: editingAt, responses: {} }); e.responses[ta.dataset.key] = ta.value; save(); return; }
+      const d = state.drafts[m.id] || (state.drafts[m.id] = {}); d[ta.dataset.key] = ta.value; save();
+    });
   });
   editingAt = null;
-  if (append) renderEntries(m, screen);
+  if (append) {
+    renderEntries(m, screen);
+    const pending = state.drafts[m.id + "@edit"]; // 고치다 말고 나갔던 기록이 있으면 이어서
+    if (pending && wsData(m.id).entries.some((e) => e.at === pending.at)) startEdit(m, screen, pending.at, pending.responses);
+  }
 }
 function renderEntries(m, screen, justSaved) {
   const wrap = $("#entries"); if (!wrap) return;
@@ -474,17 +494,25 @@ function renderEntries(m, screen, justSaved) {
       </div>`).join("");
   wrap.querySelectorAll("[data-del]").forEach((b) => b.onclick = () => {
     if (!confirm("이 기록을 삭제할까요?")) return;
+    if (editingAt === b.dataset.del) cancelEdit(m, screen);
     data.entries = data.entries.filter((e) => e.at !== b.dataset.del);
     save(); renderEntries(m, screen); toast("삭제했습니다.");
   });
-  wrap.querySelectorAll("[data-edit]").forEach((b) => b.onclick = () => {
-    const en = data.entries.find((e) => e.at === b.dataset.edit); if (!en) return;
-    editingAt = en.at;
-    document.querySelectorAll("#fields textarea").forEach((ta) => (ta.value = en.responses[ta.dataset.key] || ""));
-    $("#edit-bar").hidden = false; $("#next-btn").textContent = "수정한 내용 저장";
-    $("#edit-cancel").onclick = () => { editingAt = null; $("#edit-bar").hidden = true; $("#next-btn").textContent = screen.button || "기록 저장"; document.querySelectorAll("#fields textarea").forEach((ta) => (ta.value = (state.drafts[m.id] || {})[ta.dataset.key] || "")); };
-    $("#fields").scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" });
-  });
+  wrap.querySelectorAll("[data-edit]").forEach((b) => b.onclick = () => startEdit(m, screen, b.dataset.edit));
+}
+function startEdit(m, screen, at, pendingResponses) {
+  const en = wsData(m.id).entries.find((e) => e.at === at); if (!en) return;
+  editingAt = at;
+  const src = pendingResponses || en.responses;
+  document.querySelectorAll("#fields textarea").forEach((ta) => (ta.value = src[ta.dataset.key] || ""));
+  $("#edit-bar").hidden = false; $("#next-btn").textContent = "수정한 내용 저장";
+  $("#edit-cancel").onclick = () => cancelEdit(m, screen);
+  $("#edit-bar").scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" });
+}
+function cancelEdit(m, screen) {
+  editingAt = null; delete state.drafts[m.id + "@edit"]; save();
+  $("#edit-bar").hidden = true; $("#next-btn").textContent = screen.button || "기록 저장";
+  document.querySelectorAll("#fields textarea").forEach((ta) => (ta.value = (state.drafts[m.id] || {})[ta.dataset.key] || ""));
 }
 function submitWorksheet(m, screen) {
   const responses = {};
@@ -495,9 +523,10 @@ function submitWorksheet(m, screen) {
     if (editingAt) {
       const en = data.entries.find((e) => e.at === editingAt);
       if (en) en.responses = responses;
-      editingAt = null; $("#edit-bar").hidden = true; $("#next-btn").textContent = screen.button || "기록 저장";
-      save(); document.querySelectorAll("#fields textarea").forEach((ta) => (ta.value = "")); renderEntries(m, screen);
-      toast("수정한 내용을 저장했습니다 ✓"); return true;
+      save();
+      cancelEdit(m, screen); // 편집 종료 + 쓰다 만 새 글 복원
+      renderEntries(m, screen);
+      toast("고친 내용을 저장했습니다 ✓"); return true;
     }
     data.entries.push({ at: new Date().toISOString(), responses });
     delete state.drafts[m.id];
@@ -521,9 +550,9 @@ function renderQuestionnaire(wrap, m, screen) {
   const q = P.questionnaires[screen.questionnaire_type];
   if (!q) { wrap.innerHTML = `<p class="muted">이 설문은 클리닉 방문 시 진행됩니다.</p>`; return; }
   const prev = state.questionnaires.find((r) => r.type === q.type && r.timepoint === screen.timepoint_label);
-  const draft = (state.drafts[m.id] || {});
+  const draft = Object.keys(state.drafts[m.id] || {}).length ? state.drafts[m.id] : (prev ? prev.answers : {});
   wrap.innerHTML = `
-    ${prev ? `<div class="notice ok">이미 ${fmtDateTime(prev.at)}에 제출한 설문입니다 (총점 ${prev.total}점). 다시 제출하면 새 결과로 바뀝니다. <a href="#/results">결과 보기</a></div>` : ""}
+    ${prev ? `<div class="notice ok">이미 ${fmtDateTime(prev.at)}에 제출한 설문입니다 (총점 ${prev.total}점). 이전 답이 채워져 있으니 고칠 문항만 바꾸고 다시 제출하면 새 결과로 바뀝니다. <a href="#/results">결과 보기</a></div>` : ""}
     <div class="card"><p class="muted" style="margin:0">${esc(q.instruction)}</p><p class="muted small" style="margin:8px 0 0">답한 내용은 자동으로 보관되어, 중간에 나갔다 와도 이어서 할 수 있습니다.</p></div>
     <div class="q-progress muted small" id="q-progress"></div>
     ${q.items.map((it, i) => `
@@ -618,7 +647,7 @@ function renderToday(main, [dateArg]) {
       <hr class="divider">
       <label class="field"><span class="label">이명이 더 심해진 계기 <span class="muted">(선택)</span></span><input type="text" id="in-trigger" value="${esc(d.trigger || "")}" placeholder="예: 시끄러운 곳, 피로, 커피"></label>
       <label class="field"><span class="label">메모 <span class="muted">(선택)</span></span><span class="hint">오늘 느낀 점을 자유롭게. 연습한 것(이완 전후 긴장도, 잠든 시간 등)을 적어 두면 진료 때 도움이 됩니다.</span><textarea id="in-memo" placeholder="예: 근육이완 20분, 긴장도 7 → 3">${esc(d.memo || "")}</textarea></label>
-      <div class="btn-row between sticky-actions"><a class="btn link" href="#/records">지난 기록 보기</a><button class="btn accent big" type="submit">${saved ? "고친 내용 저장" : "저장"}</button></div>
+      <div class="btn-row between sticky-actions">${dateArg ? `<button class="btn ghost" type="button" id="diary-cancel">취소</button>` : `<a class="btn link" href="#/records">지난 기록 보기</a>`}<button class="btn accent big" type="submit">${saved ? "고친 내용 저장" : "저장"}</button></div>
       <p id="diary-status" class="status-line" ${saved ? "" : "hidden"}>${saved ? `마지막 저장 ${fmtDateTime(d.at)}` : ""}</p>
     </form>`;
   const vals = { tinnitus: d.tinnitus ?? null, annoyance: d.annoyance ?? null, sleep: d.sleep ?? null };
@@ -636,8 +665,10 @@ function renderToday(main, [dateArg]) {
       mindfulness: $("#in-mindfulness").checked, pmr: $("#in-pmr").checked,
       trigger: $("#in-trigger").value.trim(), memo: $("#in-memo").value.trim(), at: new Date().toISOString(),
     };
-    save(); toast("일기를 저장했습니다 ✓"); location.hash = "#/";
+    save(); toast("일기를 저장했습니다 ✓");
+    if (dateArg && history.length > 1) history.back(); else location.hash = "#/";
   };
+  if ($("#diary-cancel")) $("#diary-cancel").onclick = () => (history.length > 1 ? history.back() : (location.hash = "#/records"));
 }
 
 // =====================================================================
@@ -756,13 +787,13 @@ function updateTimer() {
 window.addEventListener("beforeunload", endSession);
 window.addEventListener("pagehide", endSession);
 
-function renderSoundLog(days) {
+function renderSoundLog(days, limit = 8) {
   const since = Date.now() - days * 86400000;
   const list = state.soundSessions.filter((s) => new Date(s.startedAt) >= since).slice().reverse();
   if (!list.length) return `<p class="muted" style="margin:0">최근 ${days}일 사용 기록이 없습니다.</p>`;
   const total = list.reduce((a, s) => a + s.durationSec, 0);
   return `<div class="kv" style="margin-bottom:10px"><span>최근 ${days}일 합계</span><b>${fmtDur(total)}</b></div>
-    <ul class="list-plain">${list.slice(0, 8).map((s) => `<li class="kv"><span>${fmtDateTime(s.startedAt)} · ${esc(s.title)} <span class="pill">${s.timeOfDay === "night" ? "야간" : "주간"}</span></span><span>${fmtDur(s.durationSec)}</span></li>`).join("")}</ul>`;
+    <ul class="list-plain">${list.slice(0, limit).map((s) => `<li class="kv"><span>${fmtDateTime(s.startedAt)} · ${esc(s.title)} <span class="pill">${s.timeOfDay === "night" ? "야간" : "주간"}</span></span><span>${fmtDur(s.durationSec)}</span></li>`).join("")}</ul>${list.length > limit ? `<p class="muted small" style="margin:8px 0 0">외 ${list.length - limit}건</p>` : ""}`;
 }
 function fmtDur(sec) {
   const h = Math.floor(sec / 3600), m = Math.round((sec % 3600) / 60);
@@ -773,7 +804,8 @@ function fmtDur(sec) {
 //  나의 기록
 // =====================================================================
 function renderRecords(main) {
-  const days = Object.keys(state.diary).filter((k) => state.diary[k].at).sort();
+  const days = Object.keys(state.diary).filter((k) => state.diary[k].at || state.diary[k].partial).sort();
+  const chartDays = days.filter((k) => state.diary[k].at);
   const wsList = P.modules.filter((m) => m.kind === "write" || m.id === "week8_act");
   main.innerHTML = `
     <section class="hero" style="padding-bottom:16px">
@@ -785,10 +817,10 @@ function renderRecords(main) {
 
     <section class="section">
       <div class="section-head"><h2>일기 추이</h2><a class="more" href="#/today">오늘 일기</a></div>
-      <div class="card">${days.length >= 2 ? renderChart(days) : `<p class="muted" style="margin:0">일기를 이틀 이상 기록하면 추이가 표시됩니다.</p>`}</div>
+      <div class="card">${chartDays.length >= 2 ? renderChart(chartDays) : `<p class="muted" style="margin:0">일기를 이틀 이상 기록하면 추이가 표시됩니다.</p>`}</div>
       <div class="card">
-        ${days.length ? `<div class="table-wrap"><table><thead><tr><th>날짜</th><th>크기</th><th>신경 쓰임</th><th>수면</th><th>실습</th><th>메모</th></tr></thead><tbody>
-          ${days.slice().reverse().map((k) => { const d = state.diary[k]; return `<tr><td><a href="#/today/${k}">${k.slice(5).replace("-", "/")}</a></td><td class="num">${d.tinnitus}</td><td class="num">${d.annoyance}</td><td class="num">${d.sleep}</td><td>${[d.mindfulness ? "마음챙김" : "", d.pmr ? "근육이완" : ""].filter(Boolean).join(", ")}</td><td class="small">${esc([d.trigger, d.memo].filter(Boolean).join(" · "))}</td></tr>`; }).join("")}
+        ${days.length ? `<div class="table-wrap"><table><thead><tr><th>날짜</th><th>크기</th><th>신경 쓰임</th><th>수면</th><th>실습</th><th>메모</th><th class="no-print"></th></tr></thead><tbody>
+          ${days.slice().reverse().map((k) => { const d = state.diary[k]; return `<tr class="rowlink" data-href="#/today/${k}"><td><a href="#/today/${k}">${k.slice(2)}</a></td><td class="num">${d.tinnitus ?? "–"}</td><td class="num">${d.annoyance ?? "–"}</td><td class="num">${d.sleep ?? "–"}</td><td>${[d.mindfulness ? "마음챙김" : "", d.pmr ? "근육이완" : ""].filter(Boolean).join(", ")}</td><td class="small">${esc([d.trigger, d.memo].filter(Boolean).join(" · "))}</td><td class="no-print"><a class="btn ghost sm" href="#/today/${k}">고치기</a></td></tr>`; }).join("")}
         </tbody></table></div>` : `<p class="muted" style="margin:0">아직 일기가 없습니다.</p>`}
       </div>
     </section>
@@ -801,7 +833,7 @@ function renderRecords(main) {
         const single = Object.keys(d.single || {}).length ? `<div class="entry">${fields.filter((f) => d.single[f.key]).map((f) => `<p><span class="q">${esc(f.label)}</span>${esc(d.single[f.key])}</p>`).join("")}</div>` : "";
         const entries = (d.entries || []).slice().reverse().map((en) => `<div class="entry"><div class="when">${fmtDateTime(en.at)}</div>${fields.filter((f) => en.responses[f.key]).map((f) => `<p><span class="q">${esc(f.label)}</span>${esc(en.responses[f.key])}</p>`).join("")}</div>`).join("");
         if (!single && !entries) return "";
-        return `<div class="card"><div class="section-head"><h3>${esc(m.title)}</h3><a class="more" href="#/module/${m.id}/${m.screens.findIndex((s) => s.type === "worksheet")}${(d.entries || []).length ? "/entries" : ""}">열어서 고치기</a></div>${single}${entries}</div>`;
+        return `<div class="card"><div class="section-head"><h3>${esc(m.title)}</h3><a class="more" href="#/module/${m.id}/${m.screens.findIndex((s) => s.type === "worksheet")}${(d.entries || []).length ? "/entries" : "/back"}">열어서 고치기</a></div>${single}${entries}</div>`;
       }).join("") || `<div class="card"><p class="muted" style="margin:0">아직 작성한 워크시트가 없습니다.</p></div>`}
     </section>
 
@@ -812,9 +844,10 @@ function renderRecords(main) {
 
     <section class="section">
       <div class="section-head"><h2>소리 치료 사용</h2><a class="more" href="#/sound">사운드</a></div>
-      <div class="card">${renderSoundLog(30)}</div>
+      <div class="card">${renderSoundLog(30, 60)}</div>
     </section>`;
   $("#print-btn").onclick = () => window.print();
+  main.querySelectorAll("tr.rowlink").forEach((tr) => tr.onclick = (e) => { if (e.target.closest("a")) return; location.hash = tr.dataset.href; });
 }
 
 // 일기 추이 — 3개 시리즈 선 그래프 (SVG). 색은 dataviz 검증을 통과한 3색.
@@ -891,7 +924,7 @@ function stateFromCompact(c) {
   const st = DEFAULT_STATE();
   st.profile.id = ex.id || st.profile.id; st.profile.nickname = ex.nickname || ""; st.profile.startDate = ex.startDate || null;
   for (const id of ex.done) st.progress[id] = "completed";
-  st.worksheets = ex.worksheets;
+  st.worksheets = Object.fromEntries(Object.entries(ex.worksheets).map(([k, w]) => [k, { single: w.single, entries: w.entries, singleAt: w.singleAt || undefined }]));
   st.questionnaires = ex.questionnaires.map((q) => ({ ...q, answers: Object.fromEntries(String(q.answers || "").split("").map((v, i) => ["q" + (i + 1), Number(v)])) }));
   for (const [k, d] of Object.entries(ex.diary)) st.diary[k] = { ...d, at: k + "T12:00:00.000Z" };
   st.soundSessions = ex.sounds.flatMap((s) => [["day", s.daySec], ["night", s.nightSec]].filter(([, sec]) => sec > 0).map(([tod, sec]) => ({ soundId: "restored", title: "복원된 기록", startedAt: s.day + (tod === "day" ? "T12:00:00.000Z" : "T23:00:00.000Z"), endedAt: null, durationSec: sec, timeOfDay: tod })));
@@ -955,7 +988,7 @@ function renderSettings(main) {
       else if (data && data.compact) next = stateFromCompact(data.compact); // 병원 태블릿에서 내려받은 사본
       if (!next) throw new Error();
       if (!confirm("현재 기기의 기록을 이 파일의 내용으로 바꿀까요?")) return;
-      state = next; save(); applyFontScale(); toast("가져왔습니다 ✓"); location.hash = "#/";
+      state = next; save(); applyFontScale(); toast(data.compact ? "병원 사본에서 복원했습니다 ✓ (글자 크기·설정과 소리 사용 상세 기록은 복원되지 않습니다)" : "가져왔습니다 ✓", 6000); location.hash = "#/";
     } catch (err) { toast("파일을 읽을 수 없습니다."); }
   };
   $("#s-reset").onclick = () => {

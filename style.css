@@ -396,3 +396,8 @@ details.staff summary { cursor: pointer; font-size: .95rem; }
   .font-btn { margin-right: 0; }
   .scale { gap: 3px; } .scale button { min-height: 44px; font-size: .95rem; border-radius: 8px; }
 }
+
+/* ---------- 루프 3 반영 ---------- */
+tr.rowlink { cursor: pointer; } tr.rowlink:hover td { background: var(--bg); }
+@media (max-width: 480px) { .scale { grid-template-columns: repeat(6, 1fr); } .scale button { min-height: 48px; font-size: 1.05rem; } }
+@media (max-width: 720px) { .q-progress { top: 56px; } }
