@@ -194,6 +194,7 @@ input[type=range] { width: 100%; accent-color: var(--accent); height: 32px; marg
 .q-opts input { position: absolute; opacity: 0; width: 0; height: 0; }
 .q-opts label:has(input:checked) { background: var(--ink); color: #fff; border-color: var(--ink); }
 .q-opts label:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+.q-opts input:checked + span::before { content: "✓ "; } /* :has() 미지원 브라우저용 선택 표시 */
 .q-item.missing .q-text { color: var(--accent-ink); }
 
 .result-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: stretch; }

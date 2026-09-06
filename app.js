@@ -113,6 +113,7 @@ function route() {
   const fn = routes[name] || renderHome;
   const main = $("#main");
   stopTTS();
+  destroyPlayer(); // 화면을 새로 그리면 유튜브 iframe이 사라지므로 세션을 먼저 닫고 플레이어를 정리
   main.innerHTML = "";
   fn(main, rest);
   document.querySelectorAll(".nav a").forEach((a) => {
@@ -396,7 +397,7 @@ function renderQuestionnaire(wrap, m, screen) {
     ${q.items.map((it, i) => `
       <div class="q-item" data-key="${it.key}">
         <div class="q-text"><span class="q-num">${i + 1}</span>${esc(it.text)}</div>
-        <div class="q-opts">${q.options.map((o) => `<label><input type="radio" name="${it.key}" value="${o.value}">${esc(o.label)}</label>`).join("")}</div>
+        <div class="q-opts">${q.options.map((o) => `<label><input type="radio" name="${it.key}" value="${o.value}"><span>${esc(o.label)}</span></label>`).join("")}</div>
       </div>`).join("")}`;
 }
 function thiSeverity(total) {
@@ -540,23 +541,26 @@ function renderSound(main) {
 async function playSound(id) {
   const item = allSounds().find((s) => s.id === id);
   if (!item || !item.youtubeId) return;
-  endSession();
+  destroyPlayer(); // 세션 종료 + 기존 플레이어 제거 (loop 목록이 이전 영상에 고정되지 않도록 매번 새로 만듦)
   yt.current = item;
   markPlaying(id);
+  const wrap = $("#player-wrap");
   $("#player-empty").hidden = true;
   $("#now-playing").textContent = item.title;
+  if (!$("#yt-player")) { const d = document.createElement("div"); d.id = "yt-player"; wrap.appendChild(d); }
   await loadYouTubeAPI();
-  if (yt.player && $("#yt-player") === null) { yt.player = null; } // 화면 이동으로 DOM이 사라진 경우
-  if (yt.player && typeof yt.player.loadVideoById === "function" && document.body.contains(yt.player.getIframe())) {
-    yt.player.loadVideoById(item.youtubeId);
-    return;
-  }
+  if (yt.current !== item) return; // 로딩 중 다른 소리를 골랐거나 화면을 떠남
   yt.player = new YT.Player("yt-player", {
     host: "https://www.youtube-nocookie.com",
     videoId: item.youtubeId,
     playerVars: { autoplay: 1, loop: 1, playlist: item.youtubeId, rel: 0, modestbranding: 1, playsinline: 1 },
     events: { onStateChange: onPlayerState },
   });
+}
+function destroyPlayer() {
+  endSession();
+  if (yt.player) { try { yt.player.destroy(); } catch (e) { /* 이미 사라짐 */ } }
+  yt.player = null; yt.current = null;
 }
 function markPlaying(id) {
   document.querySelectorAll(".sound-item").forEach((b) => b.classList.toggle("on", b.dataset.id === id));
@@ -591,6 +595,7 @@ function updateTimer() {
   el.textContent = `${pad(Math.floor(sec / 60))}:${pad(sec % 60)}`;
 }
 window.addEventListener("beforeunload", endSession);
+window.addEventListener("pagehide", endSession);
 
 function renderSoundLog(days) {
   const since = Date.now() - days * 86400000;
