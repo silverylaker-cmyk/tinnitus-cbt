@@ -78,4 +78,5 @@ program = {
 OUT.write_text("// 자동 생성 파일 — tools/build_content.py 로 다시 만듭니다. 직접 수정하지 마세요.\n"
                "window.PROGRAM = " + json.dumps(program, ensure_ascii=False, indent=1) + ";\n",
                encoding="utf-8")
+(ROOT / "data" / "program.json").write_text(json.dumps(program, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")  # 영상(리모션) 프로젝트용
 print(f"wrote {OUT} ({OUT.stat().st_size:,} bytes, {len(modules)} modules)")

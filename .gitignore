@@ -2,3 +2,8 @@
 __pycache__/
 *.pyc
 .orig-img/
+video/node_modules/
+video/out/
+video/public/audio/generated/
+video/.env
+video/src/generated/

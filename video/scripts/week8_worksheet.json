@@ -1,0 +1,106 @@
+{
+ "module": "week8_worksheet",
+ "week": 8,
+ "title": "나의 위기 대응 카드",
+ "_readme": "say = 읽을 문장 (TTS/육성). highlight = 화면 문장 번호(0=제목, 1..=본문, null=없음). point = 가리킬 요소(CSS 선택자). tap = 눌림 효과. type = {key,text} 입력칸에 타이핑. 임상 문장은 content/*.json 에서 고치고, 진행 멘트만 여기서 고치세요.",
+ "screens": [
+  {
+   "index": 0,
+   "title": "나의 위기 대응 카드",
+   "cues": [
+    {
+     "id": "s0-intro",
+     "say": "8주차 작성 내용, '나의 위기 대응 카드'를 함께 보겠습니다.",
+     "highlight": null
+    },
+    {
+     "id": "s0-00",
+     "say": "나의 위기 대응 카드",
+     "highlight": 0
+    },
+    {
+     "id": "s0-01",
+     "say": "이명이 유난히 힘든 날, 이 카드를 열어보게 됩니다.",
+     "highlight": 1
+    },
+    {
+     "id": "s0-02",
+     "say": "미래의 나에게 남기는 구체적인 지침이라고 생각하고 적어주세요.",
+     "highlight": 2
+    },
+    {
+     "id": "s0-03",
+     "say": "언제든 다시 열어 수정할 수 있습니다.",
+     "highlight": 3
+    },
+    {
+     "id": "s0-f0",
+     "say": "첫 번째 칸입니다. 나의 경고 신호 — 힘들어지기 시작할 때 나타나는 신호들",
+     "highlight": null,
+     "point": "textarea[data-key=\"warning_signs\"]"
+    },
+    {
+     "id": "s0-f0t",
+     "say": "예를 들면 이렇게 적을 수 있습니다. 이명 체크가 잦아짐",
+     "highlight": null,
+     "type": {
+      "key": "warning_signs",
+      "text": "이명 체크가 잦아짐"
+     }
+    },
+    {
+     "id": "s0-f1",
+     "say": "두 번째 칸입니다. 첫 번째 행동 — 신호를 느끼면 가장 먼저 할 일 (구체적으로)",
+     "highlight": null,
+     "point": "textarea[data-key=\"first_action\"]"
+    },
+    {
+     "id": "s0-f1t",
+     "say": "예를 들면 이렇게 적을 수 있습니다. 축약 이완 1분 → 사운드 켜기 → 하던 일로 주의 옮기기",
+     "highlight": null,
+     "type": {
+      "key": "first_action",
+      "text": "축약 이완 1분 → 사운드 켜기 → 하던 일로 주의 옮기기"
+     }
+    },
+    {
+     "id": "s0-f2",
+     "say": "세 번째 칸입니다. 나에게 효과 있었던 생각 — 8주 중 가장 도움이 된 대안적 생각",
+     "highlight": null,
+     "point": "textarea[data-key=\"helpful_thoughts\"]"
+    },
+    {
+     "id": "s0-f2t",
+     "say": "예를 들면 이렇게 적을 수 있습니다. 파도일 뿐",
+     "highlight": null,
+     "type": {
+      "key": "helpful_thoughts",
+      "text": "파도일 뿐"
+     }
+    },
+    {
+     "id": "s0-f3",
+     "say": "네 번째 칸입니다. 그래도 힘들면 — 2~3일 이상 지속될 때의 계획",
+     "highlight": null,
+     "point": "textarea[data-key=\"backup_plan\"]"
+    },
+    {
+     "id": "s0-f3t",
+     "say": "예를 들면 이렇게 적을 수 있습니다. PMR 매일로 복귀",
+     "highlight": null,
+     "type": {
+      "key": "backup_plan",
+      "text": "PMR 매일로 복귀"
+     }
+    },
+    {
+     "id": "s0-save",
+     "say": "다 적었으면 아래 '저장하고 다음' 버튼을 누릅니다. 저장한 내용은 언제든 다시 열어 고칠 수 있습니다.",
+     "highlight": null,
+     "point": "#next-btn",
+     "tap": true
+    }
+   ]
+  }
+ ]
+}

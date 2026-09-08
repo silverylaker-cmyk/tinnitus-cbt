@@ -1,0 +1,126 @@
+{
+ "module": "week4_worksheet",
+ "week": 4,
+ "title": "나의 행동실험 계획",
+ "_readme": "say = 읽을 문장 (TTS/육성). highlight = 화면 문장 번호(0=제목, 1..=본문, null=없음). point = 가리킬 요소(CSS 선택자). tap = 눌림 효과. type = {key,text} 입력칸에 타이핑. 임상 문장은 content/*.json 에서 고치고, 진행 멘트만 여기서 고치세요.",
+ "screens": [
+  {
+   "index": 0,
+   "title": "나의 행동실험 계획",
+   "cues": [
+    {
+     "id": "s0-intro",
+     "say": "4주차 작성 내용, '나의 행동실험 계획'을 함께 보겠습니다.",
+     "highlight": null
+    },
+    {
+     "id": "s0-00",
+     "say": "나의 행동실험 계획",
+     "highlight": 0
+    },
+    {
+     "id": "s0-01",
+     "say": "이번 주에 실행할 행동실험을 설계해 보세요.",
+     "highlight": 1
+    },
+    {
+     "id": "s0-02",
+     "say": "실험 전에 1~3번을 적어 저장하세요.",
+     "highlight": 2
+    },
+    {
+     "id": "s0-03",
+     "say": "실행한 뒤에는 아래 저장된 기록의 '수정'을 눌러 4~5번을 채워 넣으면 한 실험이 한 기록에 모입니다.",
+     "highlight": 3
+    },
+    {
+     "id": "s0-04",
+     "say": "새 실험은 빈 칸에 새로 적어 저장하세요.",
+     "highlight": 4
+    },
+    {
+     "id": "s0-f0",
+     "say": "첫 번째 칸입니다. 검증할 믿음 — \"이명 때문에 OO을 못한다\"",
+     "highlight": null,
+     "point": "textarea[data-key=\"belief\"]"
+    },
+    {
+     "id": "s0-f0t",
+     "say": "예를 들면 이렇게 적을 수 있습니다. 이명 때문에 조용한 카페에서 책을 못 읽는다",
+     "highlight": null,
+     "type": {
+      "key": "belief",
+      "text": "이명 때문에 조용한 카페에서 책을 못 읽는다"
+     }
+    },
+    {
+     "id": "s0-f1",
+     "say": "두 번째 칸입니다. 예측 — 실제로 하면 어떻게 될 것 같나요? 확신도(0~100%)도 함께",
+     "highlight": null,
+     "point": "textarea[data-key=\"prediction\"]"
+    },
+    {
+     "id": "s0-f1t",
+     "say": "예를 들면 이렇게 적을 수 있습니다. 소리에만 신경 쓰여서 5분도 못 읽고 나올 것이다 (확신 80%)",
+     "highlight": null,
+     "type": {
+      "key": "prediction",
+      "text": "소리에만 신경 쓰여서 5분도 못 읽고 나올 것이다 (확신 80%)"
+     }
+    },
+    {
+     "id": "s0-f2",
+     "say": "세 번째 칸입니다. 실험 계획 — 언제, 어디서, 무엇을 해볼까요?",
+     "highlight": null,
+     "point": "textarea[data-key=\"experiment_plan\"]"
+    },
+    {
+     "id": "s0-f2t",
+     "say": "예를 들면 이렇게 적을 수 있습니다. 토요일 오후",
+     "highlight": null,
+     "type": {
+      "key": "experiment_plan",
+      "text": "토요일 오후"
+     }
+    },
+    {
+     "id": "s0-f3",
+     "say": "네 번째 칸입니다. 실제 결과 — (실행 후 작성) 실제로는 어땠나요?",
+     "highlight": null,
+     "point": "textarea[data-key=\"actual_result\"]"
+    },
+    {
+     "id": "s0-f3t",
+     "say": "예를 들면 이렇게 적을 수 있습니다. 처음 10분은 거슬렸지만 책에 빠지자 잊었고 40분을 읽었다",
+     "highlight": null,
+     "type": {
+      "key": "actual_result",
+      "text": "처음 10분은 거슬렸지만 책에 빠지자 잊었고 40분을 읽었다"
+     }
+    },
+    {
+     "id": "s0-f4",
+     "say": "다섯 번째 칸입니다. 배운 점 — 예측과 비교해보면? 믿음의 확신도는 지금 몇 %인가요?",
+     "highlight": null,
+     "point": "textarea[data-key=\"learning\"]"
+    },
+    {
+     "id": "s0-f4t",
+     "say": "예를 들면 이렇게 적을 수 있습니다. 생각보다 할 수 있었다. 확신도 80% → 40%",
+     "highlight": null,
+     "type": {
+      "key": "learning",
+      "text": "생각보다 할 수 있었다. 확신도 80% → 40%"
+     }
+    },
+    {
+     "id": "s0-save",
+     "say": "다 적었으면 아래 '기록 저장' 버튼을 누릅니다. 저장한 내용은 언제든 다시 열어 고칠 수 있습니다.",
+     "highlight": null,
+     "point": "#next-btn",
+     "tap": true
+    }
+   ]
+  }
+ ]
+}

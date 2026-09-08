@@ -1,0 +1,101 @@
+{
+ "module": "week7_worksheet",
+ "week": 7,
+ "title": "나의 취침 루틴 설계",
+ "_readme": "say = 읽을 문장 (TTS/육성). highlight = 화면 문장 번호(0=제목, 1..=본문, null=없음). point = 가리킬 요소(CSS 선택자). tap = 눌림 효과. type = {key,text} 입력칸에 타이핑. 임상 문장은 content/*.json 에서 고치고, 진행 멘트만 여기서 고치세요.",
+ "screens": [
+  {
+   "index": 0,
+   "title": "나의 취침 루틴 설계",
+   "cues": [
+    {
+     "id": "s0-intro",
+     "say": "7주차 작성 내용, '나의 취침 루틴 설계'를 함께 보겠습니다.",
+     "highlight": null
+    },
+    {
+     "id": "s0-00",
+     "say": "나의 취침 루틴 설계",
+     "highlight": 0
+    },
+    {
+     "id": "s0-01",
+     "say": "오늘 밤부터 실행할 나만의 야간 계획을 만들어 보세요.",
+     "highlight": 1
+    },
+    {
+     "id": "s0-02",
+     "say": "구체적일수록 지키기 쉽습니다.",
+     "highlight": 2
+    },
+    {
+     "id": "s0-f0",
+     "say": "첫 번째 칸입니다. 목표 시간 — 기상 시간(고정)과 대략의 취침 시간",
+     "highlight": null,
+     "point": "textarea[data-key=\"target_times\"]"
+    },
+    {
+     "id": "s0-f0t",
+     "say": "예를 들면 이렇게 적을 수 있습니다. 기상 6:30 고정",
+     "highlight": null,
+     "type": {
+      "key": "target_times",
+      "text": "기상 6:30 고정"
+     }
+    },
+    {
+     "id": "s0-f1",
+     "say": "두 번째 칸입니다. 취침 전 루틴 — 잠들기 전 30~60분의 순서",
+     "highlight": null,
+     "point": "textarea[data-key=\"routine_steps\"]"
+    },
+    {
+     "id": "s0-f1t",
+     "say": "예를 들면 이렇게 적을 수 있습니다. 22:00 조명 낮추고 화면 끄기 → 세면 → 스트레칭 → PMR 15분 → 사운드 켜고 눕기",
+     "highlight": null,
+     "type": {
+      "key": "routine_steps",
+      "text": "22:00 조명 낮추고 화면 끄기 → 세면 → 스트레칭 → PMR 15분 → 사운드 켜고 눕기"
+     }
+    },
+    {
+     "id": "s0-f2",
+     "say": "세 번째 칸입니다. 야간 사운드 계획 — 어떤 사운드를 어느 볼륨으로?",
+     "highlight": null,
+     "point": "textarea[data-key=\"night_sound_plan\"]"
+    },
+    {
+     "id": "s0-f2t",
+     "say": "예를 들면 이렇게 적을 수 있습니다. 노치 사운드",
+     "highlight": null,
+     "type": {
+      "key": "night_sound_plan",
+      "text": "노치 사운드"
+     }
+    },
+    {
+     "id": "s0-f3",
+     "say": "네 번째 칸입니다. 한밤중에 깼을 때의 계획",
+     "highlight": null,
+     "point": "textarea[data-key=\"if_awake_plan\"]"
+    },
+    {
+     "id": "s0-f3t",
+     "say": "예를 들면 이렇게 적을 수 있습니다. 축약 이완 1분 → 사운드 다시 켜기 → 20분 넘으면 거실에서 책 읽다가 졸리면 복귀",
+     "highlight": null,
+     "type": {
+      "key": "if_awake_plan",
+      "text": "축약 이완 1분 → 사운드 다시 켜기 → 20분 넘으면 거실에서 책 읽다가 졸리면 복귀"
+     }
+    },
+    {
+     "id": "s0-save",
+     "say": "다 적었으면 아래 '저장하고 다음' 버튼을 누릅니다. 저장한 내용은 언제든 다시 열어 고칠 수 있습니다.",
+     "highlight": null,
+     "point": "#next-btn",
+     "tap": true
+    }
+   ]
+  }
+ ]
+}

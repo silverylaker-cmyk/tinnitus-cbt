@@ -1,0 +1,101 @@
+{
+ "module": "week6_worksheet",
+ "week": 6,
+ "title": "나의 축약 이완 설계",
+ "_readme": "say = 읽을 문장 (TTS/육성). highlight = 화면 문장 번호(0=제목, 1..=본문, null=없음). point = 가리킬 요소(CSS 선택자). tap = 눌림 효과. type = {key,text} 입력칸에 타이핑. 임상 문장은 content/*.json 에서 고치고, 진행 멘트만 여기서 고치세요.",
+ "screens": [
+  {
+   "index": 0,
+   "title": "나의 축약 이완 설계",
+   "cues": [
+    {
+     "id": "s0-intro",
+     "say": "6주차 작성 내용, '나의 축약 이완 설계'를 함께 보겠습니다.",
+     "highlight": null
+    },
+    {
+     "id": "s0-00",
+     "say": "나의 축약 이완 설계",
+     "highlight": 0
+    },
+    {
+     "id": "s0-01",
+     "say": "나에게 맞는 단서어와 적용 계획을 정해보세요.",
+     "highlight": 1
+    },
+    {
+     "id": "s0-02",
+     "say": "이번 주 실전 적용 후에 결과도 기록합니다.",
+     "highlight": 2
+    },
+    {
+     "id": "s0-f0",
+     "say": "첫 번째 칸입니다. 나의 단서어 — 내쉬는 숨과 짝지을 짧은 단어",
+     "highlight": null,
+     "point": "textarea[data-key=\"cue_word\"]"
+    },
+    {
+     "id": "s0-f0t",
+     "say": "예를 들면 이렇게 적을 수 있습니다. 편안",
+     "highlight": null,
+     "type": {
+      "key": "cue_word",
+      "text": "편안"
+     }
+    },
+    {
+     "id": "s0-f1",
+     "say": "두 번째 칸입니다. 내 긴장이 잘 숨는 곳 — 스트레스 때 몸 어디가 먼저 굳나요?",
+     "highlight": null,
+     "point": "textarea[data-key=\"tension_spots\"]"
+    },
+    {
+     "id": "s0-f1t",
+     "say": "예를 들면 이렇게 적을 수 있습니다. 어깨가 올라감",
+     "highlight": null,
+     "type": {
+      "key": "tension_spots",
+      "text": "어깨가 올라감"
+     }
+    },
+    {
+     "id": "s0-f2",
+     "say": "세 번째 칸입니다. 적용할 상황 — 이번 주에 축약 이완을 써 볼 순간",
+     "highlight": null,
+     "point": "textarea[data-key=\"trigger_plan\"]"
+    },
+    {
+     "id": "s0-f2t",
+     "say": "예를 들면 이렇게 적을 수 있습니다. 업무 중 이명이 거슬릴 때",
+     "highlight": null,
+     "type": {
+      "key": "trigger_plan",
+      "text": "업무 중 이명이 거슬릴 때"
+     }
+    },
+    {
+     "id": "s0-f3",
+     "say": "네 번째 칸입니다. 적용 기록 — (실전 후 작성) 시도할 때마다 한 줄씩 덧붙여 주세요. 언제 시도했고, 전후가 어땠나요?",
+     "highlight": null,
+     "point": "textarea[data-key=\"application_log\"]"
+    },
+    {
+     "id": "s0-f3t",
+     "say": "예를 들면 이렇게 적을 수 있습니다. 화요일 회의 중 시도. 긴장 7→4",
+     "highlight": null,
+     "type": {
+      "key": "application_log",
+      "text": "화요일 회의 중 시도. 긴장 7→4"
+     }
+    },
+    {
+     "id": "s0-save",
+     "say": "다 적었으면 아래 '저장하고 다음' 버튼을 누릅니다. 저장한 내용은 언제든 다시 열어 고칠 수 있습니다.",
+     "highlight": null,
+     "point": "#next-btn",
+     "tap": true
+    }
+   ]
+  }
+ ]
+}

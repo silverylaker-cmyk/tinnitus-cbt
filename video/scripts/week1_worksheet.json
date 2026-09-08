@@ -1,0 +1,116 @@
+{
+ "module": "week1_worksheet",
+ "week": 1,
+ "title": "나의 악순환 그리기",
+ "_readme": "say = 읽을 문장 (TTS/육성). highlight = 화면 문장 번호(0=제목, 1..=본문, null=없음). point = 가리킬 요소(CSS 선택자). tap = 눌림 효과. type = {key,text} 입력칸에 타이핑. 임상 문장은 content/*.json 에서 고치고, 진행 멘트만 여기서 고치세요.",
+ "screens": [
+  {
+   "index": 0,
+   "title": "나의 악순환은 어떤 모습인가요?",
+   "cues": [
+    {
+     "id": "s0-intro",
+     "say": "1주차 작성 내용, '나의 악순환 그리기'를 함께 보겠습니다.",
+     "highlight": null
+    },
+    {
+     "id": "s0-00",
+     "say": "나의 악순환은 어떤 모습인가요?",
+     "highlight": 0
+    },
+    {
+     "id": "s0-01",
+     "say": "앞에서 본 악순환 고리를 나에게 맞게 채워보세요.",
+     "highlight": 1
+    },
+    {
+     "id": "s0-02",
+     "say": "정답은 없습니다.",
+     "highlight": 2
+    },
+    {
+     "id": "s0-03",
+     "say": "지금 떠오르는 대로 편하게 적어보세요.",
+     "highlight": 3
+    },
+    {
+     "id": "s0-04",
+     "say": "지금 완벽하게 쓰지 않아도 괜찮습니다.",
+     "highlight": 4
+    },
+    {
+     "id": "s0-05",
+     "say": "저장한 기록은 아래에 차곡차곡 쌓이고, 기록 탭에서도 볼 수 있습니다.",
+     "highlight": 5
+    },
+    {
+     "id": "s0-f0",
+     "say": "첫 번째 칸입니다. 이명이 특히 신경 쓰일 때는 언제인가요?",
+     "highlight": null,
+     "point": "textarea[data-key=\"trigger_situation\"]"
+    },
+    {
+     "id": "s0-f0t",
+     "say": "예를 들면 이렇게 적을 수 있습니다. 조용한 방에서 잠들려 할 때",
+     "highlight": null,
+     "type": {
+      "key": "trigger_situation",
+      "text": "조용한 방에서 잠들려 할 때"
+     }
+    },
+    {
+     "id": "s0-f1",
+     "say": "두 번째 칸입니다. 그때 어떤 생각이 스쳐 지나가나요?",
+     "highlight": null,
+     "point": "textarea[data-key=\"automatic_thought\"]"
+    },
+    {
+     "id": "s0-f1t",
+     "say": "예를 들면 이렇게 적을 수 있습니다. 오늘따라 왜 이렇게 크지",
+     "highlight": null,
+     "type": {
+      "key": "automatic_thought",
+      "text": "오늘따라 왜 이렇게 크지"
+     }
+    },
+    {
+     "id": "s0-f2",
+     "say": "세 번째 칸입니다. 그 생각과 함께 어떤 감정이 드나요?",
+     "highlight": null,
+     "point": "textarea[data-key=\"emotion\"]"
+    },
+    {
+     "id": "s0-f2t",
+     "say": "예를 들면 이렇게 적을 수 있습니다. 불안",
+     "highlight": null,
+     "type": {
+      "key": "emotion",
+      "text": "불안"
+     }
+    },
+    {
+     "id": "s0-f3",
+     "say": "네 번째 칸입니다. 몸에서는 어떤 반응이 느껴지나요?",
+     "highlight": null,
+     "point": "textarea[data-key=\"body_reaction\"]"
+    },
+    {
+     "id": "s0-f3t",
+     "say": "예를 들면 이렇게 적을 수 있습니다. 어깨가 긴장됨",
+     "highlight": null,
+     "type": {
+      "key": "body_reaction",
+      "text": "어깨가 긴장됨"
+     }
+    },
+    {
+     "id": "s0-save",
+     "say": "다 적었으면 아래 '기록 저장' 버튼을 누릅니다. 저장한 내용은 언제든 다시 열어 고칠 수 있습니다.",
+     "highlight": null,
+     "point": "#next-btn",
+     "tap": true
+    }
+   ]
+  }
+ ]
+}

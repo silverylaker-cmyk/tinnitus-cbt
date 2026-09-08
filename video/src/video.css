@@ -1,0 +1,22 @@
+/* 영상 합성용 (폰 화면 밖) */
+.stage { position: absolute; inset: 0; background: #E9E5D8; overflow: hidden; font-family: "Noto Sans KR", sans-serif; }
+.stage::before { content: ""; position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% 0%, #F5F3EC 0%, #E9E5D8 60%, #DED9C8 100%); }
+.phone-wrap { position: absolute; left: 50%; top: 130px; width: 540px; height: 880px; transform: translateX(-50%) scale(1.5); transform-origin: top center; }
+.phone { position: relative; width: 540px; height: 880px; background: #F5F3EC; border-radius: 34px; overflow: hidden; box-shadow: 0 30px 80px rgba(20,20,19,.18), 0 0 0 8px #141413, 0 0 0 10px #3a3935; }
+.phone-scroll { position: absolute; top: 56px; left: 0; right: 0; bottom: 72px; overflow: hidden; }
+.phone-scroll > .page { will-change: transform; }
+.phone .body .nar { border-radius: 6px; padding: 0 2px; margin: 0 -2px; transition: none; }
+.phone .body .nar.on { background: rgba(194, 84, 47, .16); box-shadow: 0 0 0 4px rgba(194, 84, 47, .16); color: #141413; }
+.phone .body .nar.done { color: #3f3e3a; }
+.phone h1 .nar.on { text-decoration: underline; text-decoration-color: #C2542F; text-decoration-thickness: 3px; text-underline-offset: 8px; }
+.phone .body.dim .nar:not(.on):not(.done) { color: #8a877d; }
+.phone .tapped { transform: scale(.96); filter: brightness(.9); }
+.phone .field.focus textarea { border-color: #C2542F; box-shadow: 0 0 0 3px rgba(194,84,47,.18); }
+.caret { display: inline-block; width: 2px; height: 1.1em; background: #141413; vertical-align: -0.15em; margin-left: 1px; }
+.pointer { position: absolute; pointer-events: none; z-index: 50; filter: drop-shadow(0 6px 10px rgba(0,0,0,.28)); }
+.ripple { position: absolute; border-radius: 50%; border: 3px solid #C2542F; z-index: 49; pointer-events: none; }
+.subtitle { position: absolute; left: 60px; right: 60px; bottom: 90px; min-height: 250px; background: rgba(20, 20, 19, .92); color: #F5F3EC; border-radius: 28px; padding: 40px 48px; font-size: 44px; line-height: 1.45; font-weight: 500; word-break: keep-all; display: flex; align-items: center; box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+.subtitle .lbl { position: absolute; top: -22px; left: 40px; background: #C2542F; color: #fff; font-size: 24px; padding: 6px 16px; border-radius: 999px; font-weight: 600; letter-spacing: .04em; }
+.header { position: absolute; top: 46px; left: 60px; right: 60px; display: flex; justify-content: space-between; align-items: baseline; color: #5F5D56; font-size: 28px; }
+.header b { font-family: "Noto Serif KR", serif; font-weight: 600; color: #141413; font-size: 34px; }
+.header .accent { color: #9F401F; }

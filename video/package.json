@@ -1,0 +1,26 @@
+{
+  "name": "tinnitus-cbt-narration",
+  "private": true,
+  "description": "이명 CBT 앱 화면 기반 나레이션 영상 (Remotion)",
+  "scripts": {
+    "prep": "node tools/make_css.mjs && node tools/make_scripts.mjs && node tools/make_index.mjs",
+    "scripts": "node tools/make_scripts.mjs",
+    "tts": "node tools/tts.mjs",
+    "index": "node tools/make_index.mjs",
+    "studio": "remotion studio",
+    "render": "remotion render",
+    "render:pilot": "remotion render week1-psychoeducation out/week1_psychoeducation.mp4"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.290",
+    "@remotion/google-fonts": "4.0.290",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "remotion": "4.0.290"
+  },
+  "devDependencies": {
+    "@types/react": "19.0.0",
+    "typescript": "5.8.3"
+  },
+  "type": "module"
+}

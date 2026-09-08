@@ -1,0 +1,69 @@
+{
+ "module": "week1_assessment",
+ "week": 1,
+ "title": "시작 평가 설문지 (THI)",
+ "_readme": "say = 읽을 문장 (TTS/육성). highlight = 화면 문장 번호(0=제목, 1..=본문, null=없음). point = 가리킬 요소(CSS 선택자). tap = 눌림 효과. type = {key,text} 입력칸에 타이핑. 임상 문장은 content/*.json 에서 고치고, 진행 멘트만 여기서 고치세요.",
+ "screens": [
+  {
+   "index": 0,
+   "title": "지금 상태를 확인해볼게요",
+   "cues": [
+    {
+     "id": "s0-intro",
+     "say": "1주차 확인 내용, '시작 평가 설문지 (THI)'를 함께 보겠습니다.",
+     "highlight": null
+    },
+    {
+     "id": "s0-00",
+     "say": "지금 상태를 확인해볼게요",
+     "highlight": 0
+    },
+    {
+     "id": "s0-01",
+     "say": "프로그램을 시작하기 전, 현재 이명이 일상에 미치는 영향을 알아보는 간단한 설문입니다.",
+     "highlight": 1
+    },
+    {
+     "id": "s0-02",
+     "say": "8주 후 같은 설문을 다시 진행해 변화를 비교하게 됩니다.",
+     "highlight": 2
+    },
+    {
+     "id": "s0-03",
+     "say": "정답이 있는 시험이 아닙니다.",
+     "highlight": 3
+    },
+    {
+     "id": "s0-04",
+     "say": "지금 느끼시는 대로 편하게 응답해 주세요.",
+     "highlight": 4
+    },
+    {
+     "id": "s0-05",
+     "say": "약 5분 정도 걸리며, 제출하면 점수와 결과를 바로 볼 수 있습니다.",
+     "highlight": 5
+    },
+    {
+     "id": "s0-inst",
+     "say": "지난 한 달 동안의 경험을 기준으로, 각 문항에 해당하는 답을 골라 주세요. 정답은 없습니다.",
+     "highlight": null,
+     "point": "#fields .card"
+    },
+    {
+     "id": "s0-q1",
+     "say": "문항마다 '그렇다', '가끔 그렇다', '아니다' 가운데 하나를 고릅니다.",
+     "highlight": null,
+     "point": ".q-item .q-opts",
+     "tap": true
+    },
+    {
+     "id": "s0-submit",
+     "say": "모든 문항에 답하면 아래 '제출하기' 버튼을 누릅니다.",
+     "highlight": null,
+     "point": "#next-btn",
+     "tap": true
+    }
+   ]
+  }
+ ]
+}
