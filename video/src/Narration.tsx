@@ -36,6 +36,7 @@ export const Narration: React.FC<{ moduleId: string }> = ({ moduleId }) => {
     const max = Math.max(0, lay.pageHeight - VIEW_H);
     let y = 0;
     if (c.highlight != null && lay.sentences[c.highlight]) y = lay.sentences[c.highlight].top - 150;
+    else if (c.point && lay.targets[c.point]?.fixed) return -1;
     else if (c.point && lay.targets[c.point]) y = lay.targets[c.point].top + lay.targets[c.point].height / 2 - VIEW_H * 0.62;
     else if (c.type && lay.targets[`textarea[data-key="${c.type.key}"]`]) y = lay.targets[`textarea[data-key="${c.type.key}"]`].top - VIEW_H * 0.35;
     else return -1;
@@ -65,10 +66,10 @@ export const Narration: React.FC<{ moduleId: string }> = ({ moduleId }) => {
   // ---- 포인터(손) 위치
   let hand: { x: number; y: number; press: number; ripple: number } | null = null;
   if (cueNow?.point && lay?.targets[cueNow.point]) {
-    const r = lay.targets[cueNow.point];
-    const tx = r.left + Math.min(r.width * 0.72, 200), ty = r.top + r.height * 0.62 - scroll + 56;
+    const pos = (r: Layout["targets"][string]) => ({ x: r.left + Math.min(r.width * 0.72, 200), y: r.fixed ? r.top + r.height * 0.5 : r.top + r.height * 0.62 - scroll + 56 });
+    const { x: tx, y: ty } = pos(lay.targets[cueNow.point]);
     const prev = cueIdx > 0 ? scr.cues.slice(0, cueIdx).reverse().find((c) => c.point && lay.targets[c.point!]) : null;
-    const p0 = prev ? { x: lay.targets[prev.point!].left + Math.min(lay.targets[prev.point!].width * 0.72, 200), y: lay.targets[prev.point!].top + lay.targets[prev.point!].height * 0.62 - scroll + 56 } : { x: 620, y: 960 };
+    const p0 = prev ? pos(lay.targets[prev.point!]) : { x: 620, y: 960 };
     const k = interpolate(frame, [cueNow.from, cueNow.from + 20], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) });
     const press = cueNow.tap ? interpolate(frame, [cueNow.from + TAP_AT - 4, cueNow.from + TAP_AT, cueNow.from + TAP_AT + 8], [0, 1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) : 0;
     const ripple = cueNow.tap ? interpolate(frame, [cueNow.from + TAP_AT, cueNow.from + TAP_AT + 24], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) : 0;

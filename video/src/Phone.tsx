@@ -8,7 +8,7 @@ const KIND_LABEL: Record<string, string> = { learn: "학습", write: "작성", h
 const EXTRAS: Record<string, string> = { "week1_psychoeducation:1": "cycle", "week3_training:0": "breath", "week5_training:1": "pmr", "week6_psychoeducation:1": "breath-cue", "week7_psychoeducation:2": "img:night" };
 const ASSET = (p: string) => staticFile(p);
 
-export type Layout = { sentences: Record<number, { top: number; height: number }>; targets: Record<string, { top: number; left: number; width: number; height: number }>; pageHeight: number };
+export type Layout = { sentences: Record<number, { top: number; height: number }>; targets: Record<string, { top: number; left: number; width: number; height: number; fixed?: boolean }>; pageHeight: number };
 export type PhoneState = {
   highlight: number | null; done: Set<number>; dim: boolean;
   typed: Record<string, { text: string; caret: boolean }>; focusKey: string | null;
@@ -54,12 +54,18 @@ export const Phone: React.FC<{ program: any; mod: any; index: number; view?: "mo
       const sentences: Layout["sentences"] = {};
       page.querySelectorAll<HTMLElement>("[data-s]").forEach((el) => { const r = rel(el); sentences[Number(el.dataset.s)] = { top: r.top, height: r.height }; });
       const targets: Layout["targets"] = {};
-      for (const sel of selectors) { const el = page.querySelector(sel); if (el) targets[sel] = rel(el); }
+      const phone = page.closest(".phone")!; const pr = phone.getBoundingClientRect();
+      for (const sel of selectors) {
+        const el = page.querySelector(sel);
+        if (el) { targets[sel] = rel(el); continue; }
+        const fx = phone.querySelector(sel); // 페이지 밖(탭바 등) 요소: 폰 기준 좌표, 스크롤 영향 없음
+        if (fx) { const r = fx.getBoundingClientRect(); targets[sel] = { top: (r.top - pr.top) / scale, left: (r.left - pr.left) / scale, width: r.width / scale, height: r.height / scale, fixed: true }; }
+      }
       measured.current = true;
       onLayout({ sentences, targets, pageHeight: page.offsetHeight });
       continueRender(handle);
     };
-    const imgs = Array.from(pageRef.current?.querySelectorAll("img") ?? []).map((im) => im.complete ? Promise.resolve() : im.decode().catch(() => {}));
+    const imgs = Array.from(pageRef.current?.querySelectorAll("img") ?? []).map((im) => im.complete && im.naturalWidth > 0 ? Promise.resolve() : new Promise<void>((r) => { im.addEventListener("load", () => r(), { once: true }); im.addEventListener("error", () => r(), { once: true }); setTimeout(r, 8000); }));
     Promise.all([(document as any).fonts?.ready ?? Promise.resolve(), ...imgs]).then(run);
   }, []);
 
