@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
-import { continueRender, delayRender, staticFile } from "remotion";
+import { Img, continueRender, delayRender, staticFile } from "remotion";
 import { parseBody } from "./lib/sentences.js";
 import "../../illustrations.js";
 
@@ -71,8 +71,9 @@ export const Phone: React.FC<{ program: any; mod: any; index: number; st: PhoneS
 
   let extraHtml = "";
   if (extra === "cycle") { const steps = (screen.body.match(/^\d+\. .+$/gm) || []).map((l: string) => l.replace(/^\d+\. /, "")); extraHtml = `<h3 class="extra-title">악순환 고리 한눈에 보기</h3>` + ART.cycle(steps); }
-  else if (extra?.startsWith("img:")) extraHtml = `<figure class="concept"><img src="${ASSET(ART.CONCEPTS[extra.slice(4)])}" alt=""><figcaption>낮은 볼륨의 소리를 켜 두고, 잠을 쫓아가지 않고 기다립니다</figcaption></figure>`;
-  const artHtml = showArt ? (ART.IMAGES[mod.week] ? `<img class="art img screen-art" src="${ASSET(ART.IMAGES[mod.week])}" alt="">` : ART.week(mod.week, "screen-art")) : "";
+  const conceptImg = extra?.startsWith("img:") ? ART.CONCEPTS[extra.slice(4)] : null;
+  const heroImg = showArt && ART.IMAGES[mod.week];
+  const artHtml = showArt && !heroImg ? ART.week(mod.week, "screen-art") : "";
 
   return (
     <div className="phone">
@@ -92,12 +93,14 @@ export const Phone: React.FC<{ program: any; mod: any; index: number; st: PhoneS
               <span className="steps">{steps}</span>
             </div>
             <article className="screen">
+              {heroImg && <Img className="art img screen-art" src={ASSET(heroImg)} />}
               {artHtml && <div dangerouslySetInnerHTML={{ __html: artHtml }} />}
               {screen.title.replace(/\s/g, "") !== mod.title.replace(/\s/g, "") && <div className="eyebrow">{mod.title}</div>}
               <h1><Sent s={0} text={screen.title} st={st} /></h1>
               <div className="tts"><button className="btn ghost sm" type="button">🔈 소리로 듣기</button></div>
               <Body blocks={blocks} st={st} />
               {extraHtml && <div id="extra" dangerouslySetInnerHTML={{ __html: extraHtml }} />}
+              {conceptImg && <figure className="concept"><Img src={ASSET(conceptImg)} /><figcaption>낮은 볼륨의 소리를 켜 두고, 잠을 쫓아가지 않고 기다립니다</figcaption></figure>}
               <div id="fields">
                 {screen.type === "worksheet" && (
                   <>
