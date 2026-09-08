@@ -413,6 +413,7 @@ function renderModule(main, [id, idxStr, flag]) {
 
   $("#next-btn").onclick = () => {
     if (screen.type === "worksheet") {
+      if (screen.mode === "append" && $("#next-btn").dataset.mode === "next") { finishModule(m, ""); return; }
       if (!submitWorksheet(m, screen)) return;
       if (screen.mode === "append") return;
       if (singleEdit) { if (backMode && history.length > 1) history.back(); return; } // 고친 내용만 저장하고 머무름
@@ -496,21 +497,30 @@ function renderWorksheet(wrap, m, screen) {
     </label>`).join("")}
     ${!append && data.singleAt ? `<p class="status-line" id="single-saved">저장됨 · ${fmtDateTime(data.singleAt)}</p>` : ""}
     ${!append && hasUnsaved ? `<div class="notice" id="draft-bar">저장하지 않은 수정 내용이 있습니다. 아래 '${esc(screen.button || "저장")}'을 누르거나 <button class="btn link sm" id="draft-drop" type="button">수정 내용 버리기</button></div>` : ""}
-    ${append ? `<div class="btn-row no-print" id="append-done" ${data.entries.length ? "" : "hidden"}><button class="btn ghost" id="append-next" type="button">다 적었어요 · 다음으로 ›</button></div><div class="entries" id="entries"></div>` : ""}`;
+    ${append ? `<div class="entries" id="entries"></div>` : ""}`;
   if ($("#draft-drop")) $("#draft-drop").onclick = () => { delete state.drafts[m.id]; save(); renderWorksheet(wrap, m, screen); };
-  if ($("#append-next")) $("#append-next").onclick = () => finishModule(m, "");
   wrap.querySelectorAll("textarea").forEach((ta) => {
     ta.addEventListener("input", () => {
       if (editingAt) { const e = state.drafts[m.id + "@edit"] || (state.drafts[m.id + "@edit"] = { at: editingAt, responses: {} }); e.responses[ta.dataset.key] = ta.value; save(); return; }
       const d = state.drafts[m.id] || (state.drafts[m.id] = {}); d[ta.dataset.key] = ta.value; save();
+      if (append) syncAppendBtn(m, screen);
     });
   });
   editingAt = null;
   if (append) {
     renderEntries(m, screen);
+    syncAppendBtn(m, screen);
     const pending = state.drafts[m.id + "@edit"]; // 고치다 말고 나갔던 기록이 있으면 이어서
     if (pending && wsData(m.id).entries.some((e) => e.at === pending.at)) startEdit(m, screen, pending.at, pending.responses);
   }
+}
+// 누적형 워크시트의 버튼은 하나: 적은 글이 있으면 '기록 저장', 칸이 비어 있고 저장한 기록이 있으면 '다음으로'
+function syncAppendBtn(m, screen) {
+  const btn = $("#next-btn"); if (!btn) return;
+  const empty = ![...document.querySelectorAll("#fields textarea")].some((ta) => ta.value.trim());
+  const mode = editingAt ? "edit" : empty && wsData(m.id).entries.length ? "next" : "save";
+  btn.dataset.mode = mode;
+  btn.textContent = mode === "edit" ? "수정한 내용 저장" : mode === "next" ? "다음으로 ›" : (screen.button || "기록 저장");
 }
 function renderEntries(m, screen, justSaved) {
   const wrap = $("#entries"); if (!wrap) return;
@@ -536,14 +546,15 @@ function startEdit(m, screen, at, pendingResponses) {
   editingAt = at;
   const src = pendingResponses || en.responses;
   document.querySelectorAll("#fields textarea").forEach((ta) => (ta.value = src[ta.dataset.key] || ""));
-  $("#edit-bar").hidden = false; $("#next-btn").textContent = "수정한 내용 저장";
+  $("#edit-bar").hidden = false; syncAppendBtn(m, screen);
   $("#edit-cancel").onclick = () => cancelEdit(m, screen);
   $("#edit-bar").scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" });
 }
 function cancelEdit(m, screen) {
   editingAt = null; delete state.drafts[m.id + "@edit"]; save();
-  $("#edit-bar").hidden = true; $("#next-btn").textContent = screen.button || "기록 저장";
+  $("#edit-bar").hidden = true;
   document.querySelectorAll("#fields textarea").forEach((ta) => (ta.value = (state.drafts[m.id] || {})[ta.dataset.key] || ""));
+  syncAppendBtn(m, screen);
 }
 function submitWorksheet(m, screen) {
   const responses = {};
@@ -564,9 +575,9 @@ function submitWorksheet(m, screen) {
     setStatus(m.id, "completed"); save();
     document.querySelectorAll("#fields textarea").forEach((ta) => (ta.value = ""));
     renderEntries(m, screen, true);
-    $("#append-done").hidden = false;
+    syncAppendBtn(m, screen);
     $("#entries").scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" });
-    toast("저장했습니다 ✓ 더 적어도 되고, '다 적었어요'를 눌러 넘어가도 됩니다.", 5000);
+    toast("저장했습니다 ✓ 더 적어도 되고, '다음으로'를 눌러 넘어가도 됩니다.", 5000);
     return true;
   }
   if (!Object.keys(responses).length) { toast("한 칸이라도 적은 뒤 저장해 주세요."); return false; }
