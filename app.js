@@ -351,6 +351,7 @@ const EXTRAS = {
   "week3_training:0": "breath",
   "week5_training:1": "pmr",
   "week6_psychoeducation:1": "breath-cue",
+  "week7_psychoeducation:2": "img:night",
 };
 
 function nextModuleAfter(m) {
@@ -427,6 +428,7 @@ function renderModule(main, [id, idxStr, flag]) {
 }
 
 function mountExtra(kind, el, screen) {
+  if (kind.startsWith("img:")) { el.innerHTML = ART.concept(kind.slice(4), "낮은 볼륨의 소리를 켜 두고, 잠을 쫓아가지 않고 기다립니다"); return; }
   if (kind === "cycle") {
     const steps = (screen.body.match(/^\d+\. .+$/gm) || []).map((l) => l.replace(/^\d+\. /, ""));
     el.innerHTML = `<h3 class="extra-title">악순환 고리 한눈에 보기</h3>` + ART.cycle(steps);
