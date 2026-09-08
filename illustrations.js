@@ -17,7 +17,7 @@
     8: `<circle cx="100" cy="76" r="30" class="draw" stroke="${ACC}"/><path d="M40 100 c-12 0 -14 -18 -2 -18 c2 -12 22 -14 26 -4 c12 -6 24 6 18 16 c8 4 2 14 -6 12 z" class="draw d2" stroke="${INK}" fill="${INK}" fill-opacity="0.04"/><path d="M100 30 v-14 M138 46 l10 -10 M62 46 l-10 -10" class="draw d3" stroke="${ACC}"/>`,
   };
   // 생성 삽화가 있는 주차는 그림 파일을, 없는 주차는 선화 SVG를 쓴다 (img/ 폴더에 weekN.webp 를 넣고 여기에 등록)
-  A.IMAGES = { 1: "img/week1.webp", 2: "img/week2.webp", 3: "img/week3.webp", 4: "img/week4.webp", 6: "img/week6.webp", 7: "img/week7.webp", 8: "img/week8.webp" };
+  A.IMAGES = { 1: "img/week1.webp", 2: "img/week2.webp", 3: "img/week3.webp", 4: "img/week4.webp", 5: "img/week5.webp", 6: "img/week6.webp", 7: "img/week7.webp", 8: "img/week8.webp" };
   A.CONCEPTS = { night: "img/concept-night.webp" };
   A.week = (n, cls = "") => A.IMAGES[n]
     ? `<img class="art img ${cls}" src="${A.IMAGES[n]}" alt="">`
