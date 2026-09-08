@@ -1,0 +1,121 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>나레이션 대본 편집기</title>
+<style>
+:root{--bg:#F5F3EC;--ink:#141413;--ink2:#5F5D56;--line:#D9D5C8;--accent:#C2542F;--surface:#FCFBF8}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+header{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--line);padding:12px 20px;display:flex;gap:12px;align-items:center;z-index:5}
+header h1{font:400 1.2rem "Noto Serif KR",Georgia,serif;margin:0 12px 0 0}
+select,input,textarea,button{font:inherit}
+select{padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+button{padding:8px 14px;border:1px solid var(--ink);border-radius:999px;background:var(--ink);color:#fff;cursor:pointer}
+button.ghost{background:transparent;color:var(--ink)}
+button.sm{padding:4px 10px;font-size:.85rem}
+main{max-width:960px;margin:0 auto;padding:20px}
+.help{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin-bottom:18px;color:var(--ink2);font-size:.92rem}
+.help b{color:var(--ink)}
+.screen{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin-bottom:18px}
+.screen h2{font:400 1.1rem "Noto Serif KR",Georgia,serif;margin:0 0 4px}
+.screen .meta{color:var(--ink2);font-size:.85rem;margin-bottom:10px}
+.sent{font-size:.85rem;color:var(--ink2);margin:0 0 12px;padding-left:1.2em}
+.sent li span{color:var(--accent);margin-right:6px}
+.cue{display:grid;grid-template-columns:70px 1fr;gap:6px 12px;padding:10px 0;border-top:1px solid var(--line);align-items:start}
+.cue .id{color:var(--ink2);font-size:.8rem;padding-top:8px}
+.cue textarea{width:100%;box-sizing:border-box;min-height:56px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;resize:vertical}
+.cue .row{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:.88rem;color:var(--ink2)}
+.cue .row label{display:flex;gap:6px;align-items:center}
+.cue input[type=text]{padding:5px 8px;border:1px solid var(--line);border-radius:6px;width:260px}
+.cue .dur{color:var(--accent)}
+.cue.changed textarea{border-color:var(--accent)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;opacity:0;transition:.2s}
+.toast.on{opacity:1}
+</style></head><body>
+<header><h1>나레이션 대본 편집기</h1>
+<select id="mod"></select>
+<button class="ghost" id="add-screen">+ 화면 추가</button>
+<span style="flex:1"></span>
+<span id="state" style="color:var(--ink2);font-size:.9rem"></span>
+<button id="save">저장</button></header>
+<main>
+<div class="help">
+<b>어떻게 쓰나요</b> — 영상 1편 = 모듈 1개. 모듈은 여러 <b>화면</b>으로, 화면은 여러 <b>큐</b>(나레이션 한 문장 + 연출)로 이루어집니다. 큐 하나가 오디오 파일 하나입니다.<br>
+<b>읽을 문장</b>: 성우(TTS 또는 육성)가 읽는 말. 자막에도 이 문장이 나옵니다. 고치면 저장 뒤 <code>node tools/tts.mjs 모듈이름</code> 을 다시 돌려야 그 문장만 새로 녹음됩니다.<br>
+<b>강조</b>: 화면에 있는 문장 번호(0=제목). 그 문장이 살구색으로 표시되고 화면이 그쪽으로 스크롤됩니다. 아래 "화면 문장" 목록의 번호를 고르세요. 없음 = 강조 안 함.<br>
+<b>가리키기</b>: 손가락 포인터가 갈 요소. 자주 쓰는 것은 목록에서 고르고, 그 밖에는 CSS 선택자를 직접 적습니다. <b>누름</b>을 켜면 누르는 동작과 파문이 나옵니다.<br>
+<b>타이핑</b>: 입력칸(필드 키)에 글자를 한 자씩 치는 시연. 문장은 타이핑할 내용입니다.<br>
+<b>순서·추가·삭제</b>: ▲▼ 로 순서를 바꾸고, "+ 큐" 로 문장을 끼워 넣습니다. 임상 문장(교육 내용)은 여기서 고치지 말고 <code>content/*.json</code> 에서 고친 뒤 <code>node tools/make_scripts.mjs --force --only=모듈</code> 로 다시 뽑으세요(이 파일은 .bak 으로 남습니다).<br>
+저장 후 미리보기: <code>npm run studio</code> · 최종 출력: <code>npx remotion render 모듈-이름 out/모듈.mp4</code>
+</div>
+<div id="screens"></div>
+</main>
+<div class="toast" id="toast"></div>
+<script type="module">
+import { parseBody } from "/lib/sentences.js";
+const $ = (s, el = document) => el.querySelector(s);
+let program, script, manifest = {}, dirty = false;
+const POINTS = [["", "없음"], ["#next-btn", "아래 큰 버튼(다음/저장)"], ["#tts-btn", "소리로 듣기 버튼"], ["#entries .entry", "저장된 기록(첫 번째)"], ["[data-edit]", "기록의 '수정' 버튼"], ['[data-route="records"]', "탭: 기록"], ['[data-route="program"]', "탭: 프로그램"], ['[data-route="today"]', "탭: 일기"], ['[data-route="sound"]', "탭: 소리"], ["#fields .card", "설문 안내 카드"], [".q-item .q-opts", "설문 1번 답 버튼"]];
+const toast = (m) => { const t = $("#toast"); t.textContent = m; t.classList.add("on"); setTimeout(() => t.classList.remove("on"), 1800); };
+const mark = () => { dirty = true; $("#state").textContent = "저장 안 됨"; };
+async function load(id) {
+  script = await (await fetch("/api/script/" + id)).json();
+  manifest = await (await fetch("/api/manifest/" + id)).json();
+  dirty = false; $("#state").textContent = ""; render();
+}
+function moduleOf() { return program.modules.find((m) => m.id === script.module); }
+function render() {
+  const m = moduleOf(); const wrap = $("#screens"); wrap.innerHTML = "";
+  script.screens.forEach((sc, si) => {
+    const ms = m.screens[sc.index ?? 0];
+    const { sentences } = ms ? parseBody(ms.title, ms.body) : { sentences: [] };
+    const fields = ms?.fields || [];
+    const div = document.createElement("div"); div.className = "screen";
+    div.innerHTML = `<h2>화면 ${si + 1}: ${sc.view === "program" ? "프로그램 목록" : (ms?.title || "")}${sc.state?.afterSave ? " (저장 뒤 모습)" : ""}</h2>
+      <div class="meta">앱 화면 번호 ${sc.index ?? 0} · 보기: <select data-view><option value="module" ${sc.view !== "program" ? "selected" : ""}>모듈 화면</option><option value="program" ${sc.view === "program" ? "selected" : ""}>프로그램 목록</option></select>
+      <button class="ghost sm" data-up>▲</button><button class="ghost sm" data-down>▼</button><button class="ghost sm" data-del-screen>화면 삭제</button></div>
+      ${sentences.length && sc.view !== "program" ? `<details><summary style="cursor:pointer;color:var(--ink2);font-size:.85rem">화면 문장 번호 보기</summary><ol class="sent" start="0">${sentences.map((s, i) => `<li value="${i}"><span>${i}</span>${s}</li>`).join("")}</ol></details>` : ""}
+      <div class="cues"></div><button class="ghost sm" data-add>+ 큐</button>`;
+    const cues = $(".cues", div);
+    sc.cues.forEach((c, ci) => {
+      const row = document.createElement("div"); row.className = "cue";
+      const dur = manifest[c.id]?.dur; const changed = manifest[c.id] && manifest[c.id].say !== undefined && manifest[c.id].say !== c.say;
+      if (changed) row.classList.add("changed");
+      row.innerHTML = `<div class="id">${c.id}<br><span class="dur">${dur ? dur.toFixed(1) + "초" : "오디오 없음"}</span>${dur ? `<br><a href="/${manifest[c.id].src}" target="_blank" style="color:var(--ink2)">듣기</a>` : ""}</div>
+        <div><textarea data-say>${c.say || ""}</textarea>
+        <div class="row">
+          <label>강조 <select data-hl><option value="">없음</option>${sentences.map((s, i) => `<option value="${i}" ${c.highlight === i ? "selected" : ""}>${i}: ${s.slice(0, 18)}…</option>`).join("")}</select></label>
+          <label>가리키기 <select data-pt>${POINTS.concat(fields.map((f, i) => [`textarea[data-key="${f.key}"]`, `입력칸 ${i + 1}: ${f.label.slice(0, 14)}`])).map(([v, l]) => `<option value="${v}" ${(c.point || "") === v ? "selected" : ""}>${l}</option>`).join("")}${c.point && !POINTS.some(([v]) => v === c.point) && !fields.some((f) => `textarea[data-key="${f.key}"]` === c.point) ? `<option value="${c.point}" selected>${c.point}</option>` : ""}</select> <input type="text" data-pt-raw placeholder="직접 입력(CSS 선택자)" value="${c.point || ""}"></label>
+          <label><input type="checkbox" data-tap ${c.tap ? "checked" : ""}> 누름</label>
+          <label>타이핑 <select data-ty><option value="">없음</option>${fields.map((f) => `<option value="${f.key}" ${c.type?.key === f.key ? "selected" : ""}>${f.label.slice(0, 16)}</option>`).join("")}</select> <input type="text" data-ty-text placeholder="칠 내용" value="${c.type?.text || ""}"></label>
+          <button class="ghost sm" data-cup>▲</button><button class="ghost sm" data-cdown>▼</button><button class="ghost sm" data-cdel>삭제</button>
+        </div></div>`;
+      $("[data-say]", row).oninput = (e) => { c.say = e.target.value; mark(); };
+      $("[data-hl]", row).onchange = (e) => { c.highlight = e.target.value === "" ? null : Number(e.target.value); mark(); };
+      $("[data-pt]", row).onchange = (e) => { c.point = e.target.value || undefined; $("[data-pt-raw]", row).value = c.point || ""; if (!c.point) c.tap = undefined; mark(); };
+      $("[data-pt-raw]", row).oninput = (e) => { c.point = e.target.value || undefined; mark(); };
+      $("[data-tap]", row).onchange = (e) => { c.tap = e.target.checked || undefined; mark(); };
+      const syncType = () => { const k = $("[data-ty]", row).value, tx = $("[data-ty-text]", row).value; c.type = k ? { key: k, text: tx } : undefined; mark(); };
+      $("[data-ty]", row).onchange = syncType; $("[data-ty-text]", row).oninput = syncType;
+      $("[data-cup]", row).onclick = () => { if (ci > 0) { [sc.cues[ci - 1], sc.cues[ci]] = [sc.cues[ci], sc.cues[ci - 1]]; mark(); render(); } };
+      $("[data-cdown]", row).onclick = () => { if (ci < sc.cues.length - 1) { [sc.cues[ci + 1], sc.cues[ci]] = [sc.cues[ci], sc.cues[ci + 1]]; mark(); render(); } };
+      $("[data-cdel]", row).onclick = () => { if (confirm("이 큐를 삭제할까요?")) { sc.cues.splice(ci, 1); mark(); render(); } };
+      cues.appendChild(row);
+    });
+    $("[data-add]", div).onclick = () => { sc.cues.push({ id: `s${sc.index ?? 0}-x${Date.now().toString(36)}`, say: "", highlight: null }); mark(); render(); };
+    $("[data-view]", div).onchange = (e) => { sc.view = e.target.value; mark(); render(); };
+    $("[data-up]", div).onclick = () => { if (si > 0) { [script.screens[si - 1], script.screens[si]] = [script.screens[si], script.screens[si - 1]]; mark(); render(); } };
+    $("[data-down]", div).onclick = () => { if (si < script.screens.length - 1) { [script.screens[si + 1], script.screens[si]] = [script.screens[si], script.screens[si + 1]]; mark(); render(); } };
+    $("[data-del-screen]", div).onclick = () => { if (confirm("이 화면과 큐를 모두 삭제할까요?")) { script.screens.splice(si, 1); mark(); render(); } };
+    wrap.appendChild(div);
+  });
+}
+$("#add-screen").onclick = () => { const idx = Number(prompt("앱 화면 번호(0부터)", "0")); if (Number.isNaN(idx)) return; script.screens.push({ index: idx, view: "module", cues: [] }); mark(); render(); };
+$("#save").onclick = async () => {
+  const r = await fetch("/api/script/" + script.module, { method: "PUT", body: JSON.stringify(script) });
+  if (r.ok) { dirty = false; $("#state").textContent = "저장됨 " + new Date().toLocaleTimeString(); toast("저장했습니다. 문장을 고쳤다면 tts.mjs 를 다시 돌리세요."); }
+  else toast("저장 실패: " + (await r.json()).error);
+};
+$("#mod").onchange = (e) => { if (dirty && !confirm("저장하지 않은 변경이 있습니다. 넘어갈까요?")) { e.target.value = script.module; return; } load(e.target.value); };
+window.onbeforeunload = () => (dirty ? "저장 안 됨" : undefined);
+program = await (await fetch("/api/program")).json();
+const ids = await (await fetch("/api/list")).json();
+$("#mod").innerHTML = ids.map((id) => `<option value="${id}">${id}</option>`).join("");
+await load(ids[0]);
+</script></body></html>

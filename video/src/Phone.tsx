@@ -36,7 +36,7 @@ function Body({ blocks, st }: { blocks: any[]; st: PhoneState }) {
   );
 }
 
-export const Phone: React.FC<{ program: any; mod: any; index: number; st: PhoneState; selectors: string[]; onLayout: (l: Layout) => void }> = ({ program, mod, index, st, selectors, onLayout }) => {
+export const Phone: React.FC<{ program: any; mod: any; index: number; view?: "module" | "program"; vstate?: any; st: PhoneState; selectors: string[]; onLayout: (l: Layout) => void }> = ({ program, mod, index, view = "module", vstate, st, selectors, onLayout }) => {
   const screen = mod.screens[index];
   const isLast = index === mod.screens.length - 1;
   const { blocks } = parseBody(screen.title, screen.body);
@@ -59,12 +59,14 @@ export const Phone: React.FC<{ program: any; mod: any; index: number; st: PhoneS
       onLayout({ sentences, targets, pageHeight: page.offsetHeight });
       continueRender(handle);
     };
-    (document as any).fonts?.ready ? (document as any).fonts.ready.then(run) : run();
+    const imgs = Array.from(pageRef.current?.querySelectorAll("img") ?? []).map((im) => im.complete ? Promise.resolve() : im.decode().catch(() => {}));
+    Promise.all([(document as any).fonts?.ready ?? Promise.resolve(), ...imgs]).then(run);
   }, []);
 
   const showArt = index === 0 && mod.kind !== "write" && screen.type === "text";
   const extra = EXTRAS[`${mod.id}:${index}`];
-  const nextLabel = screen.button || (isLast ? "완료" : "다음");
+  const entries: any[] = vstate?.entries ?? [];
+  const nextLabel = vstate?.afterSave ? "다음으로 ›" : screen.button || (isLast ? "완료" : "다음");
   const tapCls = (sel: string) => (st.tapped === sel ? " tapped" : "");
   const steps = mod.screens.map((_: any, i: number) => <i key={i} className={i <= index ? "on" : ""} />);
   const q = screen.type === "questionnaire" ? program.questionnaires[screen.questionnaire_type] : null;
@@ -81,11 +83,12 @@ export const Phone: React.FC<{ program: any; mod: any; index: number; st: PhoneS
         <a className="brand"><span className="brand-mark" /><span className="brand-name">이명 관리 프로그램</span></a>
         <button className="font-btn" type="button">가<small>A</small></button>
         <nav className="nav">
-          {[["⌂", "홈"], ["▤", "프로그램"], ["✎", "일기"], ["♫", "소리"], ["≡", "기록"]].map(([ic, t]) => <a key={t} className={t === "프로그램" ? "active" : ""}><span className="nav-icon">{ic}</span><span>{t}</span></a>)}
+          {[["⌂", "홈", "home"], ["▤", "프로그램", "program"], ["✎", "일기", "today"], ["♫", "소리", "sound"], ["≡", "기록", "records"]].map(([ic, t, r]) => <a key={t} data-route={r} className={(t === "프로그램" ? "active" : "") + (st.tapped === `[data-route="${r}"]` ? " tapped" : "")}><span className="nav-icon">{ic}</span><span>{t}</span></a>)}
         </nav>
       </header>
       <div className="phone-scroll">
         <main className="page" ref={pageRef} style={{ transform: `translateY(${-st.scroll}px)` }}>
+          {view === "program" ? <ProgramList program={program} week={mod.week} doneUpTo={mod.id} tapped={st.tapped} /> : (
           <div className="viewer">
             <div className="viewer-top">
               <a className="back"><span>‹</span> 목록</a>
@@ -97,7 +100,7 @@ export const Phone: React.FC<{ program: any; mod: any; index: number; st: PhoneS
               {artHtml && <div dangerouslySetInnerHTML={{ __html: artHtml }} />}
               {screen.title.replace(/\s/g, "") !== mod.title.replace(/\s/g, "") && <div className="eyebrow">{mod.title}</div>}
               <h1><Sent s={0} text={screen.title} st={st} /></h1>
-              <div className="tts"><button className="btn ghost sm" type="button">🔈 소리로 듣기</button></div>
+              <div className="tts"><button className={"btn ghost sm" + tapCls("#tts-btn")} id="tts-btn" type="button">🔈 소리로 듣기</button></div>
               <Body blocks={blocks} st={st} />
               {extraHtml && <div id="extra" dangerouslySetInnerHTML={{ __html: extraHtml }} />}
               {conceptImg && <figure className="concept"><Img src={ASSET(conceptImg)} /><figcaption>낮은 볼륨의 소리를 켜 두고, 잠을 쫓아가지 않고 기다립니다</figcaption></figure>}
@@ -105,6 +108,7 @@ export const Phone: React.FC<{ program: any; mod: any; index: number; st: PhoneS
                 {screen.type === "worksheet" && (
                   <>
                     <div className="ws-note muted small">{screen.mode === "append" ? "저장을 누르면 아래에 기록이 하나씩 쌓입니다. 쓰다 만 글은 자동으로 보관됩니다." : "저장을 누르면 내용이 보관되고, 언제든 다시 열어 고칠 수 있습니다."}</div>
+                    {vstate?.afterSave && <div className="saved-flash">✓ 방금 쓴 내용이 아래 맨 위에 저장되었습니다. 입력칸은 다음 기록을 위해 비워졌습니다.</div>}
                     {screen.fields.map((f: any, i: number) => {
                       const ty = st.typed[f.key];
                       return (
@@ -114,6 +118,18 @@ export const Phone: React.FC<{ program: any; mod: any; index: number; st: PhoneS
                         </label>
                       );
                     })}
+                    {entries.length > 0 && (
+                      <div className="entries" id="entries">
+                        <h3>지금까지 쓴 기록 <span className="muted">({entries.length}건)</span></h3>
+                        {entries.map((en: any, i: number) => (
+                          <div className="entry" key={i}>
+                            <div className="when">{entries.length - i}번째 · {en.when || "오늘"}</div>
+                            {screen.fields.filter((f: any) => en.responses?.[f.key]).map((f: any) => <p key={f.key}><span className="q">{f.label}</span>{en.responses[f.key]}</p>)}
+                            <div className="tools"><button className={"btn ghost sm" + (st.tapped === "[data-edit]" && i === 0 ? " tapped" : "")} data-edit={i === 0 ? "1" : undefined} type="button">수정</button><button className="btn link sm" type="button">삭제</button></div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </>
                 )}
                 {q && (
@@ -135,10 +151,45 @@ export const Phone: React.FC<{ program: any; mod: any; index: number; st: PhoneS
                 <button className={"btn accent big" + tapCls("#next-btn")} id="next-btn" type="button">{nextLabel}{isLast || screen.type !== "text" ? "" : " ›"}</button>
               </div>
             </article>
-          </div>
+          </div>)}
         </main>
       </div>
     </div>
   );
 };
 
+
+// 프로그램 목록 화면 (앱의 renderProgram / renderModuleList 와 같은 마크업, 해당 주차만 펼침)
+const ProgramList: React.FC<{ program: any; week: number; doneUpTo: string; tapped: string | null }> = ({ program, week, doneUpTo, tapped }) => {
+  const mods = program.modules.filter((m: any) => m.week === week);
+  const doneIdx = mods.findIndex((m: any) => m.id === doneUpTo);
+  const wk = program.weeks.find((w: any) => w.week === week);
+  return (
+    <>
+      <section className="hero" style={{ paddingBottom: 20 }}>
+        <div className="eyebrow">8주 프로그램</div>
+        <h1>프로그램 목록</h1>
+        <p className="lead">지금은 {week}주차입니다. 다음 주차는 7일마다 자동으로 열립니다.</p>
+      </section>
+      <div className="week">
+        <h3><button className="week-head" type="button">
+          {ART.IMAGES[week] ? <Img className="art img week-art" src={ASSET(ART.IMAGES[week])} /> : <span dangerouslySetInnerHTML={{ __html: ART.week(week, "week-art") }} />}
+          <span className="week-title"><span className="week-num">{week}주차</span><span className="week-h">{wk?.title}</span><span className="sub">{wk?.subtitle}</span></span>
+          <span className="week-status">{doneIdx + 1}/{mods.length}</span>
+        </button></h3>
+        <div className="week-body">
+          {mods.map((m: any, i: number) => {
+            const done = i <= doneIdx;
+            return (
+              <a key={m.id} data-mod={m.id} className={"mod" + (done ? " done" : "") + (m.kind === "write" ? " write" : "") + (tapped === `[data-mod="${m.id}"]` ? " tapped" : "")}>
+                <span className="dot">{done ? "✓" : ""}</span>
+                <span className="t">{m.title}<span className="kind">{KIND_LABEL[m.kind]}{done ? " · 완료" : ""}</span></span>
+                <span className="chev">›</span>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </>
+  );
+};

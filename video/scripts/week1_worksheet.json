@@ -66,7 +66,7 @@
     },
     {
      "id": "s0-f1t",
-     "say": "예를 들면 이렇게 적을 수 있습니다. 오늘따라 왜 이렇게 크지",
+     "say": "오늘따라 왜 이렇게 크지",
      "highlight": null,
      "type": {
       "key": "automatic_thought",
@@ -81,7 +81,7 @@
     },
     {
      "id": "s0-f2t",
-     "say": "예를 들면 이렇게 적을 수 있습니다. 불안",
+     "say": "불안",
      "highlight": null,
      "type": {
       "key": "emotion",
@@ -96,7 +96,7 @@
     },
     {
      "id": "s0-f3t",
-     "say": "예를 들면 이렇게 적을 수 있습니다. 어깨가 긴장됨",
+     "say": "어깨가 긴장됨",
      "highlight": null,
      "type": {
       "key": "body_reaction",
@@ -105,9 +105,80 @@
     },
     {
      "id": "s0-save",
-     "say": "다 적었으면 아래 '기록 저장' 버튼을 누릅니다. 저장한 내용은 언제든 다시 열어 고칠 수 있습니다.",
+     "say": "다 적었으면 아래 '기록 저장' 버튼을 누릅니다.",
      "highlight": null,
      "point": "#next-btn",
+     "tap": true
+    }
+   ]
+  },
+  {
+   "index": 0,
+   "view": "module",
+   "state": {
+    "afterSave": true,
+    "entries": [
+     {
+      "when": "오늘",
+      "responses": {
+       "trigger_situation": "조용한 방에서 잠들려 할 때",
+       "automatic_thought": "오늘따라 왜 이렇게 크지",
+       "emotion": "불안",
+       "body_reaction": "어깨가 긴장됨"
+      }
+     }
+    ]
+   },
+   "cues": [
+    {
+     "id": "a0-saved",
+     "say": "저장하면 방금 쓴 내용이 아래에 기록으로 남고, 입력칸은 비워집니다.",
+     "highlight": null,
+     "point": "#entries .entry"
+    },
+    {
+     "id": "a0-edit",
+     "say": "기록 옆의 '수정'을 누르면 다시 고쳐 쓸 수 있고, '삭제'로 지울 수도 있습니다.",
+     "highlight": null,
+     "point": "[data-edit]",
+     "tap": true
+    },
+    {
+     "id": "a0-more",
+     "say": "더 적고 싶으면 빈 칸에 새로 적고 다시 저장하면 기록이 하나 더 쌓입니다.",
+     "highlight": null,
+     "point": "textarea[data-key=\"trigger_situation\"]"
+    },
+    {
+     "id": "a0-next",
+     "say": "칸이 비어 있으면 아래 버튼이 '다음으로'로 바뀝니다. 눌러서 다음 내용으로 넘어갑니다.",
+     "highlight": null,
+     "point": "#next-btn",
+     "tap": true
+    }
+   ]
+  },
+  {
+   "index": 0,
+   "view": "program",
+   "cues": [
+    {
+     "id": "p0-open",
+     "say": "나중에 다시 쓰고 싶으면 '프로그램' 탭에서 1주차의 '나의 악순환 그리기'를 다시 엽니다.",
+     "highlight": null,
+     "point": "[data-mod=\"week1_worksheet\"]",
+     "tap": true
+    },
+    {
+     "id": "p0-list",
+     "say": "이미 쓴 기록은 그 화면 아래에 모여 있고, 새로 적어 저장하면 하나 더 쌓입니다.",
+     "highlight": null
+    },
+    {
+     "id": "p0-rec",
+     "say": "'기록' 탭에서도 지금까지 쓴 기록을 한꺼번에 볼 수 있습니다.",
+     "highlight": null,
+     "point": "[data-route=\"records\"]",
      "tap": true
     }
    ]

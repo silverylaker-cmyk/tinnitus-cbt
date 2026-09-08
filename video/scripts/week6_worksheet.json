@@ -51,7 +51,7 @@
     },
     {
      "id": "s0-f1t",
-     "say": "예를 들면 이렇게 적을 수 있습니다. 어깨가 올라감",
+     "say": "어깨가 올라감",
      "highlight": null,
      "type": {
       "key": "tension_spots",
@@ -66,7 +66,7 @@
     },
     {
      "id": "s0-f2t",
-     "say": "예를 들면 이렇게 적을 수 있습니다. 업무 중 이명이 거슬릴 때",
+     "say": "업무 중 이명이 거슬릴 때",
      "highlight": null,
      "type": {
       "key": "trigger_plan",
@@ -81,7 +81,7 @@
     },
     {
      "id": "s0-f3t",
-     "say": "예를 들면 이렇게 적을 수 있습니다. 화요일 회의 중 시도. 긴장 7→4",
+     "say": "화요일 회의 중 시도. 긴장 7→4",
      "highlight": null,
      "type": {
       "key": "application_log",
@@ -90,7 +90,7 @@
     },
     {
      "id": "s0-save",
-     "say": "다 적었으면 아래 '저장하고 다음' 버튼을 누릅니다. 저장한 내용은 언제든 다시 열어 고칠 수 있습니다.",
+     "say": "다 적었으면 아래 '저장하고 다음' 버튼을 누릅니다.",
      "highlight": null,
      "point": "#next-btn",
      "tap": true

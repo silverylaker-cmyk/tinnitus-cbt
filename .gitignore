@@ -7,3 +7,4 @@ video/out/
 video/public/audio/generated/
 video/.env
 video/src/generated/
+video/scripts/*.bak

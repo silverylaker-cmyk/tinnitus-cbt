@@ -61,7 +61,7 @@
     },
     {
      "id": "s0-f1t",
-     "say": "예를 들면 이렇게 적을 수 있습니다. 오늘도 이 소리 때문에 못 자겠다. 내일 완전히 망가지겠지",
+     "say": "오늘도 이 소리 때문에 못 자겠다. 내일 완전히 망가지겠지",
      "highlight": null,
      "type": {
       "key": "automatic_thought",
@@ -76,7 +76,7 @@
     },
     {
      "id": "s0-f2t",
-     "say": "예를 들면 이렇게 적을 수 있습니다. 불안 7",
+     "say": "불안 7",
      "highlight": null,
      "type": {
       "key": "emotion_intensity",
@@ -91,7 +91,7 @@
     },
     {
      "id": "s0-f3t",
-     "say": "예를 들면 이렇게 적을 수 있습니다. 최악을 예상하기 — 아직 일어나지 않은 내일 일을 확정처럼 생각함",
+     "say": "최악을 예상하기 — 아직 일어나지 않은 내일 일을 확정처럼 생각함",
      "highlight": null,
      "type": {
       "key": "pattern_found",
@@ -100,9 +100,80 @@
     },
     {
      "id": "s0-save",
-     "say": "다 적었으면 아래 '기록 저장' 버튼을 누릅니다. 저장한 내용은 언제든 다시 열어 고칠 수 있습니다.",
+     "say": "다 적었으면 아래 '기록 저장' 버튼을 누릅니다.",
      "highlight": null,
      "point": "#next-btn",
+     "tap": true
+    }
+   ]
+  },
+  {
+   "index": 0,
+   "view": "module",
+   "state": {
+    "afterSave": true,
+    "entries": [
+     {
+      "when": "오늘",
+      "responses": {
+       "situation": "밤 11시",
+       "automatic_thought": "오늘도 이 소리 때문에 못 자겠다. 내일 완전히 망가지겠지",
+       "emotion_intensity": "불안 7",
+       "pattern_found": "최악을 예상하기 — 아직 일어나지 않은 내일 일을 확정처럼 생각함"
+      }
+     }
+    ]
+   },
+   "cues": [
+    {
+     "id": "a0-saved",
+     "say": "저장하면 방금 쓴 내용이 아래에 기록으로 남고, 입력칸은 비워집니다.",
+     "highlight": null,
+     "point": "#entries .entry"
+    },
+    {
+     "id": "a0-edit",
+     "say": "기록 옆의 '수정'을 누르면 다시 고쳐 쓸 수 있고, '삭제'로 지울 수도 있습니다.",
+     "highlight": null,
+     "point": "[data-edit]",
+     "tap": true
+    },
+    {
+     "id": "a0-more",
+     "say": "더 적고 싶으면 빈 칸에 새로 적고 다시 저장하면 기록이 하나 더 쌓입니다.",
+     "highlight": null,
+     "point": "textarea[data-key=\"situation\"]"
+    },
+    {
+     "id": "a0-next",
+     "say": "칸이 비어 있으면 아래 버튼이 '다음으로'로 바뀝니다. 눌러서 다음 내용으로 넘어갑니다.",
+     "highlight": null,
+     "point": "#next-btn",
+     "tap": true
+    }
+   ]
+  },
+  {
+   "index": 0,
+   "view": "program",
+   "cues": [
+    {
+     "id": "p0-open",
+     "say": "나중에 다시 쓰고 싶으면 '프로그램' 탭에서 2주차의 '사고기록지 연습'을 다시 엽니다.",
+     "highlight": null,
+     "point": "[data-mod=\"week2_worksheet\"]",
+     "tap": true
+    },
+    {
+     "id": "p0-list",
+     "say": "이미 쓴 기록은 그 화면 아래에 모여 있고, 새로 적어 저장하면 하나 더 쌓입니다.",
+     "highlight": null
+    },
+    {
+     "id": "p0-rec",
+     "say": "'기록' 탭에서도 지금까지 쓴 기록을 한꺼번에 볼 수 있습니다.",
+     "highlight": null,
+     "point": "[data-route=\"records\"]",
      "tap": true
     }
    ]

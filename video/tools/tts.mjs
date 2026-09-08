@@ -22,8 +22,8 @@ const engineArg = args.find((a) => a.startsWith("--engine="))?.slice(9);
 const ids = args.filter((a) => !a.startsWith("--"));
 const KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
 const engine = engineArg || (KEY ? "gemini" : "say");
-const MODEL = process.env.GEMINI_TTS_MODEL || "gemini-2.5-flash-preview-tts";
-const VOICE = process.env.GEMINI_TTS_VOICE || "Kore";
+const MODEL = process.env.GEMINI_TTS_MODEL || "gemini-3.1-flash-tts-preview"; // AI Studio 2026-09 기준
+const VOICE = process.env.GEMINI_TTS_VOICE || "Enceladus";
 const STYLE = process.env.TTS_STYLE || "차분하고 따뜻한 목소리로, 어르신께 설명하듯 천천히 또박또박 읽어 주세요:";
 if (engine === "gemini" && !KEY) { console.error("GEMINI_API_KEY 가 없습니다. video/.env 에 GEMINI_API_KEY=... 를 넣거나 --engine=say 로 실행하세요."); process.exit(1); }
 
@@ -37,7 +37,7 @@ function wavFromPcm(pcm, rate = 24000, ch = 1, bits = 16) {
 }
 async function gemini(text, out) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
-  const body = { contents: [{ parts: [{ text: `${STYLE}\n${text}` }] }], generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: VOICE } } } } };
+  const body = { contents: [{ role: "user", parts: [{ text: `${STYLE}\n\n## Transcript:\n${text}` }] }], generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: VOICE } } } } };
   for (let attempt = 0; attempt < 4; attempt++) {
     const res = await fetch(url, { method: "POST", headers: { "x-goog-api-key": KEY, "content-type": "application/json" }, body: JSON.stringify(body) });
     if (res.status === 429 || res.status >= 500) { await new Promise((r) => setTimeout(r, 3000 * (attempt + 1))); continue; }
@@ -66,6 +66,8 @@ for (const id of targets) {
   const script = JSON.parse(fs.readFileSync(path.join(ROOT, "scripts", `${id}.json`), "utf8"));
   const genDir = path.join(PUB, "audio", "generated", id), voiceDir = path.join(PUB, "audio", "voice", id);
   fs.mkdirSync(genDir, { recursive: true });
+  const prevFile = path.join(genDir, "manifest.json");
+  const prev = fs.existsSync(prevFile) ? JSON.parse(fs.readFileSync(prevFile, "utf8")) : {};
   const manifest = {}; let made = 0, own = 0;
   for (const sc of script.screens) for (const cue of sc.cues) {
     const voice = ["wav", "mp3", "m4a"].map((e) => path.join(voiceDir, `${cue.id}.${e}`)).find(fs.existsSync);
@@ -73,9 +75,10 @@ for (const id of targets) {
     if (voice) own++;
     else {
       file = path.join(genDir, `${cue.id}.wav`);
-      if (force || !fs.existsSync(file)) { process.stdout.write(`  [${engine}] ${id}/${cue.id}: ${cue.say.slice(0, 32)}…\n`); if (engine === "gemini") await gemini(cue.say, file); else say(cue.say, file); made++; }
+      const changed = prev[cue.id] && prev[cue.id].say !== undefined && prev[cue.id].say !== cue.say; // 대본이 바뀐 문장
+      if (force || changed || !fs.existsSync(file)) { process.stdout.write(`  [${engine}] ${id}/${cue.id}: ${cue.say.slice(0, 32)}…\n`); if (engine === "gemini") await gemini(cue.say, file); else say(cue.say, file); made++; }
     }
-    manifest[cue.id] = { src: path.relative(PUB, file), dur: dur(file), engine: voice ? "voice" : engine };
+    manifest[cue.id] = { src: path.relative(PUB, file), dur: dur(file), engine: voice ? "voice" : engine, say: cue.say };
   }
   fs.writeFileSync(path.join(genDir, "manifest.json"), JSON.stringify(manifest, null, 1));
   console.log(`${id}: ${Object.keys(manifest).length} cues (new ${made}, own voice ${own}), total ${Object.values(manifest).reduce((a, b) => a + b.dur, 0).toFixed(1)}s`);

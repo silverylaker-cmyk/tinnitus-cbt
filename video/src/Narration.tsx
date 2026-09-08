@@ -25,7 +25,7 @@ export const Narration: React.FC<{ moduleId: string }> = ({ moduleId }) => {
   const [layouts, setLayouts] = useState<Record<number, Layout>>({});
 
   const scr = tl.screens.filter((s) => s.from <= frame).pop() ?? tl.screens[0];
-  const lay = layouts[scr.index];
+  const lay = layouts[scr.ord];
   const cueNow = scr.cues.filter((c) => c.from <= frame).pop() ?? null;
   const cueIdx = cueNow ? scr.cues.indexOf(cueNow) : -1;
   const selectors = useMemo(() => Array.from(new Set(scr.cues.map((c) => c.point).filter(Boolean) as string[])), [scr]);
@@ -84,11 +84,11 @@ export const Narration: React.FC<{ moduleId: string }> = ({ moduleId }) => {
       {tl.cues.map((c) => c.src ? <Sequence key={c.id} from={c.from} durationInFrames={c.frames} name={c.id}><Audio src={staticFile(c.src)} /></Sequence> : null)}
       <div className="header">
         <span><b>{mod.week}주차</b> · {KIND_LABEL[mod.kind]}</span>
-        <span className="accent">{scr.index + 1} / {mod.screens.length}</span>
+        <span className="accent">{scr.ord + 1} / {tl.screens.length}</span>
       </div>
       <div className="phone-wrap" style={{ opacity: enter, transform: `translateX(-50%) scale(1.5) translateY(${(1 - enter) * 24}px)` }}>
         <div style={{ position: "relative" }}>
-          <Phone key={scr.index} program={program} mod={mod} index={scr.index} st={st} selectors={selectors} onLayout={(l) => setLayouts((o) => ({ ...o, [scr.index]: l }))} />
+          <Phone key={scr.ord} program={program} mod={mod} index={scr.index} view={scr.view} vstate={scr.state} st={st} selectors={selectors} onLayout={(l) => setLayouts((o) => ({ ...o, [scr.ord]: l }))} />
           {hand && hand.ripple > 0 && hand.ripple < 1 && <div className="ripple" style={{ left: hand.x - 40 * hand.ripple, top: hand.y - 40 * hand.ripple, width: 80 * hand.ripple, height: 80 * hand.ripple, opacity: 1 - hand.ripple }} />}
           {hand && <Hand x={hand.x} y={hand.y} press={hand.press} />}
         </div>

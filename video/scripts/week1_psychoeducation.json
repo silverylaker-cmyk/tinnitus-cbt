@@ -14,6 +14,19 @@
      "highlight": null
     },
     {
+     "id": "s0-tts1",
+     "say": "글을 읽기 힘들 때는 제목 아래 '소리로 듣기' 버튼을 누르세요. 화면의 글을 읽어 줍니다.",
+     "highlight": null,
+     "point": "#tts-btn",
+     "tap": true
+    },
+    {
+     "id": "s0-tts2",
+     "say": "한 번 더 누르면 읽기를 멈춥니다. 모든 화면에 같은 버튼이 있습니다.",
+     "highlight": null,
+     "point": "#tts-btn"
+    },
+    {
      "id": "s0-00",
      "say": "프로그램을 시작하며",
      "highlight": 0

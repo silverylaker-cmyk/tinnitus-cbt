@@ -1,8 +1,8 @@
 /* 영상 합성용 (폰 화면 밖) */
 .stage { position: absolute; inset: 0; background: #E9E5D8; overflow: hidden; font-family: "Noto Sans KR", sans-serif; }
 .stage::before { content: ""; position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% 0%, #F5F3EC 0%, #E9E5D8 60%, #DED9C8 100%); }
-.phone-wrap { position: absolute; left: 50%; top: 130px; width: 540px; height: 880px; transform: translateX(-50%) scale(1.5); transform-origin: top center; }
-.phone { position: relative; width: 540px; height: 880px; background: #F5F3EC; border-radius: 34px; overflow: hidden; box-shadow: 0 30px 80px rgba(20,20,19,.18), 0 0 0 8px #141413, 0 0 0 10px #3a3935; }
+.phone-wrap { position: absolute; left: 50%; top: 130px; width: 540px; height: 880px; transform: translateX(-50%) scale(1.5); transform-origin: top center; border-radius: 34px; overflow: hidden; box-shadow: 0 30px 80px rgba(20,20,19,.18), 0 0 0 8px #141413, 0 0 0 10px #3a3935; }
+.phone { position: relative; width: 540px; height: 880px; background: #F5F3EC; }
 .phone-scroll { position: absolute; top: 56px; left: 0; right: 0; bottom: 72px; overflow: hidden; }
 .phone-scroll > .page { will-change: transform; }
 .phone .body .nar { border-radius: 6px; padding: 0 2px; margin: 0 -2px; transition: none; }
@@ -20,3 +20,4 @@
 .header { position: absolute; top: 46px; left: 60px; right: 60px; display: flex; justify-content: space-between; align-items: baseline; color: #5F5D56; font-size: 28px; }
 .header b { font-family: "Noto Serif KR", serif; font-weight: 600; color: #141413; font-size: 34px; }
 .header .accent { color: #9F401F; }
+.phone .entry .tools .btn.focus { outline: 3px solid #C2542F; outline-offset: 2px; }

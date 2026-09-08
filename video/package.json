@@ -9,7 +9,8 @@
     "index": "node tools/make_index.mjs",
     "studio": "remotion studio",
     "render": "remotion render",
-    "render:pilot": "remotion render week1-psychoeducation out/week1_psychoeducation.mp4"
+    "render:pilot": "remotion render week1-psychoeducation out/week1_psychoeducation.mp4",
+    "editor": "node tools/editor.mjs"
   },
   "dependencies": {
     "@remotion/cli": "4.0.290",

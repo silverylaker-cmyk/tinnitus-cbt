@@ -61,7 +61,7 @@
     },
     {
      "id": "s0-f1t",
-     "say": "예를 들면 이렇게 적을 수 있습니다. 소리에만 신경 쓰여서 5분도 못 읽고 나올 것이다 (확신 80%)",
+     "say": "소리에만 신경 쓰여서 5분도 못 읽고 나올 것이다 (확신 80%)",
      "highlight": null,
      "type": {
       "key": "prediction",
@@ -76,7 +76,7 @@
     },
     {
      "id": "s0-f2t",
-     "say": "예를 들면 이렇게 적을 수 있습니다. 토요일 오후",
+     "say": "토요일 오후",
      "highlight": null,
      "type": {
       "key": "experiment_plan",
@@ -91,7 +91,7 @@
     },
     {
      "id": "s0-f3t",
-     "say": "예를 들면 이렇게 적을 수 있습니다. 처음 10분은 거슬렸지만 책에 빠지자 잊었고 40분을 읽었다",
+     "say": "처음 10분은 거슬렸지만 책에 빠지자 잊었고 40분을 읽었다",
      "highlight": null,
      "type": {
       "key": "actual_result",
@@ -106,7 +106,7 @@
     },
     {
      "id": "s0-f4t",
-     "say": "예를 들면 이렇게 적을 수 있습니다. 생각보다 할 수 있었다. 확신도 80% → 40%",
+     "say": "생각보다 할 수 있었다. 확신도 80% → 40%",
      "highlight": null,
      "type": {
       "key": "learning",
@@ -115,9 +115,81 @@
     },
     {
      "id": "s0-save",
-     "say": "다 적었으면 아래 '기록 저장' 버튼을 누릅니다. 저장한 내용은 언제든 다시 열어 고칠 수 있습니다.",
+     "say": "다 적었으면 아래 '기록 저장' 버튼을 누릅니다.",
      "highlight": null,
      "point": "#next-btn",
+     "tap": true
+    }
+   ]
+  },
+  {
+   "index": 0,
+   "view": "module",
+   "state": {
+    "afterSave": true,
+    "entries": [
+     {
+      "when": "오늘",
+      "responses": {
+       "belief": "이명 때문에 조용한 카페에서 책을 못 읽는다",
+       "prediction": "소리에만 신경 쓰여서 5분도 못 읽고 나올 것이다 (확신 80%)",
+       "experiment_plan": "토요일 오후",
+       "actual_result": "처음 10분은 거슬렸지만 책에 빠지자 잊었고 40분을 읽었다",
+       "learning": "생각보다 할 수 있었다. 확신도 80% → 40%"
+      }
+     }
+    ]
+   },
+   "cues": [
+    {
+     "id": "a0-saved",
+     "say": "저장하면 방금 쓴 내용이 아래에 기록으로 남고, 입력칸은 비워집니다.",
+     "highlight": null,
+     "point": "#entries .entry"
+    },
+    {
+     "id": "a0-edit",
+     "say": "기록 옆의 '수정'을 누르면 다시 고쳐 쓸 수 있고, '삭제'로 지울 수도 있습니다.",
+     "highlight": null,
+     "point": "[data-edit]",
+     "tap": true
+    },
+    {
+     "id": "a0-more",
+     "say": "더 적고 싶으면 빈 칸에 새로 적고 다시 저장하면 기록이 하나 더 쌓입니다.",
+     "highlight": null,
+     "point": "textarea[data-key=\"belief\"]"
+    },
+    {
+     "id": "a0-next",
+     "say": "칸이 비어 있으면 아래 버튼이 '다음으로'로 바뀝니다. 눌러서 다음 내용으로 넘어갑니다.",
+     "highlight": null,
+     "point": "#next-btn",
+     "tap": true
+    }
+   ]
+  },
+  {
+   "index": 0,
+   "view": "program",
+   "cues": [
+    {
+     "id": "p0-open",
+     "say": "나중에 다시 쓰고 싶으면 '프로그램' 탭에서 4주차의 '나의 행동실험 계획'을 다시 엽니다.",
+     "highlight": null,
+     "point": "[data-mod=\"week4_worksheet\"]",
+     "tap": true
+    },
+    {
+     "id": "p0-list",
+     "say": "이미 쓴 기록은 그 화면 아래에 모여 있고, 새로 적어 저장하면 하나 더 쌓입니다.",
+     "highlight": null
+    },
+    {
+     "id": "p0-rec",
+     "say": "'기록' 탭에서도 지금까지 쓴 기록을 한꺼번에 볼 수 있습니다.",
+     "highlight": null,
+     "point": "[data-route=\"records\"]",
      "tap": true
     }
    ]
