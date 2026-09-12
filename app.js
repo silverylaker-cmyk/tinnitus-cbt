@@ -50,8 +50,8 @@ function normalize(s) {
   return st;
 }
 function save() {
-  try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
-  catch (e) { toast("저장하지 못했습니다. 기기의 저장 공간이 부족할 수 있으니 진료실에 알려 주세요."); }
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); return true; }
+  catch (e) { toast("저장하지 못했습니다. 기기의 저장 공간을 확인하거나 설정에서 기록을 파일로 내보내 주세요.", 8000); return false; }
 }
 
 // =====================================================================
@@ -192,13 +192,13 @@ function renderHome(main) {
         <div>
           <div class="eyebrow">이명 인지행동치료</div>
           <h1>이명과 함께,<br>원하는 삶으로.</h1>
-          <p class="lead">${esc(P.name)}은 이명 소리에 대한 반응을 바꾸어 이명과 편안하게 지내는 방법을 익히는 과정입니다. 하루 10~15분이면 충분합니다.</p>
+          <p class="lead">${esc(P.name)}은 이명 소리에 대한 반응을 바꾸어 이명과 편안하게 지내는 방법을 익히는 과정입니다. 하루 10~15분부터, 내 속도에 맞춰 시작해 보세요.</p>
         </div>
         ${ART.heroRings()}
       </section>
       <div class="card tint" style="margin-bottom:24px">
         <h3>프로그램 시작</h3>
-        <div class="notice">휴대폰에서는 먼저 브라우저 메뉴의 <b>'홈 화면에 추가'</b>를 한 뒤, 그 앱 아이콘을 열어 시작해 주세요. iPhone은 사파리와 홈 화면 앱의 기록이 따로 저장되고, 홈 화면 앱이 기록을 더 안전하게 보관합니다. 진료실에서 도와드립니다.</div>
+        <div class="notice">기록을 이어 보려면 앞으로도 <b>같은 기기와 브라우저</b>로 열어 주세요. 기기를 바꾸기 전에는 설정에서 기록을 파일로 내보내 두세요.</div>
         <p class="muted">시작일을 기준으로 매주 다음 내용이 열립니다. 클리닉에서 안내받은 날짜가 있다면 그 날짜로 맞춰 주세요.</p>
         <label class="field"><span class="label">시작일</span><input type="date" id="start-date" value="${dateKey()}"></label>
         <label class="field"><span class="label">이름 또는 별칭 <span class="muted">(진료 때 기록을 전달할 때 표시됩니다)</span></span><input type="text" id="nickname" placeholder="예: 홍길동" maxlength="20"></label>
@@ -207,7 +207,7 @@ function renderHome(main) {
       <div class="grid">
         <div class="card"><div class="eyebrow">매주</div><h3>짧은 읽기와 적기</h3><p class="muted">매주 새로운 내용이 열리고, 워크시트에 내 이야기를 직접 적어봅니다.</p></div>
         <div class="card"><div class="eyebrow">매일</div><h3>1분 일기</h3><p class="muted">이명의 크기와 신경 쓰인 정도를 기록해 나만의 패턴을 찾습니다.</p></div>
-        <div class="card"><div class="eyebrow">언제든</div><h3>소리 치료</h3><p class="muted">클리닉에서 안내받은 소리를 재생하면 사용 시간이 기록됩니다.</p></div>
+        <div class="card"><div class="eyebrow">언제든</div><h3>소리 치료</h3><p class="muted">${allSounds().some((s) => s.youtubeId) ? "안내받은 소리를 재생하면 사용 시간이 기록됩니다." : "재생할 소리를 준비하고 있습니다. 연결되면 이곳에서 이용할 수 있습니다."}</p></div>
       </div>
       `;
     $("#start-btn").onclick = () => {
@@ -216,7 +216,7 @@ function renderHome(main) {
       if (v > dateKey() && !confirm("시작일이 오늘보다 뒤입니다. 그날까지는 1주차만 열립니다. 계속할까요?")) return;
       state.profile.startDate = v;
       state.profile.nickname = $("#nickname").value.trim();
-      save(); route();
+      if (!save()) return; route();
     };
     return;
   }
@@ -255,11 +255,11 @@ function renderHome(main) {
       <a class="card ${today ? "" : "accent"}" href="#/today">
         <div class="eyebrow">오늘의 일기</div>
         <h3>${today ? "오늘 기록을 마쳤습니다" : "아직 기록하지 않았습니다"}</h3>
-        ${today ? `<p class="muted small">이명 크기 ${today.tinnitus} · 신경 쓰임 ${today.annoyance} · 수면 영향 ${today.sleep}<br>눌러서 수정할 수 있습니다</p>` : `<p class="muted small">1분이면 충분합니다. 이명 크기와 신경 쓰인 정도를 남겨 주세요.</p>`}
+        ${today ? `<p class="muted small">이명 크기 ${esc(today.tinnitus)} · 신경 쓰임 ${esc(today.annoyance)} · 수면 영향 ${esc(today.sleep)}<br>눌러서 수정할 수 있습니다</p>` : `<p class="muted small">1분이면 충분합니다. 이명 크기와 신경 쓰인 정도를 남겨 주세요.</p>`}
       </a>
       <a class="card" href="#/sound">
         <div class="eyebrow">소리 치료</div>
-        <h3>사운드 재생</h3>
+        <h3>${allSounds().some((s) => s.youtubeId) ? "소리 재생" : "소리 준비 중"}</h3>
         <p class="muted small">${soundSummaryLine()}</p>
       </a>
       <a class="card" href="#/share">
@@ -358,7 +358,7 @@ function nextModuleAfter(m) {
   return P.modules.find((x) => x.week === m.week && x.order > m.order && modStatus(x.id) !== "completed") || null;
 }
 function finishModule(m, label) {
-  setStatus(m.id, "completed"); delete state.resume[m.id]; save();
+  state.progress[m.id] = "completed"; delete state.resume[m.id]; if (!save()) return;
   const nx = nextModuleAfter(m);
   if (/홈/.test(label || "")) { toast("완료했습니다 ✓"); location.hash = "#/"; return; }
   if (nx) { toast(`완료했습니다 ✓ 이어서: ${nx.title}`, 3500); location.hash = `#/module/${nx.id}`; return; }
@@ -368,7 +368,7 @@ function renderModule(main, [id, idxStr, flag]) {
   const m = moduleById(id);
   if (!m) { location.replace("#/program"); return; }
   if (!isWeekOpen(m.week)) { toast("아직 열리지 않은 주차입니다."); location.replace("#/program"); return; }
-  const idx = Math.min(Math.max(Number(idxStr) || 0, 0), m.screens.length - 1);
+  const idx = Math.min(Math.max(Math.floor(Number(idxStr)) || 0, 0), m.screens.length - 1);
   viewer = { module: m, index: idx };
   if (modStatus(m.id) === "not_started") setStatus(m.id, "in_progress");
   state.resume[m.id] = idx; save();
@@ -531,20 +531,22 @@ function renderEntries(m, screen, justSaved) {
       <div class="entry">
         <div class="when">${data.entries.length - i}번째 · ${fmtDateTime(en.at)}</div>
         ${screen.fields.filter((f) => en.responses[f.key]).map((f) => `<p><span class="q">${esc(f.label)}</span>${esc(en.responses[f.key])}</p>`).join("")}
-        <div class="tools no-print"><button class="btn ghost sm" data-edit="${en.at}" type="button">수정</button><button class="btn link sm" data-del="${en.at}" type="button">삭제</button></div>
+        <div class="tools no-print"><button class="btn ghost sm" data-edit="${esc(en.at)}" type="button">수정</button><button class="btn link sm" data-del="${esc(en.at)}" type="button">삭제</button></div>
       </div>`).join("");
   wrap.querySelectorAll("[data-del]").forEach((b) => b.onclick = () => {
     if (!confirm("이 기록을 삭제할까요?")) return;
     if (editingAt === b.dataset.del) cancelEdit(m, screen);
     data.entries = data.entries.filter((e) => e.at !== b.dataset.del);
-    save(); renderEntries(m, screen); toast("삭제했습니다.");
+    if (!save()) return; renderEntries(m, screen); syncAppendBtn(m, screen); toast("삭제했습니다.");
   });
   wrap.querySelectorAll("[data-edit]").forEach((b) => b.onclick = () => startEdit(m, screen, b.dataset.edit));
 }
 function startEdit(m, screen, at, pendingResponses) {
   const en = wsData(m.id).entries.find((e) => e.at === at); if (!en) return;
   editingAt = at;
-  const src = pendingResponses || en.responses;
+  const src = { ...en.responses, ...pendingResponses };
+  state.drafts[m.id + "@edit"] = { at, responses: { ...src } };
+  save();
   document.querySelectorAll("#fields textarea").forEach((ta) => (ta.value = src[ta.dataset.key] || ""));
   $("#edit-bar").hidden = false; syncAppendBtn(m, screen);
   $("#edit-cancel").onclick = () => cancelEdit(m, screen);
@@ -565,14 +567,16 @@ function submitWorksheet(m, screen) {
     if (editingAt) {
       const en = data.entries.find((e) => e.at === editingAt);
       if (en) en.responses = responses;
-      save();
+      if (!save()) return false;
       cancelEdit(m, screen); // 편집 종료 + 쓰다 만 새 글 복원
       renderEntries(m, screen);
       toast("고친 내용을 저장했습니다 ✓"); return true;
     }
+    const previousDraft = state.drafts[m.id], previousStatus = state.progress[m.id];
     data.entries.push({ at: new Date().toISOString(), responses });
     delete state.drafts[m.id];
-    setStatus(m.id, "completed"); save();
+    state.progress[m.id] = "completed";
+    if (!save()) { data.entries.pop(); if (previousDraft) state.drafts[m.id] = previousDraft; if (previousStatus) state.progress[m.id] = previousStatus; else delete state.progress[m.id]; return false; }
     document.querySelectorAll("#fields textarea").forEach((ta) => (ta.value = ""));
     renderEntries(m, screen, true);
     syncAppendBtn(m, screen);
@@ -581,7 +585,7 @@ function submitWorksheet(m, screen) {
     return true;
   }
   if (!Object.keys(responses).length) { toast("한 칸이라도 적은 뒤 저장해 주세요."); return false; }
-  data.single = responses; data.singleAt = new Date().toISOString(); delete state.drafts[m.id]; save();
+  data.single = responses; data.singleAt = new Date().toISOString(); delete state.drafts[m.id]; if (!save()) return false;
   toast("저장했습니다 ✓");
   const sl = $("#single-saved"); if (sl) sl.textContent = `저장됨 · ${fmtDateTime(data.singleAt)}`; const db = $("#draft-bar"); if (db) db.remove();
   return true;
@@ -592,7 +596,7 @@ function renderQuestionnaire(wrap, m, screen) {
   const q = P.questionnaires[screen.questionnaire_type];
   if (!q) { wrap.innerHTML = `<p class="muted">이 설문은 클리닉 방문 시 진행됩니다.</p>`; return; }
   const prev = state.questionnaires.find((r) => r.type === q.type && r.timepoint === screen.timepoint_label);
-  const draft = Object.keys(state.drafts[m.id] || {}).length ? state.drafts[m.id] : (prev ? prev.answers : {});
+  const draft = { ...(prev?.answers || {}), ...state.drafts[m.id] };
   wrap.innerHTML = `
     ${prev ? `<div class="notice ok">이미 ${fmtDateTime(prev.at)}에 제출한 설문입니다 (총점 ${prev.total}점). 이전 답이 채워져 있으니 고칠 문항만 바꾸고 다시 제출하면 새 결과로 바뀝니다. <a href="#/results">결과 보기</a></div>` : ""}
     <div class="card"><p class="muted" style="margin:0">${esc(q.instruction)}</p><p class="muted small" style="margin:8px 0 0">답한 내용은 자동으로 보관되어, 중간에 나갔다 와도 이어서 할 수 있습니다.</p></div>
@@ -627,7 +631,7 @@ function submitQuestionnaire(m, screen) {
   state.questionnaires = state.questionnaires.filter((r) => !(r.type === q.type && r.timepoint === screen.timepoint_label));
   state.questionnaires.push({ type: q.type, timepoint: screen.timepoint_label, at: new Date().toISOString(), answers, total, severity: thiSeverity(total) });
   delete state.drafts[m.id]; delete state.resume[m.id];
-  setStatus(m.id, "completed"); save();
+  state.progress[m.id] = "completed"; if (!save()) return;
   location.hash = "#/results";
 }
 
@@ -635,7 +639,7 @@ function renderResults(main) {
   const q = P.questionnaires.THI;
   const rs = state.questionnaires.filter((r) => r.type === "THI").sort((a, b) => a.at.localeCompare(b.at));
   const tpLabel = { baseline: "시작 평가 (1주차)", week8: "종료 평가 (8주차)" };
-  const box = (r) => `<div class="card"><div class="eyebrow">${tpLabel[r.timepoint] || r.timepoint}</div>
+  const box = (r) => `<div class="card"><div class="eyebrow">${esc(tpLabel[r.timepoint] || r.timepoint)}</div>
       <div class="stat">${r.total}<small>/ 100</small></div>
       <div><span class="pill">${esc(q.severity_labels[r.severity] || r.severity)}</span></div><p class="muted small" style="margin:8px 0 0">등급은 참고용입니다. 다음 진료에서 선생님과 함께 봅니다.</p>
       <p class="muted small" style="margin-top:8px">${fmtDateTime(r.at)}</p></div>`;
@@ -643,7 +647,7 @@ function renderResults(main) {
   let diff = "";
   if (base && end) {
     const d = base.total - end.total;
-    diff = `<div class="notice ${d > 0 ? "ok" : ""}">시작 시점과 비교해 총점이 ${Math.abs(d)}점 ${d > 0 ? "낮아졌습니다" : d < 0 ? "높아졌습니다" : "같습니다"}. 결과는 다음 진료에서 담당 선생님과 함께 살펴봅니다.</div>`;
+    diff = `<div class="notice ${d > 0 ? "ok" : ""}">시작 시점과 비교해 총점이 ${d === 0 ? "같습니다" : `${Math.abs(d)}점 ${d > 0 ? "낮아졌습니다" : "높아졌습니다"}`}. 결과는 다음 진료에서 담당 선생님과 함께 살펴봅니다.</div>`;
   }
   main.innerHTML = `
     <section class="hero" style="padding-bottom:20px"><div class="eyebrow">이명장애지수 (THI)</div><h1>설문 결과</h1>
@@ -663,7 +667,7 @@ function renderToday(main, [dateArg]) {
   const saved = !!d.at;
   const slider = (id, label, hint, val, lo, hi) => `
     <div class="slider ${val == null ? "unset" : ""}" id="sl-${id}">
-      <div class="slider-head"><span class="label" style="font-weight:500">${label}</span><span class="val"><output id="out-${id}">${val ?? "–"}</output><small> / 10</small></span></div>
+      <div class="slider-head"><span class="label" style="font-weight:500">${label}</span><span class="val"><output id="out-${id}">${esc(val ?? "–")}</output><small> / 10</small></span></div>
       <div class="scale" role="radiogroup" aria-label="${label}">${Array.from({ length: 11 }, (_, v) => `<button type="button" role="radio" class="${val === v ? "on" : ""}" data-id="${id}" data-v="${v}" aria-checked="${val === v}" tabindex="${(val ?? 0) === v ? 0 : -1}">${v}</button>`).join("")}</div>
       <div class="ends"><span>0 = ${lo}</span><span>10 = ${hi}</span></div>
       ${hint ? `<div class="muted small">${hint}</div>` : ""}
@@ -713,7 +717,7 @@ function renderToday(main, [dateArg]) {
       mindfulness: $("#in-mindfulness").checked, pmr: $("#in-pmr").checked,
       trigger: $("#in-trigger").value.trim(), memo: $("#in-memo").value.trim(), at: new Date().toISOString(),
     };
-    save(); toast("일기를 저장했습니다 ✓");
+    if (!save()) return; toast("일기를 저장했습니다 ✓");
     if (dateArg && history.length > 1) history.back(); else location.hash = "#/";
   };
   if ($("#diary-cancel")) $("#diary-cancel").onclick = () => (history.length > 1 ? history.back() : (location.hash = "#/records"));
@@ -868,7 +872,7 @@ function renderRecords(main) {
       <div class="card">${chartDays.length >= 2 ? renderChart(chartDays) : `<p class="muted" style="margin:0">일기를 이틀 이상 기록하면 추이가 표시됩니다.</p>`}</div>
       <div class="card">
         ${days.length ? `<div class="table-wrap"><table><thead><tr><th scope="col">날짜</th><th scope="col">크기</th><th scope="col">신경 쓰임</th><th scope="col">수면</th><th scope="col">실습</th><th scope="col">메모</th><th scope="col" class="no-print"><span class="sr-only">고치기</span></th></tr></thead><tbody>
-          ${days.slice().reverse().map((k) => { const d = state.diary[k]; return `<tr class="rowlink" data-href="#/today/${k}"><td><a href="#/today/${k}">${k.slice(2)}</a></td><td class="num">${d.tinnitus ?? "–"}</td><td class="num">${d.annoyance ?? "–"}</td><td class="num">${d.sleep ?? "–"}</td><td>${[d.mindfulness ? "마음챙김" : "", d.pmr ? "근육이완" : ""].filter(Boolean).join(", ")}</td><td class="small">${esc([d.trigger, d.memo].filter(Boolean).join(" · "))}</td><td class="no-print"><a class="btn ghost sm" href="#/today/${k}">고치기</a></td></tr>`; }).join("")}
+          ${days.slice().reverse().map((k) => { const d = state.diary[k]; return `<tr class="rowlink" data-href="#/today/${k}"><td><a href="#/today/${k}">${k.slice(2)}</a></td><td class="num">${esc(d.tinnitus ?? "–")}</td><td class="num">${esc(d.annoyance ?? "–")}</td><td class="num">${esc(d.sleep ?? "–")}</td><td>${[d.mindfulness ? "마음챙김" : "", d.pmr ? "근육이완" : ""].filter(Boolean).join(", ")}</td><td class="small">${esc([d.trigger, d.memo].filter(Boolean).join(" · "))}</td><td class="no-print"><a class="btn ghost sm" href="#/today/${k}">고치기</a></td></tr>`; }).join("")}
         </tbody></table></div>` : `<p class="muted" style="margin:0">아직 일기가 없습니다.</p>`}
       </div>
     </section>
@@ -947,7 +951,7 @@ function renderShare(main) {
       <p class="muted">화면 밝기를 최대로 하고 QR과 카메라 사이를 20~30cm로 유지해 주세요. 태블릿 화면에 "몇 조각을 받았는지"가 표시되며, 못 받은 조각은 QR이 다시 돌아올 때 자동으로 채워집니다.</p>
       <p class="muted">그래도 어려우면 <a href="#/settings">설정</a>에서 파일로 내보내 전달할 수 있습니다.</p>
     </div>`;
-  let frames = [], i = 0, timer = null, interval = 700;
+  let frames = [], i = 0, timer = null, interval = 700, disposed = false, buildId = 0;
   const qrEl = $("#qr"), prog = $("#qr-progress");
   function draw() {
     if (!frames.length) return;
@@ -957,14 +961,15 @@ function renderShare(main) {
     i = (i + 1) % frames.length;
   }
   function start() { clearInterval(timer); i = 0; draw(); timer = setInterval(draw, interval); }
-  let lock = null; if (navigator.wakeLock) navigator.wakeLock.request("screen").then((l) => (lock = l)).catch(() => {}); // 보여주는 동안 화면이 꺼지지 않게
-  cleanup = () => { clearInterval(timer); if (lock) lock.release().catch(() => {}); };
+  let lock = null; if (navigator.wakeLock) navigator.wakeLock.request("screen").then((l) => { if (disposed) l.release().catch(() => {}); else lock = l; }).catch(() => {}); // 보여주는 동안 화면이 꺼지지 않게
+  cleanup = () => { disposed = true; buildId++; clearInterval(timer); if (lock) lock.release().catch(() => {}); };
   let raw = false;
-  const build = () => Transfer.encode(state, { raw }).then(({ frames: f, bytes }) => {
+  const build = () => { const requestId = ++buildId; return Transfer.encode(state, { raw }).then(({ frames: f, bytes }) => {
+    if (disposed || requestId !== buildId) return;
     frames = f;
     $("#qr-hint").textContent = `전체 ${frames.length}조각 · ${(bytes / 1024).toFixed(1)}KB · 약 ${Math.ceil(frames.length * interval / 1000)}초에 한 바퀴`;
     start();
-  }).catch((e) => { qrEl.innerHTML = `<p class="muted">QR을 만들지 못했습니다. 설정에서 파일로 내보내 전달해 주세요.</p>`; });
+  }).catch((e) => { if (disposed || requestId !== buildId) return; qrEl.innerHTML = `<p class="muted">QR을 만들지 못했습니다. 설정에서 파일로 내보내 전달해 주세요.</p>`; }); };
   build();
   $("#qr-raw").onclick = () => { raw = !raw; $("#qr-raw").textContent = raw ? "압축해서" : "압축 없이"; build(); };
   $("#qr-slower").onclick = () => { interval = interval >= 1500 ? 700 : interval + 400; $("#qr-slower").textContent = interval >= 1500 ? "보통 속도" : "천천히"; start(); };
@@ -1024,7 +1029,7 @@ function renderSettings(main) {
   $("#s-save").onclick = () => {
     const sd = $("#s-start").value; if (sd && !DATE_RE.test(sd)) return toast("시작일 형식이 올바르지 않습니다.");
     p.startDate = sd || p.startDate; p.nickname = $("#s-name").value.trim(); p.unlockAll = $("#s-unlock").checked;
-    save(); toast("저장했습니다 ✓");
+    if (!save()) return; toast("저장했습니다 ✓");
   };
   $("#s-export").onclick = () => {
     const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
@@ -1042,12 +1047,12 @@ function renderSettings(main) {
       else if (data && data.compact) next = stateFromCompact(data.compact); // 병원 태블릿에서 내려받은 사본
       if (!next) throw new Error();
       if (!confirm("현재 기기의 기록을 이 파일의 내용으로 바꿀까요?")) return;
-      state = next; save(); applyFontScale(); toast(data.compact ? "병원 사본에서 복원했습니다 ✓ (글자 크기·설정과 소리 사용 상세 기록은 복원되지 않습니다)" : "가져왔습니다 ✓", 6000); location.hash = "#/";
+      const previous = state; state = next; if (!save()) { state = previous; return; } applyFontScale(); toast(data.compact ? "병원 사본에서 복원했습니다 ✓ (글자 크기·설정과 소리 사용 상세 기록은 복원되지 않습니다)" : "가져왔습니다 ✓", 6000); location.hash = "#/";
     } catch (err) { toast("파일을 읽을 수 없습니다."); }
   };
   $("#s-reset").onclick = () => {
     if (!confirm("정말 모든 기록을 지울까요? 되돌릴 수 없습니다.")) return;
     if (!confirm("마지막 확인입니다. 지우시겠습니까?")) return;
-    state = DEFAULT_STATE(); save(); location.hash = "#/"; toast("모든 기록을 지웠습니다.");
+    const previous = state; state = DEFAULT_STATE(); if (!save()) { state = previous; return; } location.hash = "#/"; toast("모든 기록을 지웠습니다.");
   };
 }
