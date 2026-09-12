@@ -15,7 +15,6 @@ MODULES = [
     (1, "learn",     "이명 이해하기 — 악순환과 안심 정보", "week1/psychoeducation.json"),
     (1, "write",     "나의 악순환 그리기",        "week1/worksheet.json"),
     (1, "homework",  "이번 주 숙제: 일기 시작하기",          "week1/homework.json"),
-    (1, "assess",    "시작 평가 설문지 (THI)",              "week1/assessment.json"),
     (1, "summary",   "1주차 정리",                        "week1/summary.json"),
     (2, "learn",     "생각이 이명 경험을 바꿉니다",          "week2/psychoeducation.json"),
     (2, "write",     "사고기록지 연습",                    "week2/worksheet.json"),
@@ -45,7 +44,6 @@ MODULES = [
     (8, "learn",     "이명과 함께 살아가기 — 수용전념(ACT)",  "week8/act.json"),
     (8, "learn",     "8주의 도구상자 — 총정리",             "week8/psychoeducation.json"),
     (8, "write",     "나의 위기 대응 카드",                 "week8/worksheet.json"),
-    (8, "assess",    "종료 평가 (THI)",                    "week8/assessment.json"),
     (8, "summary",   "8주를 마치며 — 이후 계획",            "week8/summary.json"),
 ]
 

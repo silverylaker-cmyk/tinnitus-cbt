@@ -885,10 +885,10 @@ function renderRecords(main) {
       }).join("") || `<div class="card"><p class="muted" style="margin:0">아직 작성한 워크시트가 없습니다.</p></div>`}
     </section>
 
-    <section class="section">
+    ${state.questionnaires.length ? `<section class="section">
       <div class="section-head"><h2>설문 (THI)</h2><a class="more" href="#/results">결과 비교</a></div>
-      <div class="card">${state.questionnaires.length ? `<ul class="list-plain">${state.questionnaires.map((r) => `<li class="kv"><span>${r.timepoint === "baseline" ? "시작 평가" : "종료 평가"} · ${fmtDateTime(r.at)}</span><b>${r.total}점 <span class="pill">${esc(P.questionnaires.THI.severity_labels[r.severity])}</span></b></li>`).join("")}</ul>` : `<p class="muted" style="margin:0">아직 제출한 설문이 없습니다.</p>`}</div>
-    </section>
+      <div class="card"><ul class="list-plain">${state.questionnaires.map((r) => `<li class="kv"><span>${r.timepoint === "baseline" ? "시작 평가" : "종료 평가"} · ${fmtDateTime(r.at)}</span><b>${r.total}점 <span class="pill">${esc(P.questionnaires.THI.severity_labels[r.severity])}</span></b></li>`).join("")}</ul></div>
+    </section>` : ""}
 
     <section class="section">
       <div class="section-head"><h2>소리 치료 사용</h2><a class="more" href="#/sound">사운드</a></div>

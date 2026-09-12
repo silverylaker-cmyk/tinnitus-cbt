@@ -192,8 +192,8 @@ function renderPatient(main, [id]) {
     ${sinceLastCard(r, ex)}
     <section class="section"><div class="section-head"><h2>주간 이행도</h2></div><div class="card">${adherenceTable(ex)}</div></section>
 
-    <section class="section"><div class="section-head"><h2>THI</h2></div>
-      <div class="card">${ex.questionnaires.length ? `<div class="result-compare">${ex.questionnaires.map((q) => `<div class="card"><div class="eyebrow">${tp[q.timepoint] || "기타"} 평가</div><div class="stat">${esc(q.total)}<small>/100</small></div><span class="pill">${esc(thi.severity_labels[q.severity] || q.severity)}</span><p class="muted small" style="margin-top:6px">${fmtDT(q.at)}</p></div>`).join("")}</div>` : `<p class="muted" style="margin:0">제출한 설문이 없습니다.</p>`}</div></section>
+    ${ex.questionnaires.length ? `<section class="section"><div class="section-head"><h2>THI</h2></div>
+      <div class="card"><div class="result-compare">${ex.questionnaires.map((q) => `<div class="card"><div class="eyebrow">${tp[q.timepoint] || "기타"} 평가</div><div class="stat">${esc(q.total)}<small>/100</small></div><span class="pill">${esc(thi.severity_labels[q.severity] || q.severity)}</span><p class="muted small" style="margin-top:6px">${fmtDT(q.at)}</p></div>`).join("")}</div></div></section>` : ""}
 
     <section class="section"><div class="section-head"><h2>진행</h2></div><div class="card"><p style="margin:0">${doneByWeek}</p></div></section>
 

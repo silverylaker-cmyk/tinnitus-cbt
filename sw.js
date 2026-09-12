@@ -1,6 +1,6 @@
 /* 오프라인용 서비스 워커 — 앱 껍데기만 캐시 (유튜브·폰트·의료진 페이지는 캐시하지 않음)
    버전 번호는 index.html의 ?v= 와 함께 올립니다. */
-const VERSION = "16"; // index.html 의 ?v= 번호와 같게
+const VERSION = "17"; // index.html 의 ?v= 번호와 같게
 const CACHE = "tinnitus-cbt-" + VERSION;
 const V = "?v=" + VERSION;
 const SHELL = ["./", "index.html", "style.css" + V, "app.js" + V, "illustrations.js" + V, "transfer.js" + V,
