@@ -89,6 +89,14 @@ export const META = {
 
 // ---------------------------------------------------------------- 공용 장면
 const K = (m) => `[data-mod="${m.id}"]`;
+// 기록 탭에 보여 줄 일기 예시 (이미 몇 주 써 온 상태)
+const SAMPLE_DIARY = [
+  { date: "오늘", tinnitus: 5, annoyance: 4, sleep: 3, memo: "" },
+  { date: "어제", tinnitus: 6, annoyance: 6, sleep: 5, memo: "피로" },
+  { date: "2일 전", tinnitus: 4, annoyance: 3, sleep: 2, memo: "" },
+  { date: "3일 전", tinnitus: 6, annoyance: 5, sleep: 4, memo: "시끄러운 곳" },
+  { date: "4일 전", tinnitus: 5, annoyance: 5, sleep: 3, memo: "" },
+];
 
 // 누적형 워크시트: 저장 뒤 → 다시 들어가기 → 기록 탭
 function appendAfter(b, idx, responses, firstKey) {
@@ -115,7 +123,8 @@ function reopen(b, idx, { single = false, label = null } = {}) {
     t.x(`p${idx}-open`, `나중에 다시 쓰고 싶으면 '프로그램' 탭에서 ${m.week}주차의 '${name}'을 다시 엽니다.`, { point: K(m), tap: true });
     t.x(`p${idx}-list`, single ? "다시 열면 전에 적은 내용이 그대로 채워져 있습니다. 고친 뒤 다시 저장하면 새 내용으로 바뀝니다." : "이미 쓴 기록은 그 화면 아래에 모여 있고, 새로 적어 저장하면 하나 더 쌓입니다.");
   });
-  b.scene(idx, "records", { worksheets: [m.id] }, (t) => {
+  // 2주차부터는 이미 일기가 쌓여 있는 상태로 보여 준다 (1주차 워크시트 시점에는 일기를 아직 시작하지 않음)
+  b.scene(idx, "records", { worksheets: [m.id], diary: m.week >= 2 ? SAMPLE_DIARY : [] }, (t) => {
     t.x(`r${idx}-tab`, "'기록' 탭을 누르면 지금까지 쓴 기록을 한꺼번에 볼 수 있습니다.", { point: '[data-route="records"]', tap: true });
     t.x(`r${idx}-ws`, "워크시트 기록은 모듈 이름 아래에 모여 있습니다. '열어서 고치기'를 누르면 그 화면으로 바로 갑니다.", { point: "#records .ws a.more" });
   });

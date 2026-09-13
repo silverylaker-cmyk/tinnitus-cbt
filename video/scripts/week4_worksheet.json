@@ -238,6 +238,43 @@
    "state": {
     "worksheets": [
      "week4_worksheet"
+    ],
+    "diary": [
+     {
+      "date": "오늘",
+      "tinnitus": 5,
+      "annoyance": 4,
+      "sleep": 3,
+      "memo": ""
+     },
+     {
+      "date": "어제",
+      "tinnitus": 6,
+      "annoyance": 6,
+      "sleep": 5,
+      "memo": "피로"
+     },
+     {
+      "date": "2일 전",
+      "tinnitus": 4,
+      "annoyance": 3,
+      "sleep": 2,
+      "memo": ""
+     },
+     {
+      "date": "3일 전",
+      "tinnitus": 6,
+      "annoyance": 5,
+      "sleep": 4,
+      "memo": "시끄러운 곳"
+     },
+     {
+      "date": "4일 전",
+      "tinnitus": 5,
+      "annoyance": 5,
+      "sleep": 3,
+      "memo": ""
+     }
     ]
    }
   }
