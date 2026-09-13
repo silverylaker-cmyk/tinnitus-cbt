@@ -118,6 +118,27 @@ const ModuleView: React.FC<{ program: any; mod: any; index: number; screen: any;
 
   let extraHtml = "";
   if (extra === "cycle") { const steps = (screen.body.match(/^\d+\. .+$/gm) || []).map((l: string) => l.replace(/^\d+\. /, "")); extraHtml = `<h3 class="extra-title">악순환 고리 한눈에 보기</h3>` + ART.cycle(steps); }
+  else if (extra === "breath" || extra === "breath-cue") {
+    const cue = extra === "breath-cue" ? (vstate?.cueWord || "편안") : "";
+    extraHtml = `<h3 class="extra-title">${extra === "breath-cue" ? "호흡–단서어 연습" : "지금 바로 연습하기"}</h3>`
+      + `<p class="muted">${extra === "breath-cue" ? `내쉴 때 단서어 <b>'${cue}'</b>가 표시됩니다.` : "원이 커질 때 들이쉬고, 작아질 때 내쉽니다. 이명이 들려도 그대로 두고 호흡으로 돌아오면 됩니다."}</p>`
+      + `<div id="breath"><div class="breath">
+        <div class="breath-stage"><div class="breath-circle" style="transform:scale(.78)"><span class="breath-word">${cue || "준비"}</span></div></div>
+        <div class="breath-info"><span class="breath-phase">시작을 누르면 원이 커졌다 작아집니다</span><span class="breath-left"></span></div>
+        <div class="btn-row center"><label class="pill-select">시간 <select class="breath-min"><option>5분</option></select></label>
+        <button class="btn accent breath-start${st.tapped === "#breath .btn" ? " tapped" : ""}" type="button">시작</button></div>
+      </div></div>`;
+  } else if (extra === "pmr") {
+    const parts = ART.parsePMRParts(screen.body);
+    extraHtml = `<h3 class="extra-title">안내에 따라 해보기</h3><p class="muted">시작을 누르면 부위마다 긴장·이완 시간을 세어 줍니다. 순서는 위 목록과 같습니다.</p>`
+      + `<div id="pmr"><div class="pmr">
+        <div class="pmr-head"><span class="pmr-step">전신 ${parts.length}부위</span><span class="pmr-count"></span></div>
+        <div class="pmr-part"><b>${parts[0]?.name || ""}</b><span>${parts[0]?.how || ""}</span></div>
+        <div class="pmr-how">긴장 7초 → 이완 12초. 아프지 않을 정도(70~80% 힘)로만 조입니다.</div>
+        <div class="pmr-bar"><i style="width:38%"></i></div>
+        <div class="btn-row center"><button class="btn accent pmr-start${st.tapped === "#pmr .btn" ? " tapped" : ""}" type="button">시작</button></div>
+      </div></div>`;
+  }
   const conceptKey = extra?.startsWith("img:") ? extra.slice(4) : null;
   const conceptImg = conceptKey ? ART.CONCEPTS[conceptKey] : null;
   const heroImg = showArt && ART.IMAGES[mod.week];

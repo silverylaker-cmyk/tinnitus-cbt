@@ -108,10 +108,11 @@ function singleAfter(b, idx, responses, extraCues) {
   });
 }
 // 프로그램 목록에서 다시 들어가기 → 기록 탭
-function reopen(b, idx, { single = false, records = "ws" } = {}) {
+function reopen(b, idx, { single = false, label = null } = {}) {
   const m = b.m;
+  const name = label || m.title;
   b.scene(idx, "program", null, (t) => {
-    t.x(`p${idx}-open`, `나중에 다시 쓰고 싶으면 '프로그램' 탭에서 ${m.week}주차의 '${m.title}'을 다시 엽니다.`, { point: K(m), tap: true });
+    t.x(`p${idx}-open`, `나중에 다시 쓰고 싶으면 '프로그램' 탭에서 ${m.week}주차의 '${name}'을 다시 엽니다.`, { point: K(m), tap: true });
     t.x(`p${idx}-list`, single ? "다시 열면 전에 적은 내용이 그대로 채워져 있습니다. 고친 뒤 다시 저장하면 새 내용으로 바뀝니다." : "이미 쓴 기록은 그 화면 아래에 모여 있고, 새로 적어 저장하면 하나 더 쌓입니다.");
   });
   b.scene(idx, "records", { worksheets: [m.id] }, (t) => {
@@ -588,7 +589,7 @@ export const PLAN = {
     singleAfter(b, 2, { value_direction: "손주들과 즐겁게 시간을 보내는 할머니, 친구들과 나들이를 다니는 사람", committed_action: "이번 주 토요일 친구에게 전화해서 나들이 날짜 정하기" }, (t) => {
       t.x("a2-later", "프로그램이 끝난 뒤에도 이 화면을 다시 열어 새로운 행동으로 바꿔 적을 수 있습니다.");
     });
-    reopen(b, 2, { single: true });
+    reopen(b, 2, { single: true, label: "나의 가치와 전념 행동" });
   },
 
   week8_psychoeducation(b) {

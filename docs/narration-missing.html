@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>녹음이 필요한 문장</title>
+<style>
+:root{--ink:#141413;--bg:#F5F3EC;--acc:#C2542F;--mute:#6b6862;--line:#d9d5cc;--card:#fff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:18px 14px 70px}
+h1{font-size:24px;margin:6px 0 4px}.meta{color:var(--mute);font-size:14px;margin-bottom:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:12px 0}
+.head{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;margin-bottom:8px;font-size:13px;color:var(--mute)}
+.pill{background:#efece3;border-radius:999px;padding:2px 10px}
+.say{font-size:19px;line-height:1.6;margin:10px 0 14px}
+.file{font-family:ui-monospace,Menlo,monospace;font-size:13px;background:#faf8f2;border:1px dashed var(--line);border-radius:8px;padding:8px 10px;word-break:break-all}
+.btns{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+button{font:inherit;font-size:14px;padding:9px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);cursor:pointer}
+button.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+button.done{background:#e8efe6;border-color:#b8cdb2}
+.steps{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.steps ol{margin:6px 0 0;padding-left:20px}.steps li{margin:4px 0}
+.empty{text-align:center;color:var(--mute);padding:40px 0}
+</style></head><body><div class="wrap">
+<h1>녹음이 필요한 문장 4개</h1>
+<div class="meta">만든 날 2026-09-13 · 대본 v2 기준</div>
+<div class="steps"><b>하는 법</b>
+<ol>
+<li>문장을 <b>복사</b> 눌러 쓰시는 TTS 에 붙여 넣고 음성을 만드세요.</li>
+<li>내려받은 파일 이름을 아래 <b>파일 이름</b>으로 바꿉니다 (파일 이름 복사 버튼).</li>
+<li><code>mydrive/CBT/나레이션</code> 폴더에 넣어 주세요. 나머지는 제가 처리합니다.</li>
+</ol></div>
+
+<div class="card" data-cue="p2-open">
+  <div class="head"><span class="pill">8주차</span><span>이명과 함께 살아가기 — 수용전념(ACT)</span><span class="pill">프로그램 목록</span><span>p2-open</span></div>
+  <div class="say">나중에 다시 쓰고 싶으면 '프로그램' 탭에서 팔 주차의 '나의 가치와 전념 행동'을 다시 엽니다.</div>
+  <div class="file">601_week8_act_p2-open.wav</div>
+  <div class="btns">
+    <button class="primary" data-copy="나중에 다시 쓰고 싶으면 '프로그램' 탭에서 팔 주차의 '나의 가치와 전념 행동'을 다시 엽니다.">문장 복사</button>
+    <button data-copy="601_week8_act_p2-open.wav">파일 이름 복사</button>
+  </div>
+</div>
+<div class="card" data-cue="p2-list">
+  <div class="head"><span class="pill">8주차</span><span>이명과 함께 살아가기 — 수용전념(ACT)</span><span class="pill">프로그램 목록</span><span>p2-list</span></div>
+  <div class="say">다시 열면 전에 적은 내용이 그대로 채워져 있습니다. 고친 뒤 다시 저장하면 새 내용으로 바뀝니다.</div>
+  <div class="file">602_week8_act_p2-list.wav</div>
+  <div class="btns">
+    <button class="primary" data-copy="다시 열면 전에 적은 내용이 그대로 채워져 있습니다. 고친 뒤 다시 저장하면 새 내용으로 바뀝니다.">문장 복사</button>
+    <button data-copy="602_week8_act_p2-list.wav">파일 이름 복사</button>
+  </div>
+</div>
+<div class="card" data-cue="r2-tab">
+  <div class="head"><span class="pill">8주차</span><span>이명과 함께 살아가기 — 수용전념(ACT)</span><span class="pill">기록 탭</span><span>r2-tab</span></div>
+  <div class="say">'기록' 탭을 누르면 지금까지 쓴 기록을 한꺼번에 볼 수 있습니다.</div>
+  <div class="file">603_week8_act_r2-tab.wav</div>
+  <div class="btns">
+    <button class="primary" data-copy="'기록' 탭을 누르면 지금까지 쓴 기록을 한꺼번에 볼 수 있습니다.">문장 복사</button>
+    <button data-copy="603_week8_act_r2-tab.wav">파일 이름 복사</button>
+  </div>
+</div>
+<div class="card" data-cue="r2-ws">
+  <div class="head"><span class="pill">8주차</span><span>이명과 함께 살아가기 — 수용전념(ACT)</span><span class="pill">기록 탭</span><span>r2-ws</span></div>
+  <div class="say">워크시트 기록은 모듈 이름 아래에 모여 있습니다. '열어서 고치기'를 누르면 그 화면으로 바로 갑니다.</div>
+  <div class="file">604_week8_act_r2-ws.wav</div>
+  <div class="btns">
+    <button class="primary" data-copy="워크시트 기록은 모듈 이름 아래에 모여 있습니다. '열어서 고치기'를 누르면 그 화면으로 바로 갑니다.">문장 복사</button>
+    <button data-copy="604_week8_act_r2-ws.wav">파일 이름 복사</button>
+  </div>
+</div>
+<script>
+document.querySelectorAll("button[data-copy]").forEach((b) => b.onclick = async () => {
+  const t = b.dataset.copy;
+  try { await navigator.clipboard.writeText(t); }
+  catch (e) { const ta = document.createElement("textarea"); ta.value = t; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove(); }
+  const old = b.textContent; b.textContent = "복사됨 ✓"; b.classList.add("done");
+  setTimeout(() => { b.textContent = old; b.classList.remove("done"); }, 1400);
+});
+</script>
+</div></body></html>
