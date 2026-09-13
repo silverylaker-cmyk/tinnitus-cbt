@@ -128,7 +128,7 @@ function recentList(n) {
 }
 function patientRow(id, r) {
   const ex = Transfer.expand(r.compact);
-  const week = ex.startDate ? Math.min(8, Math.floor((Date.now() - new Date(ex.startDate + "T00:00:00")) / 86400000 / 7) + 1) : "-";
+  const week = ex.startDate ? Math.max(1, Math.min(8, Math.floor((Date.now() - new Date(ex.startDate + "T00:00:00")) / 86400000 / 7) + 1)) : "-";
   return `<a class="patient-row" href="#/patient/${esc(id)}"><span class="pid">${esc(ex.nickname || "(이름 없음)")}</span><span class="meta">번호 ${esc(id)} · ${week}주차 · 일기 ${Object.values(ex.diary).filter((d) => d.tinnitus != null).length}일 · 받음 ${fmtDT(r.receivedAt)}</span><span class="chev">›</span></a>`;
 }
 
@@ -157,6 +157,16 @@ function chart(days, diary) {
     last.map((k, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(diary[k][s.key] ?? 0).toFixed(1)}" r="3" fill="${s.color}" stroke="#FCFBF8" stroke-width="2"><title>${esc(k)} ${s.label} ${esc(diary[k][s.key])}</title></circle>`).join("")).join("");
   return `<div class="chart-wrap"><svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="일기 추이 그래프">${grid}${xl}${lines}</svg></div><div class="legend">${SERIES.map((s) => `<span><i style="background:${s.color}"></i>${s.label}</span>`).join("")}</div>`;
 }
+// 내보낸 날을 포함한 실제 14일 구간. 최근 14건을 2주로 오인하지 않습니다.
+function diaryWindow(ex, offset = 0) {
+  const end = new Date(ex.receivedAt || Date.now());
+  if (Number.isNaN(end.getTime())) return [];
+  end.setDate(end.getDate() - offset);
+  const start = new Date(end); start.setDate(start.getDate() - 13);
+  const key = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const from = key(start), to = key(end);
+  return Object.keys(ex.diary).filter((k) => k >= from && k <= to).sort();
+}
 function avg(arr) { arr = arr.filter((v) => v != null); return arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1) : "-"; }
 
 function renderPatient(main, [id]) {
@@ -165,10 +175,10 @@ function renderPatient(main, [id]) {
   const ex = Transfer.expand(r.compact);
   const days = Object.keys(ex.diary).sort();
   const scored = days.filter((k) => ex.diary[k].tinnitus != null);
-  const last14 = days.slice(-14), prev14 = days.slice(-28, -14);
+  const last14 = diaryWindow(ex), prev14 = diaryWindow(ex, 14);
   const thi = P.questionnaires.THI;
   const modTitle = Object.fromEntries(P.modules.map((m) => [m.id, m]));
-  const week = ex.startDate ? Math.min(8, Math.floor((Date.now() - new Date(ex.startDate + "T00:00:00")) / 86400000 / 7) + 1) : "-";
+  const week = ex.startDate ? Math.max(1, Math.min(8, Math.floor((Date.now() - new Date(ex.startDate + "T00:00:00")) / 86400000 / 7) + 1)) : "-";
   const doneByWeek = P.weeks.map((w) => { const ms = P.modules.filter((m) => m.week === w.week); return `${w.week}주 ${ms.filter((m) => ex.done.includes(m.id)).length}/${ms.length}`; }).join(" · ");
   const soundTotal = ex.sounds.reduce((a, s) => a + s.daySec + s.nightSec, 0);
   const soundDays = ex.sounds.length;
@@ -222,7 +232,7 @@ function renderPatient(main, [id]) {
   $("#p-print").onclick = () => window.print();
   $("#p-export").onclick = () => download(`이명기록_${ex.nickname || id}_${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify({ clinicExport: 1, id, ...r, note: db.notes[id] || "" }, null, 2));
   $("#p-del").onclick = () => { if (!confirm("이 환자의 기록을 이 태블릿에서 삭제할까요?")) return; delete db.patients[id]; delete db.notes[id]; save(); location.hash = "#/patients"; toast("삭제했습니다."); };
-  $("#p-note-save").onclick = () => { db.notes[id] = $("#p-note").value; save(); toast("메모를 저장했습니다 ✓"); };
+  $("#p-note-save").onclick = () => { db.notes[id] = $("#p-note").value; if (save()) toast("메모를 저장했습니다 ✓"); };
 }
 
 // 주차별 이행도: 모듈 완료, 일기 일수, 사고기록 수, 마음챙김/근육이완 일수, 소리 주간/야간
@@ -232,7 +242,7 @@ function adherenceTable(ex) {
   const dk = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   const weekOf = (key) => Math.floor((new Date(key + "T00:00:00") - start) / 86400000 / 7) + 1;
   const cur = Math.min(8, Math.max(1, weekOf(dk(new Date()))));
-  const thought = (ex.worksheets.week2_worksheet?.entries || []).map((e) => weekOf(e.at.slice(0, 10)));
+  const thought = (ex.worksheets.week2_worksheet?.entries || []).map((e) => weekOf(dk(new Date(e.at))));
   const rows = P.weeks.map((w) => {
     const n = w.week; if (n > cur) return "";
     const from = new Date(start); from.setDate(from.getDate() + (n - 1) * 7); const to = new Date(from); to.setDate(to.getDate() + 6);
@@ -255,10 +265,10 @@ function sinceLastCard(r, ex) {
   const scoredDays = (e) => Object.values(e.diary).filter((d) => d.tinnitus != null).length;
   const entries = (e) => Object.values(e.worksheets).reduce((a, w) => a + w.entries.length, 0);
   const soundSec = (e) => e.sounds.reduce((a, s) => a + s.daySec + s.nightSec, 0);
-  const mean = (e, key) => { const ks = Object.keys(e.diary).sort().slice(-14).map((k) => e.diary[k][key]).filter((v) => v != null); return ks.length ? (ks.reduce((a, b) => a + b, 0) / ks.length).toFixed(1) : "-"; };
+  const mean = (e, key) => { const ks = diaryWindow(e).map((k) => e.diary[k][key]).filter((v) => v != null); return ks.length ? (ks.reduce((a, b) => a + b, 0) / ks.length).toFixed(1) : "-"; };
   const flags = [];
   const last = ex.questionnaires.slice().sort((a, b) => a.at.localeCompare(b.at)).at(-1); if (last && last.severity === "catastrophic") flags.push("THI 매우 심한 편");
-  const recent = Object.keys(ex.diary).sort().slice(-14); if (recent.filter((k) => (ex.diary[k].sleep ?? 0) >= 8).length >= 5) flags.push("수면 영향 8점 이상 5일+");
+  const recent = diaryWindow(ex); if (recent.filter((k) => (ex.diary[k].sleep ?? 0) >= 8).length >= 5) flags.push("수면 영향 8점 이상 5일+");
   const lastDay = Object.keys(ex.diary).sort().at(-1); if (lastDay && (Date.now() - new Date(lastDay + "T00:00:00")) / 86400000 >= 7) flags.push("일기 7일 이상 공백");
   return `<section class="section"><div class="section-head"><h2>지난 수신(${fmtDT(r.prevReceivedAt).slice(0, 10)}) 이후</h2></div>
     <div class="stat-row">
@@ -303,7 +313,7 @@ function renderData(main) {
         else throw new Error();
       } catch (err) { toast(`${f.name}: 읽을 수 없는 파일입니다.`); }
     }
-    save(); if (n) { toast(`${n}명의 기록을 가져왔습니다 ✓`); location.hash = "#/patients"; }
+    if (!save()) return; if (n) { toast(`${n}명의 기록을 가져왔습니다 ✓`); location.hash = "#/patients"; }
   };
   const col = Transfer.collector();
   $("#d-paste-btn").onclick = async () => {

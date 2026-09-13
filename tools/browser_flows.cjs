@@ -1,0 +1,16 @@
+// 가상 기록만 사용합니다. 실행법: docs/review-2026-09-12.md
+const artifactDir = process.env.ARTIFACT_DIR || require('node:fs').mkdtempSync(require('node:path').join(require('node:os').tmpdir(), 'tinnitus-review-'));
+const assert=require('node:assert/strict');const {chromium}=require('playwright');
+(async()=>{
+const b=await chromium.launch({...(process.env.CHROMIUM_PATH ? {executablePath:process.env.CHROMIUM_PATH} : {})});const c=await b.newContext({acceptDownloads:true,reducedMotion:'reduce'});const p=await c.newPage();p.setDefaultTimeout(8000);const errs=[];p.on('pageerror',e=>errs.push(e.message));
+const route=async(r)=>{await p.evaluate(r=>location.hash=r,r);await p.waitForTimeout(100)};
+await p.goto((process.env.SITE || 'http://127.0.0.1:8765/'));await p.locator('#start-btn').click();await route('#/today');
+for(const id of ['tinnitus','annoyance','sleep']) await p.locator(`[data-id=${id}][data-v="3"]`).click();await p.locator('#in-memo').fill('검증용 일기');await p.locator('[type=submit]').click();await p.reload();await route('#/records');assert.match(await p.locator('#main').innerText(),/검증용 일기/);console.log('PASS diary persists after reload');
+await route('#/settings');const download=p.waitForEvent('download');await p.locator('#s-export').click();const d=await download;await d.saveAs(artifactDir + '/export.json');
+const file=JSON.parse(require('fs').readFileSync(artifactDir + '/export.json','utf8'));file.profile.nickname='복원검증';p.once('dialog',d=>d.accept());await p.locator('#s-file').setInputFiles({name:'test.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(file))});await p.waitForTimeout(150);assert.match(await p.locator('h1').innerText(),/복원검증/);console.log('PASS export and import');
+await p.evaluate(()=>{window.realEncode=Transfer.encode;Transfer.encode=async(...args)=>{await new Promise(r=>setTimeout(r,400));return realEncode(...args)};window.intervals=0;window.realInterval=setInterval;window.setInterval=(...args)=>{intervals++;return realInterval(...args)}});await route('#/share');await route('#/today');await p.waitForTimeout(600);assert.equal(await p.evaluate(()=>intervals),0);console.log('PASS leaving pending QR does not leak timer');
+await p.evaluate(async()=>{await navigator.serviceWorker.ready;await caches.open('other-app-cache')});await p.reload();await p.evaluate(()=>navigator.serviceWorker.ready);await c.setOffline(true);await p.reload();assert.ok(await p.locator('h1').count());assert.equal(await p.evaluate(()=>caches.has('other-app-cache')),true);await c.setOffline(false);console.log('PASS offline reload and unrelated cache retained');
+await p.goto(new URL('clinic.html#/data', process.env.SITE || 'http://127.0.0.1:8765/').href);await p.locator('#d-file').setInputFiles(artifactDir + '/export.json');await p.waitForTimeout(150);await p.locator('.patient-row').click();await p.waitForSelector('#p-note');assert.match(await p.locator('#main').innerText(),/검증용 일기/);console.log('PASS clinic imports patient export');
+assert.deepEqual(await p.evaluate(()=>diaryWindow({receivedAt:'2026-09-12T12:00:00+09:00',diary:{'2026-06-01':{},'2026-08-29':{},'2026-08-30':{},'2026-09-12':{},'2026-09-13':{}}})),['2026-08-30','2026-09-12']);console.log('PASS clinic uses calendar 14-day window');
+assert.deepEqual(errs,[]);await b.close();
+})().catch(e=>{console.error(e);process.exit(1)});

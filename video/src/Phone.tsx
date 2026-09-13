@@ -347,11 +347,11 @@ const SoundView: React.FC<{ vstate: any; tapCls: (s: string) => string }> = ({ v
         <div className="kv"><span className="muted">선택된 소리 없음</span><span className="timer">00:00</span></div>
         <p className="muted small" style={{ margin: "8px 0 0" }}>재생을 누르면 사용 시간이 자동으로 기록되고, 밤 10시~아침 6시 사용은 야간으로 구분됩니다.</p>
       </div>
-      {S.groups.map((g: any) => (
+      {S.groups.filter((g: any) => !g.hidden).map((g: any) => (
         <section className="section" key={g.id}>
           <div className="section-head"><h2>{g.title}</h2></div>
           <p className="muted">{g.desc}</p>
-          <div className="sound-list">{g.items.map((it: any, i: number) => (
+          <div className="sound-list">{g.items.filter((it: any) => !it.hidden).map((it: any, i: number) => (
             <button className={"sound-item" + (g.id === S.groups[0].id && i === 0 ? tapCls(".sound-item") : "")} key={it.id} type="button"><span className="st">{it.title}</span><span className="sd">{it.desc || "편안한 배경 소리"}</span></button>
           ))}</div>
         </section>

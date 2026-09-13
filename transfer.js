@@ -30,7 +30,7 @@
       v: 1, id: p.id || "", n: p.nickname || "", s: p.startDate || "", at: new Date().toISOString(),
       done: Object.entries(state.progress || {}).filter(([, v]) => v === "completed").map(([k]) => k),
       w: ws,
-      q: (state.questionnaires || []).map((r) => [r.type, r.timepoint, r.at, r.total, r.severity, Object.values(r.answers || {}).join("")]),
+      q: (state.questionnaires || []).map((r) => [r.type, r.timepoint, r.at, r.total, r.severity, Array.from({ length: 25 }, (_, i) => r.answers?.["q" + (i + 1)] ?? "").join("")]),
       d: diary,
       ss: Object.entries(sounds).sort().map(([day, r]) => [day, r[0], r[1], r[2]]),
     };

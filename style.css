@@ -445,3 +445,13 @@ input[type=date], select { -webkit-appearance: none; appearance: none; }
 #blackout .hint.show { opacity: 1; }
 #blackout .hint b { display: block; font-size: 1.4rem; color: #cfcbc0; margin-bottom: 6px; }
 .sound-days td.num { text-align: right; font-variant-numeric: tabular-nums; }
+/* 첫 화면의 장식 여백을 줄여 시작 안내를 더 일찍 보여 줍니다. */
+@media (max-width: 720px) {
+  .hero.with-art:has(.hero-rings) { gap: 12px; padding-top: 8px; }
+  .hero-rings { width: 64px; height: 64px; }
+  .brand { min-width: 0; }
+  .brand-mark, .font-btn { flex-shrink: 0; }
+  .week-head { flex-wrap: wrap; }
+  .week-title { min-width: 120px; }
+  .viewer-top { flex-wrap: wrap; gap: 8px; }
+}
