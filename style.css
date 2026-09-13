@@ -438,3 +438,10 @@ input[type=date], select { -webkit-appearance: none; appearance: none; }
 .concept img { width: min(100%, 420px); height: auto; border-radius: 20px; }
 .concept figcaption { color: var(--ink-3); font-size: .95rem; margin-top: 8px; }
 @media (max-width: 720px) { .hero-art.img { width: 150px; height: 150px; border-radius: 18px; } }
+
+/* 소리 재생 중 검은 화면 — 두 번 두드리면 종료 */
+#blackout { position: fixed; inset: 0; z-index: 10000; background: #000; color: #9a9890; display: flex; align-items: center; justify-content: center; text-align: center; padding: 24px; cursor: pointer; -webkit-user-select: none; user-select: none; touch-action: manipulation; }
+#blackout .hint { font-size: 1.1rem; line-height: 1.6; opacity: 0; transition: opacity .6s; }
+#blackout .hint.show { opacity: 1; }
+#blackout .hint b { display: block; font-size: 1.4rem; color: #cfcbc0; margin-bottom: 6px; }
+.sound-days td.num { text-align: right; font-variant-numeric: tabular-nums; }

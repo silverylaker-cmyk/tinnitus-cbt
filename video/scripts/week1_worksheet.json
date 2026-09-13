@@ -2,7 +2,15 @@
  "module": "week1_worksheet",
  "week": 1,
  "title": "나의 악순환 그리기",
- "_readme": "say = 읽을 문장 (TTS/육성). highlight = 화면 문장 번호(0=제목, 1..=본문, null=없음). point = 가리킬 요소(CSS 선택자). tap = 눌림 효과. type = {key,text} 입력칸에 타이핑. 임상 문장은 content/*.json 에서 고치고, 진행 멘트만 여기서 고치세요.",
+ "_readme": "say = 읽을 문장 (육성 TTS). highlight = 화면 문장 번호(0=제목, 1..=본문, null=없음). point = 가리킬 요소(CSS 선택자). tap = 눌림 효과. type = {key,text} 입력칸에 타이핑. view = module|program|today|records|sound. image = 삽화 제안(렌더에는 영향 없음). 임상 문장은 content/*.json 에서 고치고, 진행 멘트만 여기서 고치세요.",
+ "_v2": {
+  "coverage": {
+   "drama": "—",
+   "mode": "상세",
+   "note": "누적형 워크시트 첫 경험. 칸 4개 예시 타이핑, 저장 뒤 기록, 수정·삭제, 다시 들어가기, 기록 탭"
+  },
+  "notes": []
+ },
  "screens": [
   {
    "index": 0,
@@ -10,7 +18,12 @@
    "cues": [
     {
      "id": "s0-intro",
-     "say": "1주차 작성 내용, '나의 악순환 그리기'를 함께 보겠습니다.",
+     "say": "일 주차 작성 내용, '나의 악순환 그리기'를 함께 보겠습니다.",
+     "highlight": null
+    },
+    {
+     "id": "s0-why",
+     "say": "앞 화면에서 본 악순환 고리를 이번에는 나의 경험으로 채워 보는 워크시트입니다.",
      "highlight": null
     },
     {
@@ -44,6 +57,11 @@
      "highlight": 5
     },
     {
+     "id": "s0-how",
+     "say": "칸은 네 개입니다. 칸을 누르면 글을 쓸 수 있고, 다 쓰지 않고 나가도 쓰던 글은 그대로 남습니다.",
+     "highlight": null
+    },
+    {
      "id": "s0-f0",
      "say": "첫 번째 칸입니다. 이명이 특히 신경 쓰일 때는 언제인가요?",
      "highlight": null,
@@ -66,11 +84,11 @@
     },
     {
      "id": "s0-f1t",
-     "say": "오늘따라 왜 이렇게 크지",
+     "say": "이러다 잠을 못 자겠다",
      "highlight": null,
      "type": {
       "key": "automatic_thought",
-      "text": "오늘따라 왜 이렇게 크지"
+      "text": "이러다 잠을 못 자겠다"
      }
     },
     {
@@ -81,11 +99,11 @@
     },
     {
      "id": "s0-f2t",
-     "say": "불안",
+     "say": "불안, 짜증",
      "highlight": null,
      "type": {
       "key": "emotion",
-      "text": "불안"
+      "text": "불안, 짜증"
      }
     },
     {
@@ -96,11 +114,11 @@
     },
     {
      "id": "s0-f3t",
-     "say": "어깨가 긴장됨",
+     "say": "어깨가 긴장되고 귀에 더 집중하게 됨",
      "highlight": null,
      "type": {
       "key": "body_reaction",
-      "text": "어깨가 긴장됨"
+      "text": "어깨가 긴장되고 귀에 더 집중하게 됨"
      }
     },
     {
@@ -110,25 +128,17 @@
      "point": "#next-btn",
      "tap": true
     }
-   ]
+   ],
+   "image": {
+    "file": "img/concept-cycle.webp",
+    "use": "1주차 악순환 고리 화면·워크시트 (기존 프롬프트 문서 B 참조, 아직 생성 안 됨)",
+    "size": "1:1 (1024×1024)",
+    "prompt": "[공통 스타일 블록]\nA circular diagram made of six small abstract icons connected by thin ink arrows into a loop: a small sound mark (three arcs), a thought cloud, a heart with a tremble line, a tense shoulder shape, a larger sound mark, and back to the start. No labels, no numbers. One arrow is terracotta to show the loop can be cut there. Centered on cream, square composition."
+   }
   },
   {
    "index": 0,
    "view": "module",
-   "state": {
-    "afterSave": true,
-    "entries": [
-     {
-      "when": "오늘",
-      "responses": {
-       "trigger_situation": "조용한 방에서 잠들려 할 때",
-       "automatic_thought": "오늘따라 왜 이렇게 크지",
-       "emotion": "불안",
-       "body_reaction": "어깨가 긴장됨"
-      }
-     }
-    ]
-   },
    "cues": [
     {
      "id": "a0-saved",
@@ -156,7 +166,21 @@
      "point": "#next-btn",
      "tap": true
     }
-   ]
+   ],
+   "state": {
+    "afterSave": true,
+    "entries": [
+     {
+      "when": "오늘",
+      "responses": {
+       "trigger_situation": "조용한 방에서 잠들려 할 때",
+       "automatic_thought": "이러다 잠을 못 자겠다",
+       "emotion": "불안, 짜증",
+       "body_reaction": "어깨가 긴장되고 귀에 더 집중하게 됨"
+      }
+     }
+    ]
+   }
   },
   {
    "index": 0,
@@ -164,7 +188,7 @@
    "cues": [
     {
      "id": "p0-open",
-     "say": "나중에 다시 쓰고 싶으면 '프로그램' 탭에서 1주차의 '나의 악순환 그리기'를 다시 엽니다.",
+     "say": "나중에 다시 쓰고 싶으면 '프로그램' 탭에서 일 주차의 '나의 악순환 그리기'을 다시 엽니다.",
      "highlight": null,
      "point": "[data-mod=\"week1_worksheet\"]",
      "tap": true
@@ -173,15 +197,32 @@
      "id": "p0-list",
      "say": "이미 쓴 기록은 그 화면 아래에 모여 있고, 새로 적어 저장하면 하나 더 쌓입니다.",
      "highlight": null
-    },
+    }
+   ]
+  },
+  {
+   "index": 0,
+   "view": "records",
+   "cues": [
     {
-     "id": "p0-rec",
-     "say": "'기록' 탭에서도 지금까지 쓴 기록을 한꺼번에 볼 수 있습니다.",
+     "id": "r0-tab",
+     "say": "'기록' 탭을 누르면 지금까지 쓴 기록을 한꺼번에 볼 수 있습니다.",
      "highlight": null,
      "point": "[data-route=\"records\"]",
      "tap": true
+    },
+    {
+     "id": "r0-ws",
+     "say": "워크시트 기록은 모듈 이름 아래에 모여 있습니다. '열어서 고치기'를 누르면 그 화면으로 바로 갑니다.",
+     "highlight": null,
+     "point": "#records .ws a.more"
     }
-   ]
+   ],
+   "state": {
+    "worksheets": [
+     "week1_worksheet"
+    ]
+   }
   }
  ]
 }

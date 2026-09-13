@@ -2,7 +2,15 @@
  "module": "week8_psychoeducation",
  "week": 8,
  "title": "8주의 도구상자 — 총정리",
- "_readme": "say = 읽을 문장 (TTS/육성). highlight = 화면 문장 번호(0=제목, 1..=본문, null=없음). point = 가리킬 요소(CSS 선택자). tap = 눌림 효과. type = {key,text} 입력칸에 타이핑. 임상 문장은 content/*.json 에서 고치고, 진행 멘트만 여기서 고치세요.",
+ "_readme": "say = 읽을 문장 (육성 TTS). highlight = 화면 문장 번호(0=제목, 1..=본문, null=없음). point = 가리킬 요소(CSS 선택자). tap = 눌림 효과. type = {key,text} 입력칸에 타이핑. view = module|program|today|records|sound. image = 삽화 제안(렌더에는 영향 없음). 임상 문장은 content/*.json 에서 고치고, 진행 멘트만 여기서 고치세요.",
+ "_v2": {
+  "coverage": {
+   "drama": "—",
+   "mode": "상세",
+   "note": "도구상자 6묶음, 재발이 아니라 파도"
+  },
+  "notes": []
+ },
  "screens": [
   {
    "index": 0,
@@ -10,17 +18,22 @@
    "cues": [
     {
      "id": "s0-intro",
-     "say": "8주차 학습 내용, '8주의 도구상자 — 총정리'를 함께 보겠습니다.",
+     "say": "팔 주차 학습 내용, '팔 주의 도구상자, 총정리'를 함께 보겠습니다.",
+     "highlight": null
+    },
+    {
+     "id": "s0-lead",
+     "say": "팔 주 동안 배운 도구를 한자리에 모은 화면입니다. 영상에는 없던 정리이니 하나씩 자세히 보겠습니다.",
      "highlight": null
     },
     {
      "id": "s0-00",
-     "say": "8주의 도구상자",
+     "say": "팔 주의 도구상자",
      "highlight": 0
     },
     {
      "id": "s0-01",
-     "say": "8주 동안 배운 기법들을 한자리에 모아봅니다.",
+     "say": "팔 주 동안 배운 기법들을 한자리에 모아봅니다.",
      "highlight": 1
     },
     {
@@ -30,72 +43,72 @@
     },
     {
      "id": "s0-03",
-     "say": "생각을 다루는 도구 (1~2주차):",
+     "say": "생각을 다루는 도구, 일 주차와 이 주차:",
      "highlight": 3
     },
     {
      "id": "s0-04",
-     "say": "악순환 고리 알아차리기 — \"지금 고리가 돌고 있구나\"",
+     "say": "악순환 고리 알아차리기, \"지금 고리가 돌고 있구나\"",
      "highlight": 4
     },
     {
      "id": "s0-05",
-     "say": "사고기록지 — 자동사고를 붙잡아 문장으로 만들기",
+     "say": "사고기록지, 자동사고를 붙잡아 문장으로 만들기",
      "highlight": 5
     },
     {
      "id": "s0-06",
-     "say": "주의를 다루는 도구 (3주차):",
+     "say": "주의를 다루는 도구, 삼 주차:",
      "highlight": 6
     },
     {
      "id": "s0-07",
-     "say": "마음챙김 호흡 — 알아차리고 부드럽게 돌아오기",
+     "say": "마음챙김 호흡, 알아차리고 부드럽게 돌아오기",
      "highlight": 7
     },
     {
      "id": "s0-08",
-     "say": "행동을 다루는 도구 (4주차):",
+     "say": "행동을 다루는 도구, 사 주차:",
      "highlight": 8
     },
     {
      "id": "s0-09",
-     "say": "안전행동 알아차리고 내려놓기 — 뇌에 '안전하다'고 가르치는 열쇠",
+     "say": "안전행동 알아차리고 내려놓기, 뇌에 '안전하다'고 가르치는 열쇠",
      "highlight": 9
     },
     {
      "id": "s0-10",
-     "say": "행동실험 — \"못한다\"는 믿음을 행동으로 검증하기",
+     "say": "행동실험, \"못한다\"는 믿음을 행동으로 검증하기",
      "highlight": 10
     },
     {
      "id": "s0-11",
-     "say": "몸을 다루는 도구 (5~6주차):",
+     "say": "몸을 다루는 도구, 오 주차와 육 주차:",
      "highlight": 11
     },
     {
      "id": "s0-12",
-     "say": "점진적 근육이완법 — 깊은 이완과 긴장 감지 센서",
+     "say": "점진적 근육이완법, 깊은 이완과 긴장 감지 센서",
      "highlight": 12
     },
     {
      "id": "s0-13",
-     "say": "축약 이완 — 거슬리는 순간에 몇 초 만에 쓰는 실전 기술",
+     "say": "축약 이완, 거슬리는 순간에 몇 초 만에 쓰는 실전 기술",
      "highlight": 13
     },
     {
      "id": "s0-14",
-     "say": "밤을 다루는 도구 (7주차):",
+     "say": "밤을 다루는 도구, 칠 주차:",
      "highlight": 14
     },
     {
      "id": "s0-15",
-     "say": "수면 위생 + 취침 루틴 + 야간 사운드 + 20분 규칙",
+     "say": "수면 위생, 그리고 취침 루틴, 그리고 야간 사운드, 그리고 이십 분 규칙",
      "highlight": 15
     },
     {
      "id": "s0-16",
-     "say": "삶의 방향을 다루는 도구 (8주차):",
+     "say": "삶의 방향을 다루는 도구, 팔 주차:",
      "highlight": 16
     },
     {
@@ -105,7 +118,7 @@
     },
     {
      "id": "s0-18",
-     "say": "그리고 처음부터 함께해 온 소리 치료 — 도움이 되는 만큼 계속 사용하세요.",
+     "say": "그리고 처음부터 함께해 온 소리 치료, 도움이 되는 만큼 계속 사용하세요.",
      "highlight": 18
     },
     {
@@ -115,12 +128,23 @@
      "point": "#next-btn",
      "tap": true
     }
-   ]
+   ],
+   "image": {
+    "file": "img/concept-toolbox.webp",
+    "use": "8주차 도구상자 화면",
+    "size": "1:1 (1024×1024)",
+    "prompt": "[공통 스타일 블록]\nAn open wooden toolbox drawn with a few ink lines, seen slightly from above. Inside, six small abstract objects sit in a row, each a simple shape: a small loop (thoughts), a narrow light cone (attention), a single footprint (action), a soft wave line (body), a crescent moon (night), and a tiny distant tree (values). One extra small sound-wave mark rests beside the box (sound therapy). Terracotta only on the toolbox handle. Concept: pick the tool the moment needs; you don't use all of them at once."
+   }
   },
   {
    "index": 1,
    "title": "재발이 아니라 파도입니다",
    "cues": [
+    {
+     "id": "s1-lead",
+     "say": "마지막으로 아주 중요한 이야기, 재발이 아니라 파도입니다.",
+     "highlight": null
+    },
     {
      "id": "s1-00",
      "say": "재발이 아니라 파도입니다",
@@ -133,7 +157,7 @@
     },
     {
      "id": "s1-02",
-     "say": "스트레스가 심할 때, 잠을 설쳤을 때, 몸이 아플 때 — 자연스러운 일입니다.",
+     "say": "스트레스가 심할 때, 잠을 설쳤을 때, 몸이 아플 때, 자연스러운 일입니다.",
      "highlight": 2
     },
     {
@@ -143,12 +167,12 @@
     },
     {
      "id": "s1-04",
-     "say": "\"다 소용없었어. 원점이야\" → 악순환 고리 재가동",
+     "say": "\"다 소용없었어. 원점이야\", 그다음 악순환 고리 재가동",
      "highlight": 4
     },
     {
      "id": "s1-05",
-     "say": "\"파도가 온 거야. 어떻게 대처하는지 나는 알아\" → 도구상자를 열기",
+     "say": "\"파도가 온 거야. 어떻게 대처하는지 나는 알아\", 그다음 도구상자를 열기",
      "highlight": 5
     },
     {
@@ -163,7 +187,7 @@
     },
     {
      "id": "s1-08",
-     "say": "8주 전과 지금의 차이는 이명이 있느냐 없느냐가 아니라, 파도를 다루는 도구가 있느냐입니다.",
+     "say": "팔 주 전과 지금의 차이는 이명이 있느냐 없느냐가 아니라, 파도를 다루는 도구가 있느냐입니다.",
      "highlight": 8
     },
     {
@@ -183,7 +207,13 @@
      "point": "#next-btn",
      "tap": true
     }
-   ]
+   ],
+   "image": {
+    "file": "img/concept-wave.webp",
+    "use": "8주차 '재발이 아니라 파도' 화면 (기존 프롬프트 문서 B 참조, 아직 생성 안 됨)",
+    "size": "1:1 (1024×1024)",
+    "prompt": "[공통 스타일 블록]\nOne large ocean wave drawn as a single confident ink line: it rises steeply on the left, crests, and settles into a calm flat line on the right that continues to the edge. A tiny simplified figure stands on the calm part, looking back at the wave without fear. Terracotta accent only on the crest. Concept: a hard day is a wave; it always comes down."
+   }
   }
  ]
 }

@@ -2,7 +2,15 @@
  "module": "week6_worksheet",
  "week": 6,
  "title": "나의 축약 이완 설계",
- "_readme": "say = 읽을 문장 (TTS/육성). highlight = 화면 문장 번호(0=제목, 1..=본문, null=없음). point = 가리킬 요소(CSS 선택자). tap = 눌림 효과. type = {key,text} 입력칸에 타이핑. 임상 문장은 content/*.json 에서 고치고, 진행 멘트만 여기서 고치세요.",
+ "_readme": "say = 읽을 문장 (육성 TTS). highlight = 화면 문장 번호(0=제목, 1..=본문, null=없음). point = 가리킬 요소(CSS 선택자). tap = 눌림 효과. type = {key,text} 입력칸에 타이핑. view = module|program|today|records|sound. image = 삽화 제안(렌더에는 영향 없음). 임상 문장은 content/*.json 에서 고치고, 진행 멘트만 여기서 고치세요.",
+ "_v2": {
+  "coverage": {
+   "drama": "—",
+   "mode": "상세",
+   "note": "단일형 워크시트 첫 경험. 저장하고 다음 → 다시 열면 채워져 있음 → 적용 기록 덧붙이기"
+  },
+  "notes": []
+ },
  "screens": [
   {
    "index": 0,
@@ -10,7 +18,7 @@
    "cues": [
     {
      "id": "s0-intro",
-     "say": "6주차 작성 내용, '나의 축약 이완 설계'를 함께 보겠습니다.",
+     "say": "육 주차 작성 내용, '나의 축약 이완 설계'를 함께 보겠습니다.",
      "highlight": null
     },
     {
@@ -29,14 +37,19 @@
      "highlight": 2
     },
     {
+     "id": "s0-single",
+     "say": "이 워크시트는 앞의 것과 달리 기록이 쌓이지 않고 한 장을 계속 고쳐 쓰는 형식입니다.",
+     "highlight": null
+    },
+    {
      "id": "s0-f0",
-     "say": "첫 번째 칸입니다. 나의 단서어 — 내쉬는 숨과 짝지을 짧은 단어",
+     "say": "첫 번째 칸입니다. 나의 단서어, 내쉬는 숨과 짝지을 짧은 단어",
      "highlight": null,
      "point": "textarea[data-key=\"cue_word\"]"
     },
     {
      "id": "s0-f0t",
-     "say": "예를 들면 이렇게 적을 수 있습니다. 편안",
+     "say": "짧은 단어 하나면 됩니다. 예를 들어, 편안.",
      "highlight": null,
      "type": {
       "key": "cue_word",
@@ -45,48 +58,39 @@
     },
     {
      "id": "s0-f1",
-     "say": "두 번째 칸입니다. 내 긴장이 잘 숨는 곳 — 스트레스 때 몸 어디가 먼저 굳나요?",
+     "say": "두 번째 칸입니다. 내 긴장이 잘 숨는 곳, 스트레스 때 몸 어디가 먼저 굳나요?",
      "highlight": null,
      "point": "textarea[data-key=\"tension_spots\"]"
     },
     {
      "id": "s0-f1t",
-     "say": "어깨가 올라감",
+     "say": "예를 들어, 어깨가 올라감, 이를 꽉 물게 됨.",
      "highlight": null,
      "type": {
       "key": "tension_spots",
-      "text": "어깨가 올라감"
+      "text": "어깨가 올라감, 이를 꽉 물게 됨"
      }
     },
     {
      "id": "s0-f2",
-     "say": "세 번째 칸입니다. 적용할 상황 — 이번 주에 축약 이완을 써 볼 순간",
+     "say": "세 번째 칸입니다. 적용할 상황, 이번 주에 축약 이완을 써 볼 순간",
      "highlight": null,
      "point": "textarea[data-key=\"trigger_plan\"]"
     },
     {
      "id": "s0-f2t",
-     "say": "업무 중 이명이 거슬릴 때",
+     "say": "예를 들어, 업무 중 이명이 거슬릴 때, 잠자리에서 깼을 때.",
      "highlight": null,
      "type": {
       "key": "trigger_plan",
-      "text": "업무 중 이명이 거슬릴 때"
+      "text": "업무 중 이명이 거슬릴 때, 잠자리에서 깼을 때"
      }
     },
     {
      "id": "s0-f3",
-     "say": "네 번째 칸입니다. 적용 기록 — (실전 후 작성) 시도할 때마다 한 줄씩 덧붙여 주세요. 언제 시도했고, 전후가 어땠나요?",
+     "say": "넷째 칸, 적용 기록은 지금 비워 둡니다. 이번 주에 실제로 써 본 뒤 한 줄씩 덧붙입니다.",
      "highlight": null,
      "point": "textarea[data-key=\"application_log\"]"
-    },
-    {
-     "id": "s0-f3t",
-     "say": "화요일 회의 중 시도. 긴장 7→4",
-     "highlight": null,
-     "type": {
-      "key": "application_log",
-      "text": "화요일 회의 중 시도. 긴장 7→4"
-     }
     },
     {
      "id": "s0-save",
@@ -96,6 +100,117 @@
      "tap": true
     }
    ]
+  },
+  {
+   "index": 0,
+   "view": "module",
+   "cues": [
+    {
+     "id": "a0-saved",
+     "say": "저장하면 적은 내용이 그대로 남고, 칸 아래에 '저장됨'과 저장한 시각이 표시됩니다.",
+     "highlight": null,
+     "point": "#single-saved"
+    },
+    {
+     "id": "a0-edit",
+     "say": "고치고 싶으면 칸의 글을 바로 고친 뒤 같은 버튼을 다시 누르면 됩니다. 그러면 새 내용으로 바뀝니다.",
+     "highlight": null,
+     "point": "textarea[data-key=\"cue_word\"]"
+    },
+    {
+     "id": "a0-cue",
+     "say": "단서어를 저장하면 앞 화면의 호흡 도구에 그 단어가 표시됩니다.",
+     "highlight": null
+    }
+   ],
+   "state": {
+    "single": {
+     "cue_word": "편안",
+     "tension_spots": "어깨가 올라감, 이를 꽉 물게 됨",
+     "trigger_plan": "업무 중 이명이 거슬릴 때, 잠자리에서 깼을 때",
+     "application_log": ""
+    },
+    "savedAt": "오늘"
+   }
+  },
+  {
+   "index": 0,
+   "view": "module",
+   "cues": [
+    {
+     "id": "l0-open",
+     "say": "실제 상황에서 축약 이완을 써 본 뒤에는 이 워크시트를 다시 열어 넷째 칸에 한 줄 덧붙입니다.",
+     "highlight": null,
+     "point": "textarea[data-key=\"application_log\"]"
+    },
+    {
+     "id": "l0-ex",
+     "say": "예를 들어, 화요일 회의 중 시도. 긴장 칠에서 사, 이명에서 회의로 주의가 돌아옴.",
+     "highlight": null,
+     "type": {
+      "key": "application_log",
+      "text": "화요일 회의 중 시도. 긴장 7→4, 이명에서 회의로 주의가 돌아옴"
+     }
+    },
+    {
+     "id": "l0-save",
+     "say": "그리고 '저장하고 다음'을 다시 누릅니다. 시도할 때마다 이렇게 줄을 더해 갑니다.",
+     "highlight": null,
+     "point": "#next-btn",
+     "tap": true
+    }
+   ],
+   "state": {
+    "single": {
+     "cue_word": "편안",
+     "tension_spots": "어깨가 올라감, 이를 꽉 물게 됨",
+     "trigger_plan": "업무 중 이명이 거슬릴 때, 잠자리에서 깼을 때",
+     "application_log": "화요일 회의 중 시도. 긴장 7→4, 이명에서 회의로 주의가 돌아옴"
+    },
+    "savedAt": "오늘"
+   }
+  },
+  {
+   "index": 0,
+   "view": "program",
+   "cues": [
+    {
+     "id": "p0-open",
+     "say": "나중에 다시 쓰고 싶으면 '프로그램' 탭에서 육 주차의 '나의 축약 이완 설계'을 다시 엽니다.",
+     "highlight": null,
+     "point": "[data-mod=\"week6_worksheet\"]",
+     "tap": true
+    },
+    {
+     "id": "p0-list",
+     "say": "다시 열면 전에 적은 내용이 그대로 채워져 있습니다. 고친 뒤 다시 저장하면 새 내용으로 바뀝니다.",
+     "highlight": null
+    }
+   ]
+  },
+  {
+   "index": 0,
+   "view": "records",
+   "cues": [
+    {
+     "id": "r0-tab",
+     "say": "'기록' 탭을 누르면 지금까지 쓴 기록을 한꺼번에 볼 수 있습니다.",
+     "highlight": null,
+     "point": "[data-route=\"records\"]",
+     "tap": true
+    },
+    {
+     "id": "r0-ws",
+     "say": "워크시트 기록은 모듈 이름 아래에 모여 있습니다. '열어서 고치기'를 누르면 그 화면으로 바로 갑니다.",
+     "highlight": null,
+     "point": "#records .ws a.more"
+    }
+   ],
+   "state": {
+    "worksheets": [
+     "week6_worksheet"
+    ]
+   }
   }
  ]
 }

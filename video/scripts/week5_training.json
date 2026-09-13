@@ -2,7 +2,15 @@
  "module": "week5_training",
  "week": 5,
  "title": "점진적 근육이완(PMR) 훈련",
- "_readme": "say = 읽을 문장 (TTS/육성). highlight = 화면 문장 번호(0=제목, 1..=본문, null=없음). point = 가리킬 요소(CSS 선택자). tap = 눌림 효과. type = {key,text} 입력칸에 타이핑. 임상 문장은 content/*.json 에서 고치고, 진행 멘트만 여기서 고치세요.",
+ "_readme": "say = 읽을 문장 (육성 TTS). highlight = 화면 문장 번호(0=제목, 1..=본문, null=없음). point = 가리킬 요소(CSS 선택자). tap = 눌림 효과. type = {key,text} 입력칸에 타이핑. view = module|program|today|records|sound. image = 삽화 제안(렌더에는 영향 없음). 임상 문장은 content/*.json 에서 고치고, 진행 멘트만 여기서 고치세요.",
+ "_v2": {
+  "coverage": {
+   "drama": "—",
+   "mode": "상세",
+   "note": "준비, 기본 동작, 호흡, 14부위 순서, 타이머 도구(시작, 자동 체크)"
+  },
+  "notes": []
+ },
  "screens": [
   {
    "index": 0,
@@ -10,12 +18,17 @@
    "cues": [
     {
      "id": "s0-intro",
-     "say": "5주차 학습 내용, '점진적 근육이완(PMR) 훈련'을 함께 보겠습니다.",
+     "say": "오 주차 학습 내용, '점진적 근육이완, 피엠알 훈련'을 함께 보겠습니다.",
+     "highlight": null
+    },
+    {
+     "id": "s0-lead",
+     "say": "영상에서는 원리만 다루었고, 실제 방법은 이 화면과 다음 화면에 있습니다. 자세히 보겠습니다.",
      "highlight": null
     },
     {
      "id": "s0-00",
-     "say": "근육이완 — 준비와 기본 동작",
+     "say": "근육이완, 준비와 기본 동작",
      "highlight": 0
     },
     {
@@ -35,22 +48,22 @@
     },
     {
      "id": "s0-04",
-     "say": "15~20분 확보 (자기 전에 하면 수면에도 도움이 됩니다)",
+     "say": "십오 분에서 이십 분 확보, 자기 전에 하면 수면에도 도움이 됩니다",
      "highlight": 4
     },
     {
      "id": "s0-05",
-     "say": "기본 동작 (모든 부위 공통):",
+     "say": "기본 동작, 모든 부위 공통:",
      "highlight": 5
     },
     {
      "id": "s0-06",
-     "say": "해당 근육을 5~7초간 힘껏 긴장시킵니다 (아프지 않을 정도로, 70~80% 힘)",
+     "say": "해당 근육을 오 초에서 칠 초간 힘껏 긴장시킵니다, 아프지 않을 정도로, 칠십 퍼센트에서 팔십 퍼센트 힘",
      "highlight": 6
     },
     {
      "id": "s0-07",
-     "say": "한 번에 힘을 탁 풀고, 10~15초간 풀린 느낌을 음미합니다",
+     "say": "한 번에 힘을 탁 풀고, 십 초에서 십오 초간 풀린 느낌을 음미합니다",
      "highlight": 7
     },
     {
@@ -60,12 +73,12 @@
     },
     {
      "id": "s0-09",
-     "say": "호흡 요령: 긴장시킬 때 숨을 들이쉬고, 풀 때 길게 내쉽니다.",
+     "say": "호흡 요령, 긴장시킬 때 숨을 들이쉬고, 풀 때 길게 내쉽니다.",
      "highlight": 9
     },
     {
      "id": "s0-10",
-     "say": "'후—' 하고 내쉬는 숨과 함께 힘이 빠져나간다고 상상하면 좋습니다.",
+     "say": "'후우' 하고 내쉬는 숨과 함께 힘이 빠져나간다고 상상하면 좋습니다.",
      "highlight": 10
     },
     {
@@ -82,8 +95,13 @@
    "title": "근육이완 — 전신 순서",
    "cues": [
     {
+     "id": "s1-lead",
+     "say": "이제 전신 순서입니다. 팔에서 시작해 얼굴, 몸통, 다리로 내려갑니다. 모두 열네 부위입니다.",
+     "highlight": null
+    },
+    {
      "id": "s1-00",
-     "say": "근육이완 — 전신 순서",
+     "say": "근육이완, 전신 순서",
      "highlight": 0
     },
     {
@@ -93,77 +111,77 @@
     },
     {
      "id": "s1-02",
-     "say": "각 부위: 긴장 5~7초 → 이완 10~15초.",
+     "say": "각 부위, 긴장 오 초에서 칠 초, 그다음 이완 십 초에서 십오 초.",
      "highlight": 2
     },
     {
      "id": "s1-03",
-     "say": "오른손·팔뚝 — 주먹을 꽉 쥔다",
+     "say": "오른손, 팔뚝, 주먹을 꽉 쥔다",
      "highlight": 3
     },
     {
      "id": "s1-04",
-     "say": "오른팔 위쪽 — 팔꿈치를 굽혀 이두박근에 힘",
+     "say": "오른팔 위쪽, 팔꿈치를 굽혀 이두박근에 힘",
      "highlight": 4
     },
     {
      "id": "s1-05",
-     "say": "왼손·팔뚝 — 주먹을 꽉 쥔다",
+     "say": "왼손, 팔뚝, 주먹을 꽉 쥔다",
      "highlight": 5
     },
     {
      "id": "s1-06",
-     "say": "왼팔 위쪽 — 팔꿈치를 굽혀 힘",
+     "say": "왼팔 위쪽, 팔꿈치를 굽혀 힘",
      "highlight": 6
     },
     {
      "id": "s1-07",
-     "say": "이마 — 눈썹을 최대한 위로 치켜올린다",
+     "say": "이마, 눈썹을 최대한 위로 치켜올린다",
      "highlight": 7
     },
     {
      "id": "s1-08",
-     "say": "눈·코 — 눈을 질끈 감고 코를 찡그린다",
+     "say": "눈, 코, 눈을 질끈 감고 코를 찡그린다",
      "highlight": 8
     },
     {
      "id": "s1-09",
-     "say": "턱·입 — 이를 물지 말고 입술만 꽉 다문다 (턱관절에 무리가 가지 않게)",
+     "say": "턱, 입, 이를 물지 말고 입술만 꽉 다문다, 턱관절에 무리가 가지 않게",
      "highlight": 9
     },
     {
      "id": "s1-10",
-     "say": "목·어깨 — 어깨를 귀 쪽으로 최대한 끌어올린다",
+     "say": "목, 어깨, 어깨를 귀 쪽으로 최대한 끌어올린다",
      "highlight": 10
     },
     {
      "id": "s1-11",
-     "say": "가슴·등 — 숨을 들이쉬고 어깨뼈를 뒤로 모은다",
+     "say": "가슴, 등, 숨을 들이쉬고 어깨뼈를 뒤로 모은다",
      "highlight": 11
     },
     {
      "id": "s1-12",
-     "say": "배 — 배를 단단하게 조인다",
+     "say": "배, 배를 단단하게 조인다",
      "highlight": 12
     },
     {
      "id": "s1-13",
-     "say": "오른쪽 허벅지 — 다리를 뻗어 힘",
+     "say": "오른쪽 허벅지, 다리를 뻗어 힘",
      "highlight": 13
     },
     {
      "id": "s1-14",
-     "say": "오른쪽 종아리·발 — 발끝을 몸 쪽으로 당긴다",
+     "say": "오른쪽 종아리, 발, 발끝을 몸 쪽으로 당긴다",
      "highlight": 14
     },
     {
      "id": "s1-15",
-     "say": "왼쪽 허벅지 — 다리를 뻗어 힘",
+     "say": "왼쪽 허벅지, 다리를 뻗어 힘",
      "highlight": 15
     },
     {
      "id": "s1-16",
-     "say": "왼쪽 종아리·발 — 발끝을 몸 쪽으로 당긴다",
+     "say": "왼쪽 종아리, 발, 발끝을 몸 쪽으로 당긴다",
      "highlight": 16
     },
     {
@@ -178,7 +196,7 @@
     },
     {
      "id": "s1-19",
-     "say": "모든 단계가 끝나면 천천히 복식호흡을 1~2분간 하면서 전신이 무겁고 따뜻해진 느낌을 그대로 느껴봅니다.",
+     "say": "모든 단계가 끝나면 천천히 복식호흡을 일 분에서 이 분간 하면서 전신이 무겁고 따뜻해진 느낌을 그대로 느껴봅니다.",
      "highlight": 19
     },
     {
@@ -197,13 +215,37 @@
      "highlight": 22
     },
     {
+     "id": "s1-tool1",
+     "say": "본문 아래 '안내에 따라 해보기'에서 '시작'을 누르면 부위마다 긴장과 이완 시간을 세어 줍니다.",
+     "highlight": null,
+     "point": "#pmr .btn",
+     "tap": true
+    },
+    {
+     "id": "s1-tool2",
+     "say": "화면에 지금 어느 부위인지, 힘을 줄 때인지 풀 때인지가 크게 표시됩니다. 소리로 듣기와 함께 쓰면 눈을 감고도 할 수 있습니다.",
+     "highlight": null,
+     "point": "#pmr"
+    },
+    {
+     "id": "s1-tool3",
+     "say": "끝까지 마치면 오늘 일기에 '근육이완' 체크가 자동으로 표시됩니다.",
+     "highlight": null
+    },
+    {
      "id": "s1-next",
      "say": "여기까지 읽었으면 아래 '완료' 버튼을 눌러 마무리합니다.",
      "highlight": null,
      "point": "#next-btn",
      "tap": true
     }
-   ]
+   ],
+   "image": {
+    "file": "img/concept-pmr-body.webp",
+    "use": "5주차 근육이완 전신 순서 화면",
+    "size": "1:1 (1024×1024)",
+    "prompt": "[공통 스타일 블록]\nA simplified standing human outline drawn with one continuous thin ink line, front view, no face. Along the body, fourteen small terracotta dots mark the sequence points: both hands, both upper arms, forehead, eyes, jaw, shoulders, chest, belly, both thighs, both calves. A faint dotted ink path connects the dots from the right hand down to the left foot, suggesting order. Lots of cream space. Concept: tense and release, one part at a time, top to bottom."
+   }
   }
  ]
 }

@@ -2,7 +2,15 @@
  "module": "week4_worksheet",
  "week": 4,
  "title": "나의 행동실험 계획",
- "_readme": "say = 읽을 문장 (TTS/육성). highlight = 화면 문장 번호(0=제목, 1..=본문, null=없음). point = 가리킬 요소(CSS 선택자). tap = 눌림 효과. type = {key,text} 입력칸에 타이핑. 임상 문장은 content/*.json 에서 고치고, 진행 멘트만 여기서 고치세요.",
+ "_readme": "say = 읽을 문장 (육성 TTS). highlight = 화면 문장 번호(0=제목, 1..=본문, null=없음). point = 가리킬 요소(CSS 선택자). tap = 눌림 효과. type = {key,text} 입력칸에 타이핑. view = module|program|today|records|sound. image = 삽화 제안(렌더에는 영향 없음). 임상 문장은 content/*.json 에서 고치고, 진행 멘트만 여기서 고치세요.",
+ "_v2": {
+  "coverage": {
+   "drama": "—",
+   "mode": "상세",
+   "note": "실험 전 1~3번 저장 → 실행 후 '수정'으로 4~5번 채우기(두 단계). 기록 탭"
+  },
+  "notes": []
+ },
  "screens": [
   {
    "index": 0,
@@ -10,7 +18,7 @@
    "cues": [
     {
      "id": "s0-intro",
-     "say": "4주차 작성 내용, '나의 행동실험 계획'을 함께 보겠습니다.",
+     "say": "사 주차 작성 내용, '나의 행동실험 계획'을 함께 보겠습니다.",
      "highlight": null
     },
     {
@@ -25,12 +33,12 @@
     },
     {
      "id": "s0-02",
-     "say": "실험 전에 1~3번을 적어 저장하세요.",
+     "say": "실험 전에 일 번에서 삼 번을 적어 저장하세요.",
      "highlight": 2
     },
     {
      "id": "s0-03",
-     "say": "실행한 뒤에는 아래 저장된 기록의 '수정'을 눌러 4~5번을 채워 넣으면 한 실험이 한 기록에 모입니다.",
+     "say": "실행한 뒤에는 아래 저장된 기록의 '수정'을 눌러 사 번에서 오 번을 채워 넣으면 한 실험이 한 기록에 모입니다.",
      "highlight": 3
     },
     {
@@ -39,8 +47,13 @@
      "highlight": 4
     },
     {
+     "id": "s0-two",
+     "say": "이 워크시트는 두 번에 나누어 씁니다. 실험 전에 첫째부터 셋째 칸을 적어 저장하고, 실험을 다녀온 뒤 다시 열어 넷째와 다섯째 칸을 채웁니다.",
+     "highlight": null
+    },
+    {
      "id": "s0-f0",
-     "say": "첫 번째 칸입니다. 검증할 믿음 — \"이명 때문에 OO을 못한다\"",
+     "say": "첫 번째 칸입니다. 검증할 믿음, \"이명 때문에 무엇무엇을 못한다\"",
      "highlight": null,
      "point": "textarea[data-key=\"belief\"]"
     },
@@ -55,13 +68,13 @@
     },
     {
      "id": "s0-f1",
-     "say": "두 번째 칸입니다. 예측 — 실제로 하면 어떻게 될 것 같나요? 확신도(0~100%)도 함께",
+     "say": "두 번째 칸입니다. 예측, 실제로 하면 어떻게 될 것 같나요? 확신도, 영 퍼센트에서 백 퍼센트도 함께",
      "highlight": null,
      "point": "textarea[data-key=\"prediction\"]"
     },
     {
      "id": "s0-f1t",
-     "say": "소리에만 신경 쓰여서 5분도 못 읽고 나올 것이다 (확신 80%)",
+     "say": "예측과 함께 얼마나 확신하는지 퍼센트로 적습니다. 소리에만 신경 쓰여서 오 분도 못 읽고 나올 것이다, 확신 팔십 퍼센트.",
      "highlight": null,
      "type": {
       "key": "prediction",
@@ -70,52 +83,28 @@
     },
     {
      "id": "s0-f2",
-     "say": "세 번째 칸입니다. 실험 계획 — 언제, 어디서, 무엇을 해볼까요?",
+     "say": "세 번째 칸입니다. 실험 계획, 언제, 어디서, 무엇을 해볼까요?",
      "highlight": null,
      "point": "textarea[data-key=\"experiment_plan\"]"
     },
     {
      "id": "s0-f2t",
-     "say": "토요일 오후",
+     "say": "언제, 어디서, 무엇을 할지 정합니다. 토요일 오후, 집 근처 카페에서 삼십 분 책 읽기.",
      "highlight": null,
      "type": {
       "key": "experiment_plan",
-      "text": "토요일 오후"
+      "text": "토요일 오후, 집 근처 카페에서 30분 책 읽기"
      }
     },
     {
-     "id": "s0-f3",
-     "say": "네 번째 칸입니다. 실제 결과 — (실행 후 작성) 실제로는 어땠나요?",
+     "id": "s0-later",
+     "say": "넷째와 다섯째 칸은 지금 비워 둡니다. 실험을 한 뒤에 채웁니다.",
      "highlight": null,
      "point": "textarea[data-key=\"actual_result\"]"
     },
     {
-     "id": "s0-f3t",
-     "say": "처음 10분은 거슬렸지만 책에 빠지자 잊었고 40분을 읽었다",
-     "highlight": null,
-     "type": {
-      "key": "actual_result",
-      "text": "처음 10분은 거슬렸지만 책에 빠지자 잊었고 40분을 읽었다"
-     }
-    },
-    {
-     "id": "s0-f4",
-     "say": "다섯 번째 칸입니다. 배운 점 — 예측과 비교해보면? 믿음의 확신도는 지금 몇 %인가요?",
-     "highlight": null,
-     "point": "textarea[data-key=\"learning\"]"
-    },
-    {
-     "id": "s0-f4t",
-     "say": "생각보다 할 수 있었다. 확신도 80% → 40%",
-     "highlight": null,
-     "type": {
-      "key": "learning",
-      "text": "생각보다 할 수 있었다. 확신도 80% → 40%"
-     }
-    },
-    {
      "id": "s0-save",
-     "say": "다 적었으면 아래 '기록 저장' 버튼을 누릅니다.",
+     "say": "여기까지 적었으면 아래 '기록 저장' 버튼을 누릅니다.",
      "highlight": null,
      "point": "#next-btn",
      "tap": true
@@ -125,6 +114,21 @@
   {
    "index": 0,
    "view": "module",
+   "cues": [
+    {
+     "id": "a0-saved",
+     "say": "저장하면 실험 계획이 아래에 기록으로 남습니다.",
+     "highlight": null,
+     "point": "#entries .entry"
+    },
+    {
+     "id": "a0-back",
+     "say": "실험을 다녀온 뒤에는 프로그램 탭에서 이 워크시트를 다시 열고, 기록 옆의 '수정'을 누릅니다.",
+     "highlight": null,
+     "point": "[data-edit]",
+     "tap": true
+    }
+   ],
    "state": {
     "afterSave": true,
     "entries": [
@@ -133,41 +137,67 @@
       "responses": {
        "belief": "이명 때문에 조용한 카페에서 책을 못 읽는다",
        "prediction": "소리에만 신경 쓰여서 5분도 못 읽고 나올 것이다 (확신 80%)",
-       "experiment_plan": "토요일 오후",
-       "actual_result": "처음 10분은 거슬렸지만 책에 빠지자 잊었고 40분을 읽었다",
-       "learning": "생각보다 할 수 있었다. 확신도 80% → 40%"
+       "experiment_plan": "토요일 오후, 집 근처 카페에서 30분 책 읽기"
       }
      }
     ]
-   },
+   }
+  },
+  {
+   "index": 0,
+   "view": "module",
    "cues": [
     {
-     "id": "a0-saved",
-     "say": "저장하면 방금 쓴 내용이 아래에 기록으로 남고, 입력칸은 비워집니다.",
+     "id": "e0-fill",
+     "say": "수정을 누르면 적어 둔 내용이 칸에 다시 채워집니다. 이제 넷째 칸, 실제 결과를 적습니다.",
      "highlight": null,
-     "point": "#entries .entry"
+     "point": "textarea[data-key=\"actual_result\"]"
     },
     {
-     "id": "a0-edit",
-     "say": "기록 옆의 '수정'을 누르면 다시 고쳐 쓸 수 있고, '삭제'로 지울 수도 있습니다.",
+     "id": "e0-r",
+     "say": "예를 들어, 처음 십 분은 거슬렸지만 책에 빠지자 잊었고 사십 분을 읽었다.",
      "highlight": null,
-     "point": "[data-edit]",
-     "tap": true
+     "type": {
+      "key": "actual_result",
+      "text": "처음 10분은 거슬렸지만 책에 빠지자 잊었고 40분을 읽었다"
+     }
     },
     {
-     "id": "a0-more",
-     "say": "더 적고 싶으면 빈 칸에 새로 적고 다시 저장하면 기록이 하나 더 쌓입니다.",
+     "id": "e0-l",
+     "say": "다섯째 칸에는 배운 점과 지금의 확신도를 적습니다. 생각보다 할 수 있었다. 확신도 팔십 퍼센트에서 사십 퍼센트.",
      "highlight": null,
-     "point": "textarea[data-key=\"belief\"]"
+     "type": {
+      "key": "learning",
+      "text": "생각보다 할 수 있었다. 확신도 80% → 40%"
+     }
     },
     {
-     "id": "a0-next",
-     "say": "칸이 비어 있으면 아래 버튼이 '다음으로'로 바뀝니다. 눌러서 다음 내용으로 넘어갑니다.",
+     "id": "e0-save",
+     "say": "버튼이 '수정한 내용 저장'으로 바뀌어 있습니다. 누르면 한 실험이 한 기록에 모입니다.",
      "highlight": null,
      "point": "#next-btn",
      "tap": true
+    },
+    {
+     "id": "e0-new",
+     "say": "새 실험은 빈 칸에 새로 적고 저장하면 기록이 하나 더 쌓입니다.",
+     "highlight": null,
+     "point": "textarea[data-key=\"belief\"]"
     }
-   ]
+   ],
+   "state": {
+    "editing": 0,
+    "entries": [
+     {
+      "when": "오늘",
+      "responses": {
+       "belief": "이명 때문에 조용한 카페에서 책을 못 읽는다",
+       "prediction": "소리에만 신경 쓰여서 5분도 못 읽고 나올 것이다 (확신 80%)",
+       "experiment_plan": "토요일 오후, 집 근처 카페에서 30분 책 읽기"
+      }
+     }
+    ]
+   }
   },
   {
    "index": 0,
@@ -175,7 +205,7 @@
    "cues": [
     {
      "id": "p0-open",
-     "say": "나중에 다시 쓰고 싶으면 '프로그램' 탭에서 4주차의 '나의 행동실험 계획'을 다시 엽니다.",
+     "say": "나중에 다시 쓰고 싶으면 '프로그램' 탭에서 사 주차의 '나의 행동실험 계획'을 다시 엽니다.",
      "highlight": null,
      "point": "[data-mod=\"week4_worksheet\"]",
      "tap": true
@@ -184,15 +214,32 @@
      "id": "p0-list",
      "say": "이미 쓴 기록은 그 화면 아래에 모여 있고, 새로 적어 저장하면 하나 더 쌓입니다.",
      "highlight": null
-    },
+    }
+   ]
+  },
+  {
+   "index": 0,
+   "view": "records",
+   "cues": [
     {
-     "id": "p0-rec",
-     "say": "'기록' 탭에서도 지금까지 쓴 기록을 한꺼번에 볼 수 있습니다.",
+     "id": "r0-tab",
+     "say": "'기록' 탭을 누르면 지금까지 쓴 기록을 한꺼번에 볼 수 있습니다.",
      "highlight": null,
      "point": "[data-route=\"records\"]",
      "tap": true
+    },
+    {
+     "id": "r0-ws",
+     "say": "워크시트 기록은 모듈 이름 아래에 모여 있습니다. '열어서 고치기'를 누르면 그 화면으로 바로 갑니다.",
+     "highlight": null,
+     "point": "#records .ws a.more"
     }
-   ]
+   ],
+   "state": {
+    "worksheets": [
+     "week4_worksheet"
+    ]
+   }
   }
  ]
 }

@@ -2,7 +2,15 @@
  "module": "week8_worksheet",
  "week": 8,
  "title": "나의 위기 대응 카드",
- "_readme": "say = 읽을 문장 (TTS/육성). highlight = 화면 문장 번호(0=제목, 1..=본문, null=없음). point = 가리킬 요소(CSS 선택자). tap = 눌림 효과. type = {key,text} 입력칸에 타이핑. 임상 문장은 content/*.json 에서 고치고, 진행 멘트만 여기서 고치세요.",
+ "_readme": "say = 읽을 문장 (육성 TTS). highlight = 화면 문장 번호(0=제목, 1..=본문, null=없음). point = 가리킬 요소(CSS 선택자). tap = 눌림 효과. type = {key,text} 입력칸에 타이핑. view = module|program|today|records|sound. image = 삽화 제안(렌더에는 영향 없음). 임상 문장은 content/*.json 에서 고치고, 진행 멘트만 여기서 고치세요.",
+ "_v2": {
+  "coverage": {
+   "drama": "—",
+   "mode": "상세",
+   "note": "위기 대응 카드 4칸, 언제든 다시 열기"
+  },
+  "notes": []
+ },
  "screens": [
   {
    "index": 0,
@@ -10,7 +18,7 @@
    "cues": [
     {
      "id": "s0-intro",
-     "say": "8주차 작성 내용, '나의 위기 대응 카드'를 함께 보겠습니다.",
+     "say": "팔 주차 작성 내용, '나의 위기 대응 카드'를 함께 보겠습니다.",
      "highlight": null
     },
     {
@@ -34,29 +42,34 @@
      "highlight": 3
     },
     {
+     "id": "s0-why",
+     "say": "힘든 순간에는 생각이 잘 나지 않기 때문에 미리 적어 두는 카드입니다. 칸은 네 개입니다.",
+     "highlight": null
+    },
+    {
      "id": "s0-f0",
-     "say": "첫 번째 칸입니다. 나의 경고 신호 — 힘들어지기 시작할 때 나타나는 신호들",
+     "say": "첫 번째 칸입니다. 나의 경고 신호, 힘들어지기 시작할 때 나타나는 신호들",
      "highlight": null,
      "point": "textarea[data-key=\"warning_signs\"]"
     },
     {
      "id": "s0-f0t",
-     "say": "예를 들면 이렇게 적을 수 있습니다. 이명 체크가 잦아짐",
+     "say": "예를 들어, 이명 체크가 잦아짐, 어깨가 굳음, 잠들기 걱정이 미리 듦.",
      "highlight": null,
      "type": {
       "key": "warning_signs",
-      "text": "이명 체크가 잦아짐"
+      "text": "이명 체크가 잦아짐, 어깨가 굳음, 잠들기 걱정이 미리 듦"
      }
     },
     {
      "id": "s0-f1",
-     "say": "두 번째 칸입니다. 첫 번째 행동 — 신호를 느끼면 가장 먼저 할 일 (구체적으로)",
+     "say": "두 번째 칸입니다. 첫 번째 행동, 신호를 느끼면 가장 먼저 할 일, 구체적으로",
      "highlight": null,
      "point": "textarea[data-key=\"first_action\"]"
     },
     {
      "id": "s0-f1t",
-     "say": "축약 이완 1분 → 사운드 켜기 → 하던 일로 주의 옮기기",
+     "say": "가장 먼저 할 일을 순서대로 구체적으로 적습니다. 축약 이완 일 분, 사운드 켜기, 하던 일로 주의 옮기기.",
      "highlight": null,
      "type": {
       "key": "first_action",
@@ -65,32 +78,32 @@
     },
     {
      "id": "s0-f2",
-     "say": "세 번째 칸입니다. 나에게 효과 있었던 생각 — 8주 중 가장 도움이 된 대안적 생각",
+     "say": "세 번째 칸입니다. 나에게 효과 있었던 생각, 팔 주 중 가장 도움이 된 대안적 생각",
      "highlight": null,
      "point": "textarea[data-key=\"helpful_thoughts\"]"
     },
     {
      "id": "s0-f2t",
-     "say": "파도일 뿐",
+     "say": "팔 주 가운데 가장 도움이 된 생각을 적습니다. 파도일 뿐, 내려간다. 소리는 같아도 내 반응은 내가 정한다.",
      "highlight": null,
      "type": {
       "key": "helpful_thoughts",
-      "text": "파도일 뿐"
+      "text": "\"파도일 뿐, 내려간다\", \"소리는 같아도 내 반응은 내가 정한다\""
      }
     },
     {
      "id": "s0-f3",
-     "say": "네 번째 칸입니다. 그래도 힘들면 — 2~3일 이상 지속될 때의 계획",
+     "say": "네 번째 칸입니다. 그래도 힘들면, 이 일에서 삼 일 이상 지속될 때의 계획",
      "highlight": null,
      "point": "textarea[data-key=\"backup_plan\"]"
     },
     {
      "id": "s0-f3t",
-     "say": "PMR 매일로 복귀",
+     "say": "이삼 일 이상 이어질 때의 계획입니다. 근육이완 매일로 복귀, 수면 루틴 재점검, 이 주 이상이면 클리닉 연락.",
      "highlight": null,
      "type": {
       "key": "backup_plan",
-      "text": "PMR 매일로 복귀"
+      "text": "PMR 매일로 복귀, 수면 루틴 재점검, 2주 이상이면 클리닉 연락"
      }
     },
     {
@@ -101,6 +114,80 @@
      "tap": true
     }
    ]
+  },
+  {
+   "index": 0,
+   "view": "module",
+   "cues": [
+    {
+     "id": "a0-saved",
+     "say": "저장하면 적은 내용이 그대로 남고, 칸 아래에 '저장됨'과 저장한 시각이 표시됩니다.",
+     "highlight": null,
+     "point": "#single-saved"
+    },
+    {
+     "id": "a0-edit",
+     "say": "고치고 싶으면 칸의 글을 바로 고친 뒤 같은 버튼을 다시 누르면 됩니다. 그러면 새 내용으로 바뀝니다.",
+     "highlight": null,
+     "point": "textarea[data-key=\"warning_signs\"]"
+    },
+    {
+     "id": "a0-open",
+     "say": "이 카드는 프로그램이 끝난 뒤에도 프로그램 목록에서 언제든 다시 열어 볼 수 있습니다. 파도가 왔을 때 열어 보세요.",
+     "highlight": null
+    }
+   ],
+   "state": {
+    "single": {
+     "warning_signs": "이명 체크가 잦아짐, 어깨가 굳음, 잠들기 걱정이 미리 듦",
+     "first_action": "축약 이완 1분 → 사운드 켜기 → 하던 일로 주의 옮기기",
+     "helpful_thoughts": "\"파도일 뿐, 내려간다\", \"소리는 같아도 내 반응은 내가 정한다\"",
+     "backup_plan": "PMR 매일로 복귀, 수면 루틴 재점검, 2주 이상이면 클리닉 연락"
+    },
+    "savedAt": "오늘"
+   }
+  },
+  {
+   "index": 0,
+   "view": "program",
+   "cues": [
+    {
+     "id": "p0-open",
+     "say": "나중에 다시 쓰고 싶으면 '프로그램' 탭에서 팔 주차의 '나의 위기 대응 카드'을 다시 엽니다.",
+     "highlight": null,
+     "point": "[data-mod=\"week8_worksheet\"]",
+     "tap": true
+    },
+    {
+     "id": "p0-list",
+     "say": "다시 열면 전에 적은 내용이 그대로 채워져 있습니다. 고친 뒤 다시 저장하면 새 내용으로 바뀝니다.",
+     "highlight": null
+    }
+   ]
+  },
+  {
+   "index": 0,
+   "view": "records",
+   "cues": [
+    {
+     "id": "r0-tab",
+     "say": "'기록' 탭을 누르면 지금까지 쓴 기록을 한꺼번에 볼 수 있습니다.",
+     "highlight": null,
+     "point": "[data-route=\"records\"]",
+     "tap": true
+    },
+    {
+     "id": "r0-ws",
+     "say": "워크시트 기록은 모듈 이름 아래에 모여 있습니다. '열어서 고치기'를 누르면 그 화면으로 바로 갑니다.",
+     "highlight": null,
+     "point": "#records .ws a.more"
+    }
+   ],
+   "state": {
+    "worksheets": [
+     "week8_worksheet"
+    ]
+   }
   }
  ]
 }

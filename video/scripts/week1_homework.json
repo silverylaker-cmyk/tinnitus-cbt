@@ -2,7 +2,15 @@
  "module": "week1_homework",
  "week": 1,
  "title": "이번 주 숙제: 일기 시작하기",
- "_readme": "say = 읽을 문장 (TTS/육성). highlight = 화면 문장 번호(0=제목, 1..=본문, null=없음). point = 가리킬 요소(CSS 선택자). tap = 눌림 효과. type = {key,text} 입력칸에 타이핑. 임상 문장은 content/*.json 에서 고치고, 진행 멘트만 여기서 고치세요.",
+ "_readme": "say = 읽을 문장 (육성 TTS). highlight = 화면 문장 번호(0=제목, 1..=본문, null=없음). point = 가리킬 요소(CSS 선택자). tap = 눌림 효과. type = {key,text} 입력칸에 타이핑. view = module|program|today|records|sound. image = 삽화 제안(렌더에는 영향 없음). 임상 문장은 content/*.json 에서 고치고, 진행 멘트만 여기서 고치세요.",
+ "_v2": {
+  "coverage": {
+   "drama": "—",
+   "mode": "상세",
+   "note": "일기 탭 사용법 전체(숫자 고르기, 체크, 계기·메모, 저장, 지난 기록, 전날 쓰기), 소리 탭"
+  },
+  "notes": []
+ },
  "screens": [
   {
    "index": 0,
@@ -10,7 +18,7 @@
    "cues": [
     {
      "id": "s0-intro",
-     "say": "1주차 숙제 내용, '이번 주 숙제: 일기 시작하기'를 함께 보겠습니다.",
+     "say": "일 주차 숙제 내용, '이번 주 숙제, 일기 시작하기'를 함께 보겠습니다.",
      "highlight": null
     },
     {
@@ -20,7 +28,7 @@
     },
     {
      "id": "s0-01",
-     "say": "오늘부터 매일 1분 정도 일기를 작성합니다.",
+     "say": "오늘부터 매일 일 분 정도 일기를 작성합니다.",
      "highlight": 1
     },
     {
@@ -35,37 +43,37 @@
     },
     {
      "id": "s0-04",
-     "say": "오늘 이명의 크기 (0~10)",
+     "say": "오늘 이명의 크기, 영에서 십",
      "highlight": 4
     },
     {
      "id": "s0-05",
-     "say": "오늘 이명이 신경 쓰인 정도 (0~10)",
+     "say": "오늘 이명이 신경 쓰인 정도, 영에서 십",
      "highlight": 5
     },
     {
      "id": "s0-06",
-     "say": "간밤 수면에 미친 영향 (0~10)",
+     "say": "간밤 수면에 미친 영향, 영에서 십",
      "highlight": 6
     },
     {
      "id": "s0-07",
-     "say": "이명이 더 심해진 계기, 메모 (선택)",
+     "say": "이명이 더 심해진 계기, 메모, 선택 사항",
      "highlight": 7
     },
     {
      "id": "s0-08",
-     "say": "예: 크기 6, 신경 쓰임 7, 수면 영향 3.",
+     "say": "예를 들어, 크기 육, 신경 쓰임 칠, 수면 영향 삼.",
      "highlight": 8
     },
     {
      "id": "s0-09",
-     "say": "계기: 시끄러운 카페에 다녀옴",
+     "say": "계기, 시끄러운 카페에 다녀옴",
      "highlight": 9
     },
     {
      "id": "s0-10",
-     "say": "매일 같은 시간(예: 자기 전)에 작성하는 습관을 들이면 훨씬 수월합니다.",
+     "say": "매일 같은 시간, 예를 들어, 자기 전에 작성하는 습관을 들이면 훨씬 수월합니다.",
      "highlight": 10
     },
     {
@@ -84,13 +92,199 @@
      "highlight": 13
     },
     {
-     "id": "s0-next",
-     "say": "여기까지 읽었으면 아래 '완료' 버튼을 눌러 마무리합니다.",
+     "id": "s0-go",
+     "say": "이제 일기 탭으로 가서 실제로 어떻게 쓰는지 보겠습니다.",
      "highlight": null,
-     "point": "#next-btn",
+     "point": "[data-route=\"today\"]",
      "tap": true
     }
    ]
+  },
+  {
+   "index": 0,
+   "view": "today",
+   "cues": [
+    {
+     "id": "d0-open",
+     "say": "일기 탭을 누르면 오늘의 일기 화면이 열립니다. 위에 오늘 날짜가 보입니다.",
+     "highlight": null,
+     "point": ".hero .eyebrow"
+    },
+    {
+     "id": "d0-num",
+     "say": "숫자 줄이 세 개 있습니다. 영에서 십까지 숫자 가운데 하나를 눌러 고릅니다.",
+     "highlight": null,
+     "point": "#sl-tinnitus .scale"
+    },
+    {
+     "id": "d0-t",
+     "say": "첫 줄은 오늘 이명의 크기입니다. 영은 거의 안 들림, 십은 매우 큼입니다. 예를 들어 육을 누릅니다.",
+     "highlight": null,
+     "point": "#sl-tinnitus button[data-v=\"6\"]",
+     "tap": true
+    },
+    {
+     "id": "d0-a",
+     "say": "둘째 줄은 오늘 이명이 신경 쓰인 정도입니다. 예를 들어 칠을 누릅니다.",
+     "highlight": null,
+     "point": "#sl-annoyance button[data-v=\"7\"]",
+     "tap": true
+    },
+    {
+     "id": "d0-s",
+     "say": "셋째 줄은 간밤 수면에 미친 영향입니다. 이명이 잠드는 것을 얼마나 방해했는지 고릅니다. 예를 들어 삼입니다.",
+     "highlight": null,
+     "point": "#sl-sleep button[data-v=\"3\"]",
+     "tap": true
+    },
+    {
+     "id": "d0-chk",
+     "say": "그 아래 두 개의 체크는 삼 주차와 오 주차에 배울 마음챙김 호흡과 근육이완을 한 날 표시하는 칸입니다. 지금은 비워 두세요.",
+     "highlight": null,
+     "point": "#in-mindfulness"
+    },
+    {
+     "id": "d0-trg",
+     "say": "이명이 더 심해진 계기는 선택 사항입니다. 시끄러운 곳, 피로, 커피처럼 짧게 적습니다.",
+     "highlight": null,
+     "point": "#in-trigger"
+    },
+    {
+     "id": "d0-memo",
+     "say": "메모란에는 오늘 느낀 점을 자유롭게 적습니다. 앞으로 연습한 내용도 여기에 적게 됩니다.",
+     "highlight": null,
+     "point": "#in-memo"
+    },
+    {
+     "id": "d0-save",
+     "say": "다 골랐으면 아래 '저장' 버튼을 누릅니다. 일 분이면 충분합니다.",
+     "highlight": null,
+     "point": "#diary-form button[type=submit]",
+     "tap": true
+    },
+    {
+     "id": "d0-saved",
+     "say": "저장하면 아래에 마지막 저장 시각이 표시됩니다. 같은 날 다시 열어 고치고 저장하면 새 내용으로 바뀝니다.",
+     "highlight": null,
+     "point": "#diary-status"
+    },
+    {
+     "id": "d0-prev",
+     "say": "빠뜨린 날이 있으면 위의 '전날' 버튼으로 날짜를 옮겨 지난 날 일기를 쓸 수 있습니다.",
+     "highlight": null,
+     "point": ".date-nav a:first-child"
+    },
+    {
+     "id": "d0-time",
+     "say": "매일 같은 시간, 예를 들어 자기 전에 쓰는 습관을 들이면 훨씬 수월합니다.",
+     "highlight": null
+    }
+   ],
+   "state": {
+    "values": {
+     "tinnitus": 6,
+     "annoyance": 7,
+     "sleep": 3
+    },
+    "trigger": "시끄러운 카페에 다녀옴",
+    "memo": ""
+   }
+  },
+  {
+   "index": 0,
+   "view": "records",
+   "cues": [
+    {
+     "id": "r0-tab",
+     "say": "쓴 일기는 '기록' 탭에서 볼 수 있습니다.",
+     "highlight": null,
+     "point": "[data-route=\"records\"]",
+     "tap": true
+    },
+    {
+     "id": "r0-chart",
+     "say": "일기가 쌓이면 이명 크기와 신경 쓰인 정도가 그래프로 보입니다. 나만의 흐름을 볼 수 있습니다.",
+     "highlight": null,
+     "point": "#records .chart"
+    },
+    {
+     "id": "r0-table",
+     "say": "아래 표에는 날짜별 점수가 있습니다. 날짜나 '고치기'를 누르면 그날 일기를 다시 열어 고칠 수 있습니다.",
+     "highlight": null,
+     "point": "#records table tbody tr:first-child"
+    }
+   ],
+   "state": {
+    "diary": [
+     {
+      "date": "오늘",
+      "tinnitus": 6,
+      "annoyance": 7,
+      "sleep": 3,
+      "memo": "시끄러운 카페에 다녀옴"
+     },
+     {
+      "date": "어제",
+      "tinnitus": 5,
+      "annoyance": 5,
+      "sleep": 4,
+      "memo": ""
+     },
+     {
+      "date": "2일 전",
+      "tinnitus": 7,
+      "annoyance": 6,
+      "sleep": 5,
+      "memo": "피로"
+     },
+     {
+      "date": "3일 전",
+      "tinnitus": 4,
+      "annoyance": 3,
+      "sleep": 2,
+      "memo": ""
+     },
+     {
+      "date": "4일 전",
+      "tinnitus": 6,
+      "annoyance": 6,
+      "sleep": 4,
+      "memo": "커피"
+     }
+    ]
+   }
+  },
+  {
+   "index": 0,
+   "view": "sound",
+   "cues": [
+    {
+     "id": "n0-tab",
+     "say": "클리닉에서 소리 치료를 안내받으셨다면 '소리' 탭에서 재생합니다.",
+     "highlight": null,
+     "point": "[data-route=\"sound\"]",
+     "tap": true
+    },
+    {
+     "id": "n0-play",
+     "say": "소리를 고르고 누르면 재생되고, 사용 시간이 자동으로 기록됩니다. 밤 열 시부터 아침 여섯 시 사이 사용은 야간으로 따로 기록됩니다.",
+     "highlight": null,
+     "point": ".sound-item"
+    },
+    {
+     "id": "n0-back",
+     "say": "이제 프로그램으로 돌아가 이번 주 정리를 보겠습니다.",
+     "highlight": null,
+     "point": "[data-route=\"program\"]",
+     "tap": true
+    }
+   ],
+   "image": {
+    "file": "img/concept-diary.webp",
+    "use": "1주차 숙제(일기 시작) 화면 위",
+    "size": "1:1 (1024×1024)",
+    "prompt": "[공통 스타일 블록]\nA small open notebook page drawn in a few ink lines, with three short horizontal scales sketched on it (each a thin line with a small terracotta dot placed somewhere along it). Beside the notebook, a simple bedside lamp turned low and a cup, suggesting 'before sleep'. Everything else empty cream. Concept: one minute a day, three quick marks."
+   }
   }
  ]
 }

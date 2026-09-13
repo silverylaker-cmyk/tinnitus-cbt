@@ -2,7 +2,15 @@
  "module": "week2_homework",
  "week": 2,
  "title": "이번 주 숙제: 사고기록지",
- "_readme": "say = 읽을 문장 (TTS/육성). highlight = 화면 문장 번호(0=제목, 1..=본문, null=없음). point = 가리킬 요소(CSS 선택자). tap = 눌림 효과. type = {key,text} 입력칸에 타이핑. 임상 문장은 content/*.json 에서 고치고, 진행 멘트만 여기서 고치세요.",
+ "_readme": "say = 읽을 문장 (육성 TTS). highlight = 화면 문장 번호(0=제목, 1..=본문, null=없음). point = 가리킬 요소(CSS 선택자). tap = 눌림 효과. type = {key,text} 입력칸에 타이핑. view = module|program|today|records|sound. image = 삽화 제안(렌더에는 영향 없음). 임상 문장은 content/*.json 에서 고치고, 진행 멘트만 여기서 고치세요.",
+ "_v2": {
+  "coverage": {
+   "drama": "—",
+   "mode": "상세",
+   "note": "주 3회 요령, 워크시트 다시 열어 이어 쓰기"
+  },
+  "notes": []
+ },
  "screens": [
   {
    "index": 0,
@@ -10,12 +18,12 @@
    "cues": [
     {
      "id": "s0-intro",
-     "say": "2주차 숙제 내용, '이번 주 숙제: 사고기록지'를 함께 보겠습니다.",
+     "say": "이 주차 숙제 내용, '이번 주 숙제, 사고기록지'를 함께 보겠습니다.",
      "highlight": null
     },
     {
      "id": "s0-00",
-     "say": "이번 주 숙제: 사고기록지 주 3회",
+     "say": "이번 주 숙제, 사고기록지 주 삼 회",
      "highlight": 0
     },
     {
@@ -25,7 +33,7 @@
     },
     {
      "id": "s0-02",
-     "say": "목표는 주 3회 이상입니다.",
+     "say": "목표는 주 삼 회 이상입니다.",
      "highlight": 2
     },
     {
@@ -70,8 +78,13 @@
     },
     {
      "id": "s0-11",
-     "say": "사고기록과 일기가 쌓이면 행동실험(4주차)의 재료가 됩니다.",
+     "say": "사고기록과 일기가 쌓이면 행동실험, 사 주차의 재료가 됩니다.",
      "highlight": 11
+    },
+    {
+     "id": "s0-where",
+     "say": "정리하면, 사고기록지는 프로그램 탭에서 '사고기록지 연습'을 다시 열어 쓰고, 쓴 기록은 그 화면 아래와 기록 탭에서 봅니다.",
+     "highlight": null
     },
     {
      "id": "s0-next",

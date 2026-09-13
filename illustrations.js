@@ -18,7 +18,23 @@
   };
   // 생성 삽화가 있는 주차는 그림 파일을, 없는 주차는 선화 SVG를 쓴다 (img/ 폴더에 weekN.webp 를 넣고 여기에 등록)
   A.IMAGES = { 1: "img/week1.webp", 2: "img/week2.webp", 3: "img/week3.webp", 4: "img/week4.webp", 5: "img/week5.webp", 6: "img/week6.webp", 7: "img/week7.webp", 8: "img/week8.webp" };
-  A.CONCEPTS = { night: "img/concept-night.webp" };
+  A.CONCEPTS = {
+    night: "img/concept-night.webp", cycle: "img/concept-cycle.webp", diary: "img/concept-diary.webp", "thought-record": "img/concept-thought-record.webp",
+    breath: "img/concept-breath.webp", "pmr-body": "img/concept-pmr-body.webp", "three-spots": "img/concept-three-spots.webp",
+    "sleep-hygiene": "img/concept-sleep-hygiene.webp", toolbox: "img/concept-toolbox.webp", wave: "img/concept-wave.webp",
+  };
+  A.CAPTIONS = {
+    night: "낮은 볼륨의 소리를 켜 두고, 잠을 쫓아가지 않고 기다립니다",
+    cycle: "소리는 그대로인데, 반응이 고리를 만듭니다",
+    diary: "하루 1분, 세 가지 점수만 남기면 됩니다",
+    "thought-record": "스쳐 가는 생각을 붙잡아 종이에 옮기면, 생각과 나 사이에 거리가 생깁니다",
+    breath: "주의는 호흡에, 소리는 그대로 두고",
+    "pmr-body": "팔에서 다리까지, 한 부위씩 긴장했다가 풀기",
+    "three-spots": "어깨, 턱, 이마 — 긴장이 잘 숨는 세 곳",
+    "sleep-hygiene": "같은 시간에 일어나기, 침대는 잠자리로만, 늦은 카페인 피하기, 조명 낮추기",
+    toolbox: "상황에 맞는 도구 하나만 꺼내면 됩니다",
+    wave: "힘든 날은 파도입니다. 올라갔다가 반드시 내려옵니다",
+  };
   A.week = (n, cls = "") => A.IMAGES[n]
     ? `<img class="art img ${cls}" src="${A.IMAGES[n]}" alt="">`
     : `<svg class="art ${cls}" viewBox="0 0 200 140" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${WEEK_ART[n] || WEEK_ART[1]}</svg>`;

@@ -1,6 +1,6 @@
 // 소리 치료 재생 목록 — 유튜브에 올린 영상의 ID를 여기에 적습니다.
 // 유튜브 주소가 https://www.youtube.com/watch?v=AbCdEfGhIjK 라면 youtubeId 는 "AbCdEfGhIjK" 입니다.
-// youtubeId 가 비어 있으면 화면에 "준비 중"으로 표시됩니다.
+// youtubeId 가 비어 있으면 화면에 "준비 중"으로 표시됩니다. src 가 있으면 앱 안의 오디오 파일(audio/)을 끊김 없이 반복 재생합니다.
 window.SOUNDS = {
   note: "볼륨은 이명보다 약간 작거나 비슷한 수준으로 맞춰 주세요. 이명이 살짝 들릴 정도가 적당하며, 너무 크게 들으면 오히려 청각 피로를 유발할 수 있습니다.",
   groups: [
@@ -19,11 +19,11 @@ window.SOUNDS = {
       title: "자연음",
       desc: "편안함과 이완을 위한 소리입니다. 취침 전 낮은 볼륨으로 틀어 두어도 좋습니다.",
       items: [
-        { id: "rain",      title: "빗소리",    desc: "", youtubeId: "" },
+        { id: "rain",      title: "빗소리",    desc: "잔잔한 빗소리, 끊김 없이 반복", src: "audio/rain.m4a", youtubeId: "" },
         { id: "waves",     title: "파도소리",  desc: "", youtubeId: "" },
         { id: "stream",    title: "계곡물",    desc: "", youtubeId: "" },
         { id: "waterfall", title: "폭포소리",  desc: "", youtubeId: "" },
-        { id: "fire",      title: "장작불",    desc: "", youtubeId: "" },
+        { id: "fire",      title: "장작불",    desc: "타닥거리는 장작불 소리, 끊김 없이 반복", src: "audio/fireplace.m4a", youtubeId: "" },
         { id: "wind",      title: "바람소리",  desc: "", youtubeId: "" },
         { id: "crickets",  title: "밤 풀벌레", desc: "", youtubeId: "" },
       ],

@@ -2,7 +2,15 @@
  "module": "week3_training",
  "week": 3,
  "title": "마음챙김 호흡 훈련",
- "_readme": "say = 읽을 문장 (TTS/육성). highlight = 화면 문장 번호(0=제목, 1..=본문, null=없음). point = 가리킬 요소(CSS 선택자). tap = 눌림 효과. type = {key,text} 입력칸에 타이핑. 임상 문장은 content/*.json 에서 고치고, 진행 멘트만 여기서 고치세요.",
+ "_readme": "say = 읽을 문장 (육성 TTS). highlight = 화면 문장 번호(0=제목, 1..=본문, null=없음). point = 가리킬 요소(CSS 선택자). tap = 눌림 효과. type = {key,text} 입력칸에 타이핑. view = module|program|today|records|sound. image = 삽화 제안(렌더에는 영향 없음). 임상 문장은 content/*.json 에서 고치고, 진행 멘트만 여기서 고치세요.",
+ "_v2": {
+  "coverage": {
+   "drama": "—",
+   "mode": "상세",
+   "note": "호흡 방법 5단계, 호흡 원 도구(시작, 자동 체크), 이명이 들려도 괜찮다, 오해 두 가지"
+  },
+  "notes": []
+ },
  "screens": [
   {
    "index": 0,
@@ -10,12 +18,17 @@
    "cues": [
     {
      "id": "s0-intro",
-     "say": "3주차 학습 내용, '마음챙김 호흡 훈련'을 함께 보겠습니다.",
+     "say": "삼 주차 학습 내용, '마음챙김 호흡 훈련'을 함께 보겠습니다.",
+     "highlight": null
+    },
+    {
+     "id": "s0-lead",
+     "say": "영상에서는 원리만 다루었고, 실제 호흡 방법은 이 화면에 있습니다. 순서대로 자세히 보겠습니다.",
      "highlight": null
     },
     {
      "id": "s0-00",
-     "say": "마음챙김 호흡 — 방법",
+     "say": "마음챙김 호흡, 방법",
      "highlight": 0
     },
     {
@@ -25,7 +38,7 @@
     },
     {
      "id": "s0-02",
-     "say": "하루 5~10분이면 충분합니다.",
+     "say": "하루 오 분에서 십 분이면 충분합니다.",
      "highlight": 2
     },
     {
@@ -50,7 +63,7 @@
     },
     {
      "id": "s0-07",
-     "say": "생각이나 소리(이명 포함)에 주의를 빼앗기면(반드시 빼앗기게 됩니다) '아, 딴 데 갔구나' 하고 알아차리고, 부드럽게 호흡으로 돌아옵니다",
+     "say": "생각이나 소리, 이명 포함에 주의를 빼앗기면, 반드시 빼앗기게 됩니다 '아, 딴 데 갔구나' 하고 알아차리고, 부드럽게 호흡으로 돌아옵니다",
      "highlight": 7
     },
     {
@@ -59,13 +72,37 @@
      "highlight": 8
     },
     {
+     "id": "s0-tool1",
+     "say": "본문 아래에 '지금 바로 연습하기'가 있습니다. 원이 커질 때 들이쉬고, 작아질 때 내쉽니다.",
+     "highlight": null,
+     "point": "#breath"
+    },
+    {
+     "id": "s0-tool2",
+     "say": "'시작'을 누르면 원이 움직이기 시작하고, 정한 시간이 끝나면 멈춥니다.",
+     "highlight": null,
+     "point": "#breath .btn",
+     "tap": true
+    },
+    {
+     "id": "s0-tool3",
+     "say": "연습을 마치면 오늘 일기에 '마음챙김' 체크가 자동으로 표시됩니다. 따로 적지 않아도 됩니다.",
+     "highlight": null
+    },
+    {
      "id": "s0-next",
      "say": "아래 '다음' 버튼을 눌러 다음 화면으로 넘어갑니다.",
      "highlight": null,
      "point": "#next-btn",
      "tap": true
     }
-   ]
+   ],
+   "image": {
+    "file": "img/concept-breath.webp",
+    "use": "3주차 마음챙김 호흡 방법 화면 (호흡 원 도구 옆)",
+    "size": "1:1 (1024×1024)",
+    "prompt": "[공통 스타일 블록]\nConcentric gentle rings, like ripples, drawn with thin ink lines around a small central circle. A simplified seated figure with an upright back sits beside them, eyes suggested closed by two short lines. Off in the dim margin, a tiny ringing-sound mark (three short arcs) is left alone, unlit. Terracotta only on the innermost ring. Concept: attention rests on the breath; the sound is allowed to be there."
+   }
   },
   {
    "index": 1,
@@ -98,12 +135,12 @@
     },
     {
      "id": "s1-05",
-     "say": "이명 → 알아차림 → 호흡으로 복귀.",
+     "say": "이명, 그다음 알아차림, 그다음 호흡으로 복귀.",
      "highlight": 5
     },
     {
      "id": "s1-06",
-     "say": "이 한 사이클이 주의 근육의 반복 운동 1회입니다",
+     "say": "이 한 사이클이 주의 근육의 반복 운동 일 회입니다",
      "highlight": 6
     },
     {
@@ -113,7 +150,7 @@
     },
     {
      "id": "s1-08",
-     "say": "\"생각이 자꾸 끼어드는 걸 보니 나는 못하나 봐\" → 생각이 끼어드는 건 뇌의 정상 작동입니다.",
+     "say": "\"생각이 자꾸 끼어드는 걸 보니 나는 못하나 봐\", 그다음 생각이 끼어드는 건 뇌의 정상 작동입니다.",
      "highlight": 8
     },
     {
@@ -123,17 +160,17 @@
     },
     {
      "id": "s1-10",
-     "say": "\"마음이 편안해져야 성공\" → 편안함은 부산물일 뿐, 목표는 '돌아오는 연습' 자체입니다",
+     "say": "\"마음이 편안해져야 성공\", 그다음 편안함은 부산물일 뿐, 목표는 '돌아오는 연습' 자체입니다",
      "highlight": 10
     },
     {
      "id": "s1-11",
-     "say": "처음엔 5분으로 시작해서 익숙해지면 10분으로 늘려보세요.",
+     "say": "처음엔 오 분으로 시작해서 익숙해지면 십 분으로 늘려보세요.",
      "highlight": 11
     },
     {
      "id": "s1-12",
-     "say": "매일 같은 시간대(예: 아침 식사 후)에 하면 습관이 되기 쉽습니다.",
+     "say": "매일 같은 시간대, 예를 들어, 아침 식사 후에 하면 습관이 되기 쉽습니다.",
      "highlight": 12
     },
     {
@@ -143,7 +180,7 @@
     },
     {
      "id": "s1-14",
-     "say": "이명이 들려도 내가 원하는 곳(예: 호흡)으로 주의를 옮길 수 있는 능력을 기르는 것입니다.",
+     "say": "이명이 들려도 내가 원하는 곳, 예를 들어, 호흡으로 주의를 옮길 수 있는 능력을 기르는 것입니다.",
      "highlight": 14
     },
     {

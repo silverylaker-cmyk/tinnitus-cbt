@@ -2,7 +2,15 @@
  "module": "week7_worksheet",
  "week": 7,
  "title": "나의 취침 루틴 설계",
- "_readme": "say = 읽을 문장 (TTS/육성). highlight = 화면 문장 번호(0=제목, 1..=본문, null=없음). point = 가리킬 요소(CSS 선택자). tap = 눌림 효과. type = {key,text} 입력칸에 타이핑. 임상 문장은 content/*.json 에서 고치고, 진행 멘트만 여기서 고치세요.",
+ "_readme": "say = 읽을 문장 (육성 TTS). highlight = 화면 문장 번호(0=제목, 1..=본문, null=없음). point = 가리킬 요소(CSS 선택자). tap = 눌림 효과. type = {key,text} 입력칸에 타이핑. view = module|program|today|records|sound. image = 삽화 제안(렌더에는 영향 없음). 임상 문장은 content/*.json 에서 고치고, 진행 멘트만 여기서 고치세요.",
+ "_v2": {
+  "coverage": {
+   "drama": "—",
+   "mode": "상세",
+   "note": "취침 루틴 4칸, 단일형 저장·수정"
+  },
+  "notes": []
+ },
  "screens": [
   {
    "index": 0,
@@ -10,7 +18,7 @@
    "cues": [
     {
      "id": "s0-intro",
-     "say": "7주차 작성 내용, '나의 취침 루틴 설계'를 함께 보겠습니다.",
+     "say": "칠 주차 작성 내용, '나의 취침 루틴 설계'를 함께 보겠습니다.",
      "highlight": null
     },
     {
@@ -29,29 +37,34 @@
      "highlight": 2
     },
     {
+     "id": "s0-single",
+     "say": "이 워크시트도 한 장을 계속 고쳐 쓰는 형식입니다. 오늘 밤부터 실제로 해 볼 계획을 구체적으로 적습니다.",
+     "highlight": null
+    },
+    {
      "id": "s0-f0",
-     "say": "첫 번째 칸입니다. 목표 시간 — 기상 시간(고정)과 대략의 취침 시간",
+     "say": "첫 번째 칸입니다. 목표 시간, 기상 시간, 고정과 대략의 취침 시간",
      "highlight": null,
      "point": "textarea[data-key=\"target_times\"]"
     },
     {
      "id": "s0-f0t",
-     "say": "예를 들면 이렇게 적을 수 있습니다. 기상 6:30 고정",
+     "say": "예를 들어, 기상 여섯 시 삼십 분 고정, 취침 밤 열한 시에서 열한 시 삼십 분.",
      "highlight": null,
      "type": {
       "key": "target_times",
-      "text": "기상 6:30 고정"
+      "text": "기상 6:30 고정, 취침 23:00~23:30"
      }
     },
     {
      "id": "s0-f1",
-     "say": "두 번째 칸입니다. 취침 전 루틴 — 잠들기 전 30~60분의 순서",
+     "say": "두 번째 칸입니다. 취침 전 루틴, 잠들기 전 삼십 분에서 육십 분의 순서",
      "highlight": null,
      "point": "textarea[data-key=\"routine_steps\"]"
     },
     {
      "id": "s0-f1t",
-     "say": "22:00 조명 낮추고 화면 끄기 → 세면 → 스트레칭 → PMR 15분 → 사운드 켜고 눕기",
+     "say": "잠들기 전 삼십 분에서 한 시간의 순서입니다. 밤 열 시에 조명을 낮추고 화면 끄기, 세면, 스트레칭, 근육이완 십오 분, 사운드 켜고 눕기.",
      "highlight": null,
      "type": {
       "key": "routine_steps",
@@ -60,17 +73,17 @@
     },
     {
      "id": "s0-f2",
-     "say": "세 번째 칸입니다. 야간 사운드 계획 — 어떤 사운드를 어느 볼륨으로?",
+     "say": "세 번째 칸입니다. 야간 사운드 계획, 어떤 사운드를 어느 볼륨으로?",
      "highlight": null,
      "point": "textarea[data-key=\"night_sound_plan\"]"
     },
     {
      "id": "s0-f2t",
-     "say": "노치 사운드",
+     "say": "예를 들어, 노치 사운드, 볼륨 십오 퍼센트, 겨우 들릴 정도, 잠들기 십 분 전부터.",
      "highlight": null,
      "type": {
       "key": "night_sound_plan",
-      "text": "노치 사운드"
+      "text": "노치 사운드, 볼륨 15% (겨우 들릴 정도), 잠들기 10분 전부터"
      }
     },
     {
@@ -81,7 +94,7 @@
     },
     {
      "id": "s0-f3t",
-     "say": "축약 이완 1분 → 사운드 다시 켜기 → 20분 넘으면 거실에서 책 읽다가 졸리면 복귀",
+     "say": "예를 들어, 축약 이완 일 분, 사운드 다시 켜기, 이십 분 넘으면 거실에서 책 읽다가 졸리면 복귀.",
      "highlight": null,
      "type": {
       "key": "if_awake_plan",
@@ -96,6 +109,80 @@
      "tap": true
     }
    ]
+  },
+  {
+   "index": 0,
+   "view": "module",
+   "cues": [
+    {
+     "id": "a0-saved",
+     "say": "저장하면 적은 내용이 그대로 남고, 칸 아래에 '저장됨'과 저장한 시각이 표시됩니다.",
+     "highlight": null,
+     "point": "#single-saved"
+    },
+    {
+     "id": "a0-edit",
+     "say": "고치고 싶으면 칸의 글을 바로 고친 뒤 같은 버튼을 다시 누르면 됩니다. 그러면 새 내용으로 바뀝니다.",
+     "highlight": null,
+     "point": "textarea[data-key=\"target_times\"]"
+    },
+    {
+     "id": "a0-adj",
+     "say": "한 주 해 보고 맞지 않는 부분은 다시 열어 고치면 됩니다. 다음 진료에서 선생님과 함께 조정하기도 합니다.",
+     "highlight": null
+    }
+   ],
+   "state": {
+    "single": {
+     "target_times": "기상 6:30 고정, 취침 23:00~23:30",
+     "routine_steps": "22:00 조명 낮추고 화면 끄기 → 세면 → 스트레칭 → PMR 15분 → 사운드 켜고 눕기",
+     "night_sound_plan": "노치 사운드, 볼륨 15% (겨우 들릴 정도), 잠들기 10분 전부터",
+     "if_awake_plan": "축약 이완 1분 → 사운드 다시 켜기 → 20분 넘으면 거실에서 책 읽다가 졸리면 복귀"
+    },
+    "savedAt": "오늘"
+   }
+  },
+  {
+   "index": 0,
+   "view": "program",
+   "cues": [
+    {
+     "id": "p0-open",
+     "say": "나중에 다시 쓰고 싶으면 '프로그램' 탭에서 칠 주차의 '나의 취침 루틴 설계'을 다시 엽니다.",
+     "highlight": null,
+     "point": "[data-mod=\"week7_worksheet\"]",
+     "tap": true
+    },
+    {
+     "id": "p0-list",
+     "say": "다시 열면 전에 적은 내용이 그대로 채워져 있습니다. 고친 뒤 다시 저장하면 새 내용으로 바뀝니다.",
+     "highlight": null
+    }
+   ]
+  },
+  {
+   "index": 0,
+   "view": "records",
+   "cues": [
+    {
+     "id": "r0-tab",
+     "say": "'기록' 탭을 누르면 지금까지 쓴 기록을 한꺼번에 볼 수 있습니다.",
+     "highlight": null,
+     "point": "[data-route=\"records\"]",
+     "tap": true
+    },
+    {
+     "id": "r0-ws",
+     "say": "워크시트 기록은 모듈 이름 아래에 모여 있습니다. '열어서 고치기'를 누르면 그 화면으로 바로 갑니다.",
+     "highlight": null,
+     "point": "#records .ws a.more"
+    }
+   ],
+   "state": {
+    "worksheets": [
+     "week7_worksheet"
+    ]
+   }
   }
  ]
 }

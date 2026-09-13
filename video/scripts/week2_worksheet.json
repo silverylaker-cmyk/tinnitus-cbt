@@ -2,7 +2,15 @@
  "module": "week2_worksheet",
  "week": 2,
  "title": "사고기록지 연습",
- "_readme": "say = 읽을 문장 (TTS/육성). highlight = 화면 문장 번호(0=제목, 1..=본문, null=없음). point = 가리킬 요소(CSS 선택자). tap = 눌림 효과. type = {key,text} 입력칸에 타이핑. 임상 문장은 content/*.json 에서 고치고, 진행 멘트만 여기서 고치세요.",
+ "_readme": "say = 읽을 문장 (육성 TTS). highlight = 화면 문장 번호(0=제목, 1..=본문, null=없음). point = 가리킬 요소(CSS 선택자). tap = 눌림 효과. type = {key,text} 입력칸에 타이핑. view = module|program|today|records|sound. image = 삽화 제안(렌더에는 영향 없음). 임상 문장은 content/*.json 에서 고치고, 진행 멘트만 여기서 고치세요.",
+ "_v2": {
+  "coverage": {
+   "drama": "—",
+   "mode": "상세",
+   "note": "사고기록지 칸 4개, 누적 저장, 수정·삭제, 기록 탭"
+  },
+  "notes": []
+ },
  "screens": [
   {
    "index": 0,
@@ -10,7 +18,7 @@
    "cues": [
     {
      "id": "s0-intro",
-     "say": "2주차 작성 내용, '사고기록지 연습'을 함께 보겠습니다.",
+     "say": "이 주차 작성 내용, '사고기록지 연습'을 함께 보겠습니다.",
      "highlight": null
     },
     {
@@ -40,28 +48,28 @@
     },
     {
      "id": "s0-f0",
-     "say": "첫 번째 칸입니다. 상황 — 언제, 어디서, 무엇을 하고 있었나요?",
+     "say": "첫 번째 칸입니다. 상황, 언제, 어디서, 무엇을 하고 있었나요?",
      "highlight": null,
      "point": "textarea[data-key=\"situation\"]"
     },
     {
      "id": "s0-f0t",
-     "say": "예를 들면 이렇게 적을 수 있습니다. 밤 11시",
+     "say": "예를 들면 이렇게 적을 수 있습니다. 밤 열한 시, 침대에 누워 잠들려던 참.",
      "highlight": null,
      "type": {
       "key": "situation",
-      "text": "밤 11시"
+      "text": "밤 11시, 침대에 누워 잠들려던 참"
      }
     },
     {
      "id": "s0-f1",
-     "say": "두 번째 칸입니다. 자동사고 — 그 순간 머리를 스친 생각을 그대로 적어보세요",
+     "say": "두 번째 칸입니다. 자동사고, 그 순간 머리를 스친 생각을 그대로 적어보세요",
      "highlight": null,
      "point": "textarea[data-key=\"automatic_thought\"]"
     },
     {
      "id": "s0-f1t",
-     "say": "오늘도 이 소리 때문에 못 자겠다. 내일 완전히 망가지겠지",
+     "say": "머리를 스친 말을 그대로 적습니다. 오늘도 이 소리 때문에 못 자겠다. 내일 완전히 망가지겠지.",
      "highlight": null,
      "type": {
       "key": "automatic_thought",
@@ -70,28 +78,28 @@
     },
     {
      "id": "s0-f2",
-     "say": "세 번째 칸입니다. 감정과 강도 — 어떤 감정이 얼마나 강했나요? (0~10)",
+     "say": "세 번째 칸입니다. 감정과 강도, 어떤 감정이 얼마나 강했나요?, 영에서 십",
      "highlight": null,
      "point": "textarea[data-key=\"emotion_intensity\"]"
     },
     {
      "id": "s0-f2t",
-     "say": "불안 7",
+     "say": "감정에 이름을 붙이고 영에서 십으로 강도를 적습니다. 불안 칠, 짜증 오.",
      "highlight": null,
      "type": {
       "key": "emotion_intensity",
-      "text": "불안 7"
+      "text": "불안 7, 짜증 5"
      }
     },
     {
      "id": "s0-f3",
-     "say": "네 번째 칸입니다. 패턴 찾기 — 앞에서 본 파국적 사고 패턴 중 해당하는 것이 있나요?",
+     "say": "네 번째 칸입니다. 패턴 찾기, 앞에서 본 파국적 사고 패턴 중 해당하는 것이 있나요?",
      "highlight": null,
      "point": "textarea[data-key=\"pattern_found\"]"
     },
     {
      "id": "s0-f3t",
-     "say": "최악을 예상하기 — 아직 일어나지 않은 내일 일을 확정처럼 생각함",
+     "say": "앞 화면의 다섯 가지 가운데 맞는 것을 고릅니다. 최악을 예상하기, 아직 일어나지 않은 내일 일을 확정처럼 생각함.",
      "highlight": null,
      "type": {
       "key": "pattern_found",
@@ -110,20 +118,6 @@
   {
    "index": 0,
    "view": "module",
-   "state": {
-    "afterSave": true,
-    "entries": [
-     {
-      "when": "오늘",
-      "responses": {
-       "situation": "밤 11시",
-       "automatic_thought": "오늘도 이 소리 때문에 못 자겠다. 내일 완전히 망가지겠지",
-       "emotion_intensity": "불안 7",
-       "pattern_found": "최악을 예상하기 — 아직 일어나지 않은 내일 일을 확정처럼 생각함"
-      }
-     }
-    ]
-   },
    "cues": [
     {
      "id": "a0-saved",
@@ -151,7 +145,21 @@
      "point": "#next-btn",
      "tap": true
     }
-   ]
+   ],
+   "state": {
+    "afterSave": true,
+    "entries": [
+     {
+      "when": "오늘",
+      "responses": {
+       "situation": "밤 11시, 침대에 누워 잠들려던 참",
+       "automatic_thought": "오늘도 이 소리 때문에 못 자겠다. 내일 완전히 망가지겠지",
+       "emotion_intensity": "불안 7, 짜증 5",
+       "pattern_found": "최악을 예상하기 — 아직 일어나지 않은 내일 일을 확정처럼 생각함"
+      }
+     }
+    ]
+   }
   },
   {
    "index": 0,
@@ -159,7 +167,7 @@
    "cues": [
     {
      "id": "p0-open",
-     "say": "나중에 다시 쓰고 싶으면 '프로그램' 탭에서 2주차의 '사고기록지 연습'을 다시 엽니다.",
+     "say": "나중에 다시 쓰고 싶으면 '프로그램' 탭에서 이 주차의 '사고기록지 연습'을 다시 엽니다.",
      "highlight": null,
      "point": "[data-mod=\"week2_worksheet\"]",
      "tap": true
@@ -168,15 +176,32 @@
      "id": "p0-list",
      "say": "이미 쓴 기록은 그 화면 아래에 모여 있고, 새로 적어 저장하면 하나 더 쌓입니다.",
      "highlight": null
-    },
+    }
+   ]
+  },
+  {
+   "index": 0,
+   "view": "records",
+   "cues": [
     {
-     "id": "p0-rec",
-     "say": "'기록' 탭에서도 지금까지 쓴 기록을 한꺼번에 볼 수 있습니다.",
+     "id": "r0-tab",
+     "say": "'기록' 탭을 누르면 지금까지 쓴 기록을 한꺼번에 볼 수 있습니다.",
      "highlight": null,
      "point": "[data-route=\"records\"]",
      "tap": true
+    },
+    {
+     "id": "r0-ws",
+     "say": "워크시트 기록은 모듈 이름 아래에 모여 있습니다. '열어서 고치기'를 누르면 그 화면으로 바로 갑니다.",
+     "highlight": null,
+     "point": "#records .ws a.more"
     }
-   ]
+   ],
+   "state": {
+    "worksheets": [
+     "week2_worksheet"
+    ]
+   }
   }
  ]
 }

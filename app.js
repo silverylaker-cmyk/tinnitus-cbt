@@ -352,6 +352,12 @@ const EXTRAS = {
   "week5_training:1": "pmr",
   "week6_psychoeducation:1": "breath-cue",
   "week7_psychoeducation:2": "img:night",
+  "week1_worksheet:0": "img:cycle",
+  "week1_homework:0": "img:diary",
+  "week2_psychoeducation:2": "img:thought-record",
+  "week7_psychoeducation:1": "img:sleep-hygiene",
+  "week8_psychoeducation:0": "img:toolbox",
+  "week8_psychoeducation:1": "img:wave",
 };
 
 function nextModuleAfter(m) {
@@ -429,7 +435,7 @@ function renderModule(main, [id, idxStr, flag]) {
 }
 
 function mountExtra(kind, el, screen) {
-  if (kind.startsWith("img:")) { el.innerHTML = ART.concept(kind.slice(4), "낮은 볼륨의 소리를 켜 두고, 잠을 쫓아가지 않고 기다립니다"); return; }
+  if (kind.startsWith("img:")) { const key = kind.slice(4); el.innerHTML = ART.concept(key, ART.CAPTIONS[key] || ""); return; }
   if (kind === "cycle") {
     const steps = (screen.body.match(/^\d+\. .+$/gm) || []).map((l) => l.replace(/^\d+\. /, ""));
     el.innerHTML = `<h3 class="extra-title">악순환 고리 한눈에 보기</h3>` + ART.cycle(steps);
@@ -735,11 +741,44 @@ function loadYouTubeAPI() {
   });
 }
 function allSounds() { return window.SOUNDS.groups.flatMap((g) => g.items); }
+const soundReady = (it) => !!(it.youtubeId || it.src);
 function timeOfDayNow() { const h = new Date().getHours(); return h >= 6 && h < 22 ? "day" : "night"; }
+
+// --- 하루 합계 (오전 9시 기준: 9시 이전은 전날로 친다) ---
+const DAY_START_H = 9;
+function dayKey09(d) { const x = new Date(d); x.setHours(x.getHours() - DAY_START_H); return dateKey(x); }
+// 세션이 9시를 넘기면 앞뒤로 나눠 각 날에 더한다 → { "YYYY-MM-DD": sec }
+function soundSecondsByDay() {
+  const out = {};
+  for (const s of state.soundSessions) {
+    let from = new Date(s.startedAt).getTime();
+    const end = s.endedAt ? new Date(s.endedAt).getTime() : from + (Number(s.durationSec) || 0) * 1000;
+    let guard = 0;
+    while (from < end && guard++ < 100) {
+      const key = dayKey09(from);
+      const next = new Date(key + "T00:00:00"); next.setDate(next.getDate() + 1); next.setHours(DAY_START_H, 0, 0, 0); // 다음 날 09:00
+      const to = Math.min(end, next.getTime());
+      out[key] = (out[key] || 0) + Math.round((to - from) / 1000);
+      from = to;
+    }
+  }
+  return out;
+}
+function renderSoundDays(days) {
+  const by = soundSecondsByDay();
+  const keys = Object.keys(by).sort().reverse().filter((k) => k >= dayKey09(Date.now() - days * 86400000));
+  if (!keys.length) return `<p class="muted" style="margin:0">최근 ${days}일 사용 기록이 없습니다.</p>`;
+  const total = keys.reduce((a, k) => a + by[k], 0);
+  return `<div class="kv" style="margin-bottom:10px"><span>최근 ${days}일 합계 <span class="muted small">(하루는 오전 9시부터 다음 날 오전 9시까지)</span></span><b>${fmtDur(total)}</b></div>
+    <div class="table-wrap"><table class="sound-days"><thead><tr><th scope="col">날짜</th><th scope="col" class="num">하루 합계</th></tr></thead><tbody>
+    ${keys.map((k) => `<tr><td>${k.slice(2)} (${weekdayKo[new Date(k + "T12:00:00").getDay()]})</td><td class="num">${fmtHours(by[k])}</td></tr>`).join("")}
+    </tbody></table></div>`;
+}
+function fmtHours(sec) { return sec >= 3600 ? `${(sec / 3600).toFixed(1)}시간` : `${Math.round(sec / 60)}분`; }
 
 function renderSound(main) {
   const S = window.SOUNDS;
-  const anyReady = S.groups.some((g) => g.items.some((it) => it.youtubeId));
+  const anyReady = S.groups.some((g) => g.items.some(soundReady));
   if (!anyReady) {
     main.innerHTML = `<section class="hero"><div class="eyebrow">소리 치료</div><h1>소리</h1><p class="lead">클리닉에서 소리를 안내해 드리면 여기에 표시됩니다. 아직 준비 중입니다.</p></section>`;
     return;
@@ -754,30 +793,91 @@ function renderSound(main) {
       <div class="player" id="player-wrap"><div class="empty" id="player-empty">아래에서 소리를 골라 누르세요</div><div id="yt-player"></div></div>
       <div class="kv"><span id="now-playing" class="muted">선택된 소리 없음</span><span class="timer" id="timer">00:00</span></div>
       <div class="btn-row"><button class="btn ghost" id="stop-btn" type="button" hidden>■ 멈추기</button></div>
-      <p class="muted small" style="margin:8px 0 0">재생을 누르면 사용 시간이 자동으로 기록되고, 밤 10시~아침 6시 사용은 야간으로 구분됩니다. 휴대폰 화면이 꺼지면 재생이 멈출 수 있으니 취침 시에는 화면 자동 잠금을 길게 설정해 두세요.</p>
+      <p class="muted small" style="margin:8px 0 0">소리를 누르면 화면이 검게 바뀌고 소리가 끊김 없이 반복됩니다. 검은 화면을 두 번 두드리면 멈춥니다. 사용 시간은 자동으로 기록되며, 밤 10시~아침 6시 사용은 야간으로 구분됩니다.</p>
     </div>
     ${S.groups.map((g) => `
       <section class="section">
         <div class="section-head"><h2>${esc(g.title)}</h2></div>
         <p class="muted">${esc(g.desc)}</p>
         <div class="sound-list">${g.items.map((it) => `
-          <button class="sound-item ${it.youtubeId ? "" : "na"}" data-id="${it.id}" ${it.youtubeId ? "" : "disabled"} type="button">
+          <button class="sound-item ${soundReady(it) ? "" : "na"}" data-id="${it.id}" ${soundReady(it) ? "" : "disabled"} type="button">
             <span class="st">${esc(it.title)}</span>
-            <span class="sd">${it.youtubeId ? esc(it.desc) : "준비 중"}</span>
+            <span class="sd">${soundReady(it) ? esc(it.desc) : "준비 중"}</span>
           </button>`).join("")}</div>
       </section>`).join("")}
     <section class="section">
-      <div class="section-head"><h2>최근 사용 기록</h2><a class="more" href="#/records">전체 보기</a></div>
-      <div class="card" id="sound-log">${renderSoundLog(7)}</div>
+      <div class="section-head"><h2>하루 사용 시간</h2><a class="more" href="#/records">전체 보기</a></div>
+      <div class="card" id="sound-log">${renderSoundDays(7)}</div>
     </section>`;
   document.querySelectorAll(".sound-item:not(.na)").forEach((b) => b.onclick = () => playSound(b.dataset.id));
-  $("#stop-btn").onclick = () => { try { yt.player?.pauseVideo(); } catch (e) {} endSession(); $("#stop-btn").hidden = true; };
+  $("#stop-btn").onclick = () => { try { yt.player?.pauseVideo(); } catch (e) {} stopLocal(); endSession(); $("#stop-btn").hidden = true; };
   updateTimer();
+}
+
+// --- 앱 안의 오디오 파일 재생 (Web Audio 로 끊김 없는 반복, 검은 화면) ---
+const local = { ctx: null, node: null, el: null, item: null, hintTimer: null, lock: null, lastTap: 0 };
+async function playLocal(item) {
+  destroyPlayer(); stopLocal();
+  local.item = item; yt.current = item;
+  markPlaying(item.id);
+  $("#now-playing").textContent = item.title;
+  const AC = window.AudioContext || window.webkitAudioContext;
+  let ok = false;
+  if (AC) {
+    try {
+      local.ctx = new AC(); await local.ctx.resume(); // 사용자가 누른 직후에 만들어야 iOS 에서 소리가 남
+      const buf = await (await fetch(item.src)).arrayBuffer();
+      const audio = await new Promise((res, rej) => local.ctx.decodeAudioData(buf, res, rej));
+      if (local.item !== item) return; // 로딩 중 다른 소리를 골랐거나 멈춤
+      const node = local.ctx.createBufferSource(); node.buffer = audio; node.loop = true;
+      node.connect(local.ctx.destination); node.start(0); local.node = node; ok = true;
+    } catch (e) { /* 아래 <audio> 로 대신 */ }
+  }
+  if (!ok) {
+    if (local.item !== item) return;
+    const el = new Audio(item.src); el.loop = true; el.preload = "auto"; local.el = el;
+    try { await el.play(); } catch (e) { toast("소리를 재생하지 못했습니다. 다시 눌러 주세요."); stopLocal(); return; }
+  }
+  startSession();
+  openBlackout();
+}
+function stopLocal() {
+  if (local.node) { try { local.node.stop(); } catch (e) {} local.node = null; }
+  if (local.ctx) { try { local.ctx.close(); } catch (e) {} local.ctx = null; }
+  if (local.el) { try { local.el.pause(); } catch (e) {} local.el = null; }
+  if (local.item) { local.item = null; if (yt.current && !yt.player) yt.current = null; markPlaying(null); const np = $("#now-playing"); if (np) np.textContent = "선택된 소리 없음"; }
+  closeBlackout();
+}
+function openBlackout() {
+  closeBlackout();
+  const el = document.createElement("div"); el.id = "blackout"; el.setAttribute("role", "button"); el.setAttribute("aria-label", "두 번 두드리면 소리를 멈춥니다");
+  el.innerHTML = `<div class="hint show"><b>${esc(local.item?.title || "재생 중")}</b>화면을 두 번 두드리면 멈춥니다</div>`;
+  document.body.appendChild(el);
+  const hint = el.querySelector(".hint");
+  const showHint = (ms) => { hint.classList.add("show"); clearTimeout(local.hintTimer); local.hintTimer = setTimeout(() => hint.classList.remove("show"), ms); };
+  showHint(3500);
+  el.addEventListener("click", () => {
+    const now = Date.now();
+    if (now - local.lastTap < 500) { local.lastTap = 0; stopLocal(); endSession(); const sb = $("#stop-btn"); if (sb) sb.hidden = true; return; }
+    local.lastTap = now; showHint(2000);
+  });
+  if (navigator.wakeLock) navigator.wakeLock.request("screen").then((l) => (local.lock = l)).catch(() => {}); // 화면이 꺼지지 않게 (검은 화면이라 배터리 부담은 작음)
+  document.addEventListener("visibilitychange", reacquireLock);
+}
+function reacquireLock() { if (document.visibilityState === "visible" && $("#blackout") && navigator.wakeLock) navigator.wakeLock.request("screen").then((l) => (local.lock = l)).catch(() => {}); }
+function closeBlackout() {
+  const el = $("#blackout"); if (el) el.remove();
+  clearTimeout(local.hintTimer);
+  if (local.lock) { try { local.lock.release(); } catch (e) {} local.lock = null; }
+  document.removeEventListener("visibilitychange", reacquireLock);
 }
 
 async function playSound(id) {
   const item = allSounds().find((s) => s.id === id);
-  if (!item || !item.youtubeId) return;
+  if (!item) return;
+  if (item.src) return playLocal(item);
+  if (!item.youtubeId) return;
+  stopLocal();
   destroyPlayer(); // 세션 종료 + 기존 플레이어 제거 (loop 목록이 이전 영상에 고정되지 않도록 매번 새로 만듦)
   yt.current = item;
   markPlaying(id);
@@ -807,23 +907,27 @@ function onPlayerState(e) {
   if (e.data === S.PLAYING) startSession();
   else if (e.data === S.PAUSED || e.data === S.ENDED) endSession();
 }
+// 세션은 시작하자마자 기록에 넣고 30초마다 길이를 갱신한다 (배터리가 다 되거나 앱이 꺼져도 그때까지의 시간은 남는다)
 function startSession() {
   const sb = $("#stop-btn"); if (sb) sb.hidden = false;
   if (yt.session || !yt.current) return;
-  yt.session = { soundId: yt.current.id, title: yt.current.title, startedAt: new Date().toISOString(), timeOfDay: timeOfDayNow() };
-  clearInterval(yt.tick); yt.tick = setInterval(updateTimer, 1000);
+  yt.session = { soundId: yt.current.id, title: yt.current.title, startedAt: new Date().toISOString(), timeOfDay: timeOfDayNow(), durationSec: 0 };
+  clearInterval(yt.tick); yt.tick = setInterval(() => { updateTimer(); if (Math.floor((Date.now() - new Date(yt.session.startedAt)) / 1000) % 30 === 0) touchSession(); }, 1000);
+}
+function touchSession(final = false) {
+  const s = yt.session; if (!s) return;
+  const ended = new Date();
+  s.endedAt = ended.toISOString(); s.durationSec = Math.round((ended - new Date(s.startedAt)) / 1000);
+  const i = state.soundSessions.indexOf(s);
+  if (s.durationSec >= 10) { if (i < 0) state.soundSessions.push(s); save(); }
+  else if (final && i >= 0) { state.soundSessions.splice(i, 1); save(); }
 }
 function endSession() {
   clearInterval(yt.tick);
   if (!yt.session) return;
-  const s = yt.session; yt.session = null;
-  const ended = new Date();
-  const dur = Math.round((ended - new Date(s.startedAt)) / 1000);
-  if (dur >= 10) {
-    state.soundSessions.push({ ...s, endedAt: ended.toISOString(), durationSec: dur, timeOfDay: s.timeOfDay || timeOfDayNow() });
-    save();
-    const log = $("#sound-log"); if (log) log.innerHTML = renderSoundLog(7);
-  }
+  touchSession(true);
+  yt.session = null;
+  const log = $("#sound-log"); if (log) log.innerHTML = renderSoundDays(7);
   updateTimer();
 }
 function updateTimer() {
@@ -892,6 +996,7 @@ function renderRecords(main) {
 
     <section class="section">
       <div class="section-head"><h2>소리 치료 사용</h2><a class="more" href="#/sound">사운드</a></div>
+      <div class="card">${renderSoundDays(30)}</div>
       <div class="card">${renderSoundLog(30, 60)}</div>
     </section>`;
   $("#print-btn").onclick = () => window.print();
