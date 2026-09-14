@@ -187,6 +187,12 @@
     "worksheets": [
      "week8_worksheet"
     ],
+    "wsValues": {
+     "warning_signs": "이명 체크가 잦아짐, 어깨가 굳음, 잠들기 걱정이 미리 듦",
+     "first_action": "축약 이완 1분 → 사운드 켜기 → 하던 일로 주의 옮기기",
+     "helpful_thoughts": "\"파도일 뿐, 내려간다\", \"소리는 같아도 내 반응은 내가 정한다\"",
+     "backup_plan": "PMR 매일로 복귀, 수면 루틴 재점검, 2주 이상이면 클리닉 연락"
+    },
     "diary": [
      {
       "date": "오늘",

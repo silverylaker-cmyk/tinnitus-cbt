@@ -201,6 +201,12 @@
     "worksheets": [
      "week2_worksheet"
     ],
+    "wsValues": {
+     "situation": "밤 11시, 침대에 누워 잠들려던 참",
+     "automatic_thought": "오늘도 이 소리 때문에 못 자겠다. 내일 완전히 망가지겠지",
+     "emotion_intensity": "불안 7, 짜증 5",
+     "pattern_found": "최악을 예상하기 — 아직 일어나지 않은 내일 일을 확정처럼 생각함"
+    },
     "diary": [
      {
       "date": "오늘",

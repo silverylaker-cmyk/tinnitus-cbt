@@ -196,6 +196,10 @@
     "worksheets": [
      "week8_act"
     ],
+    "wsValues": {
+     "value_direction": "손주들과 즐겁게 시간을 보내는 할머니, 친구들과 나들이를 다니는 사람",
+     "committed_action": "이번 주 토요일 친구에게 전화해서 나들이 날짜 정하기"
+    },
     "diary": [
      {
       "date": "오늘",

@@ -210,6 +210,12 @@
     "worksheets": [
      "week6_worksheet"
     ],
+    "wsValues": {
+     "cue_word": "편안",
+     "tension_spots": "어깨가 올라감, 이를 꽉 물게 됨",
+     "trigger_plan": "업무 중 이명이 거슬릴 때, 잠자리에서 깼을 때",
+     "application_log": "화요일 회의 중 시도. 긴장 7→4, 이명에서 회의로 주의가 돌아옴"
+    },
     "diary": [
      {
       "date": "오늘",

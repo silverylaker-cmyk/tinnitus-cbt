@@ -144,7 +144,35 @@
       "tinnitus": 5,
       "annoyance": 4,
       "sleep": 6,
-      "memo": "23:10 누움, 20분쯤 걸려 잠듦…"
+      "memo": "23:10 누움, 20분쯤 걸려 잠듦, 새벽 1회 깸"
+     },
+     {
+      "date": "어제",
+      "tinnitus": 5,
+      "annoyance": 5,
+      "sleep": 5,
+      "memo": "23:40 누움, 30분쯤 걸림"
+     },
+     {
+      "date": "2일 전",
+      "tinnitus": 6,
+      "annoyance": 5,
+      "sleep": 7,
+      "memo": "새벽 2회 깸"
+     },
+     {
+      "date": "3일 전",
+      "tinnitus": 4,
+      "annoyance": 3,
+      "sleep": 3,
+      "memo": ""
+     },
+     {
+      "date": "4일 전",
+      "tinnitus": 5,
+      "annoyance": 4,
+      "sleep": 4,
+      "memo": "사운드 켜고 잠"
      }
     ]
    }

@@ -239,6 +239,13 @@
     "worksheets": [
      "week4_worksheet"
     ],
+    "wsValues": {
+     "belief": "이명 때문에 조용한 카페에서 책을 못 읽는다",
+     "prediction": "소리에만 신경 쓰여서 5분도 못 읽고 나올 것이다 (확신 80%)",
+     "experiment_plan": "토요일 오후, 집 근처 카페에서 30분 책 읽기",
+     "actual_result": "처음 10분은 거슬렸지만 책에 빠지자 잊었고 40분을 읽었다",
+     "learning": "생각보다 할 수 있었다. 확신도 80% → 40%"
+    },
     "diary": [
      {
       "date": "오늘",

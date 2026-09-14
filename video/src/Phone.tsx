@@ -336,7 +336,8 @@ const RecordsView: React.FC<{ program: any; vstate: any; tapCls: (s: string) => 
           const m = program.modules.find((mm: any) => mm.id === id); if (!m) return null;
           const scr = m.screens.find((s: any) => s.type === "worksheet");
           const fields = scr?.fields || [];
-          const rows = fields.map((f: any) => [f.label, example(f.placeholder)]).filter(([, v]: any) => v);
+          const vals = vstate?.wsValues || null; // 영상에서 실제로 적은 내용 (없으면 예시 문구)
+          const rows = fields.map((f: any) => [f.label, vals ? vals[f.key] : example(f.placeholder)]).filter(([, v]: any) => v);
           return (
             <div className="card" key={id}>
               <div className="section-head"><h3>{m.title}</h3><a className={"more" + tapCls("#records .ws a.more")}>열어서 고치기</a></div>

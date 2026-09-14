@@ -116,7 +116,7 @@ function singleAfter(b, idx, responses, extraCues) {
   });
 }
 // 프로그램 목록에서 다시 들어가기 → 기록 탭
-function reopen(b, idx, { single = false, label = null } = {}) {
+function reopen(b, idx, { single = false, label = null, responses = null } = {}) {
   const m = b.m;
   const name = label || m.title;
   b.scene(idx, "program", null, (t) => {
@@ -124,7 +124,7 @@ function reopen(b, idx, { single = false, label = null } = {}) {
     t.x(`p${idx}-list`, single ? "다시 열면 전에 적은 내용이 그대로 채워져 있습니다. 고친 뒤 다시 저장하면 새 내용으로 바뀝니다." : "이미 쓴 기록은 그 화면 아래에 모여 있고, 새로 적어 저장하면 하나 더 쌓입니다.");
   });
   // 2주차부터는 이미 일기가 쌓여 있는 상태로 보여 준다 (1주차 워크시트 시점에는 일기를 아직 시작하지 않음)
-  b.scene(idx, "records", { worksheets: [m.id], diary: m.week >= 2 ? SAMPLE_DIARY : [] }, (t) => {
+  b.scene(idx, "records", { worksheets: [m.id], wsValues: responses, diary: m.week >= 2 ? SAMPLE_DIARY : [] }, (t) => {
     t.x(`r${idx}-tab`, "'기록' 탭을 누르면 지금까지 쓴 기록을 한꺼번에 볼 수 있습니다.", { point: '[data-route="records"]', tap: true });
     t.x(`r${idx}-ws`, "워크시트 기록은 모듈 이름 아래에 모여 있습니다. '열어서 고치기'를 누르면 그 화면으로 바로 갑니다.", { point: "#records .ws a.more" });
   });
@@ -174,7 +174,7 @@ export const PLAN = {
       t.save();
     }, { image: img("concept-cycle.webp", "1주차 악순환 고리 화면·워크시트 (기존 프롬프트 문서 B 참조, 아직 생성 안 됨)", "A circular diagram made of six small abstract icons connected by thin ink arrows into a loop: a small sound mark (three arcs), a thought cloud, a heart with a tremble line, a tense shoulder shape, a larger sound mark, and back to the start. No labels, no numbers. One arrow is terracotta to show the loop can be cut there. Centered on cream, square composition.") });
     appendAfter(b, 0, ex, "trigger_situation");
-    reopen(b, 0);
+    reopen(b, 0, { responses: ex });
   },
 
   week1_homework(b) {
@@ -255,7 +255,7 @@ export const PLAN = {
       t.save();
     });
     appendAfter(b, 0, ex, "situation");
-    reopen(b, 0);
+    reopen(b, 0, { responses: ex });
   },
 
   week2_homework(b) {
@@ -383,7 +383,7 @@ export const PLAN = {
       t.x("e0-save", "버튼이 '수정한 내용 저장'으로 바뀌어 있습니다. 누르면 한 실험이 한 기록에 모입니다.", { point: "#next-btn", tap: true });
       t.x("e0-new", "새 실험은 빈 칸에 새로 적고 저장하면 기록이 하나 더 쌓입니다.", { point: t.fieldSel("belief") });
     });
-    reopen(b, 0);
+    reopen(b, 0, { responses: done });
   },
 
   week4_homework(b) {
@@ -492,7 +492,7 @@ export const PLAN = {
       t.x("l0-ex", "예를 들어, 화요일 회의 중 시도. 긴장 칠에서 사, 이명에서 회의로 주의가 돌아옴.", { type: { key: "application_log", text: "화요일 회의 중 시도. 긴장 7→4, 이명에서 회의로 주의가 돌아옴" } });
       t.x("l0-save", "그리고 '저장하고 다음'을 다시 누릅니다. 시도할 때마다 이렇게 줄을 더해 갑니다.", { point: "#next-btn", tap: true });
     });
-    reopen(b, 0, { single: true });
+    reopen(b, 0, { single: true, responses: { ...ex, application_log: "화요일 회의 중 시도. 긴장 7→4, 이명에서 회의로 주의가 돌아옴" } });
   },
 
   week6_homework(b) {
@@ -547,7 +547,7 @@ export const PLAN = {
     singleAfter(b, 0, ex, (t) => {
       t.x("a0-adj", "한 주 해 보고 맞지 않는 부분은 다시 열어 고치면 됩니다. 다음 진료에서 선생님과 함께 조정하기도 합니다.");
     });
-    reopen(b, 0, { single: true });
+    reopen(b, 0, { single: true, responses: ex });
   },
 
   week7_homework(b) {
@@ -563,7 +563,13 @@ export const PLAN = {
       t.x("d0-clock", "잠들기까지 걸린 시간은 시계를 보지 말고 느낌으로만 적습니다.");
       t.x("d0-save", "저장하면 됩니다. 야간 사운드는 소리 탭에서 재생만 하면 자동으로 야간 사용으로 기록됩니다.", { point: "#diary-form button[type=submit]", tap: true });
     });
-    b.scene(0, "records", { diary: [{ date: "오늘", tinnitus: 5, annoyance: 4, sleep: 6, memo: "23:10 누움, 20분쯤 걸려 잠듦…" }] }, (t) => {
+    b.scene(0, "records", { diary: [
+      { date: "오늘", tinnitus: 5, annoyance: 4, sleep: 6, memo: "23:10 누움, 20분쯤 걸려 잠듦, 새벽 1회 깸" },
+      { date: "어제", tinnitus: 5, annoyance: 5, sleep: 5, memo: "23:40 누움, 30분쯤 걸림" },
+      { date: "2일 전", tinnitus: 6, annoyance: 5, sleep: 7, memo: "새벽 2회 깸" },
+      { date: "3일 전", tinnitus: 4, annoyance: 3, sleep: 3, memo: "" },
+      { date: "4일 전", tinnitus: 5, annoyance: 4, sleep: 4, memo: "사운드 켜고 잠" },
+    ] }, (t) => {
       t.x("r0-tab", "일주일 치가 쌓이면 기록 탭에서 수면 영향 점수의 흐름과 메모를 함께 볼 수 있습니다. 다음 진료 때 이 화면을 선생님과 같이 봅니다.", { point: '[data-route="records"]', tap: true });
     });
   },
@@ -598,7 +604,7 @@ export const PLAN = {
     singleAfter(b, 2, { value_direction: "손주들과 즐겁게 시간을 보내는 할머니, 친구들과 나들이를 다니는 사람", committed_action: "이번 주 토요일 친구에게 전화해서 나들이 날짜 정하기" }, (t) => {
       t.x("a2-later", "프로그램이 끝난 뒤에도 이 화면을 다시 열어 새로운 행동으로 바꿔 적을 수 있습니다.");
     });
-    reopen(b, 2, { single: true, label: "나의 가치와 전념 행동" });
+    reopen(b, 2, { single: true, label: "나의 가치와 전념 행동", responses: { value_direction: "손주들과 즐겁게 시간을 보내는 할머니, 친구들과 나들이를 다니는 사람", committed_action: "이번 주 토요일 친구에게 전화해서 나들이 날짜 정하기" } });
   },
 
   week8_psychoeducation(b) {
@@ -630,7 +636,7 @@ export const PLAN = {
     singleAfter(b, 0, ex, (t) => {
       t.x("a0-open", "이 카드는 프로그램이 끝난 뒤에도 프로그램 목록에서 언제든 다시 열어 볼 수 있습니다. 파도가 왔을 때 열어 보세요.");
     });
-    reopen(b, 0, { single: true });
+    reopen(b, 0, { single: true, responses: ex });
   },
 
   week8_summary(b) {

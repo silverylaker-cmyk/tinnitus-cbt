@@ -222,6 +222,12 @@
     "worksheets": [
      "week1_worksheet"
     ],
+    "wsValues": {
+     "trigger_situation": "조용한 방에서 잠들려 할 때",
+     "automatic_thought": "이러다 잠을 못 자겠다",
+     "emotion": "불안, 짜증",
+     "body_reaction": "어깨가 긴장되고 귀에 더 집중하게 됨"
+    },
     "diary": []
    }
   }
