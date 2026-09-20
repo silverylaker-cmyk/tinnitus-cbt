@@ -350,6 +350,7 @@ const EXTRAS = {
   "week1_psychoeducation:1": "cycle",
   "week3_training:0": "breath",
   "week5_training:1": "pmr",
+  "week5_training:2": "pmr-short",
   "week6_psychoeducation:1": "breath-cue",
   "week7_psychoeducation:2": "img:night",
   "week1_worksheet:0": "img:cycle",
@@ -443,10 +444,11 @@ function mountExtra(kind, el, screen) {
     const cue = kind === "breath-cue" ? (state.worksheets.week6_worksheet?.single?.cue_word || "") : "";
     el.innerHTML = `<h3 class="extra-title">${kind === "breath-cue" ? "호흡–단서어 연습" : "지금 바로 연습하기"}</h3><p class="muted">${kind === "breath-cue" ? (cue ? `내쉴 때 단서어 <b>'${esc(cue)}'</b>가 표시됩니다.` : "다음 워크시트에서 단서어를 정하면 내쉴 때 그 단어가 표시됩니다.") : "원이 커질 때 들이쉬고, 작아질 때 내쉽니다. 이명이 들려도 그대로 두고 호흡으로 돌아오면 됩니다."}</p><div id="breath"></div>`;
     cleanup = ART.mountBreath($("#breath"), { cue, onDone: () => markPractice("mindfulness", el) });
-  } else if (kind === "pmr") {
+  } else if (kind === "pmr" || kind === "pmr-short") {
     const parts = ART.parsePMRParts(screen.body);
-    el.innerHTML = `<h3 class="extra-title">안내에 따라 해보기</h3><p class="muted">시작을 누르면 부위마다 긴장·이완 시간을 세어 줍니다. 순서는 위 목록과 같습니다.</p><div id="pmr"></div>`;
-    cleanup = ART.mountPMR($("#pmr"), parts, { onDone: () => markPractice("pmr", el) });
+    const short = kind === "pmr-short";
+    el.innerHTML = `<h3 class="extra-title">${short ? "짧은 버전 안내에 따라 해보기" : "안내에 따라 해보기"}</h3><p class="muted">시작을 누르면 부위마다 긴장·이완 시간을 세어 줍니다. 순서는 위 목록과 같습니다. 남은 긴장이 느껴지면 '다시 이 부위'로 한 번 더 할 수 있습니다.</p><div id="pmr"></div>`;
+    cleanup = ART.mountPMR($("#pmr"), parts, { label: short ? "짧은 버전" : "전신", onDone: () => markPractice("pmr", el) });
   }
 }
 // 실습을 마치면 오늘 일기에 자동 체크

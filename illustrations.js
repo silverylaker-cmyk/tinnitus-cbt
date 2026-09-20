@@ -109,36 +109,44 @@
 
   // ---------- 점진적 근육이완 안내 타이머 ----------
   A.mountPMR = function (el, parts, opts = {}) {
-    const TENSE = opts.tense || 7, RELAX = opts.relax || 12;
+    const TENSE = opts.tense || 7, RELAX = opts.relax || 12, RELAX_ONLY = opts.relaxOnly || 20;
+    const label = opts.label || "전신";
     el.innerHTML = `
       <div class="pmr">
-        <div class="pmr-head"><span class="pmr-step">전신 ${parts.length}부위</span><span class="pmr-count"></span></div>
+        <div class="pmr-head"><span class="pmr-step">${label} ${parts.length}부위</span><span class="pmr-count"></span></div>
         <div class="pmr-part" aria-live="polite">시작을 누르면 한 부위씩 안내합니다</div>
         <div class="pmr-how">긴장 ${TENSE}초 → 이완 ${RELAX}초. 아프지 않을 정도(70~80% 힘)로만 조입니다.</div>
         <div class="pmr-bar"><i></i></div>
+        <label class="check pmr-mode"><input type="checkbox" class="pmr-relax-only"> 이완만 하기 (긴장 단계 생략, 부위마다 ${RELAX_ONLY}초)</label>
         <div class="btn-row center">
           <button class="btn accent pmr-start" type="button">시작</button>
+          <button class="btn ghost pmr-again" type="button" hidden>다시 이 부위</button>
           <button class="btn ghost pmr-next" type="button" hidden>다음 부위</button>
           <button class="btn ghost pmr-stop" type="button" hidden>멈추기</button>
         </div>
       </div>`;
     const stepEl = el.querySelector(".pmr-step"), countEl = el.querySelector(".pmr-count"), partEl = el.querySelector(".pmr-part"), howEl = el.querySelector(".pmr-how"), bar = el.querySelector(".pmr-bar i");
-    const start = el.querySelector(".pmr-start"), next = el.querySelector(".pmr-next"), stop = el.querySelector(".pmr-stop");
-    let idx = 0, phaseStart = 0, tense = true, timer = null;
+    const start = el.querySelector(".pmr-start"), again = el.querySelector(".pmr-again"), next = el.querySelector(".pmr-next"), stop = el.querySelector(".pmr-stop"), modeBox = el.querySelector(".pmr-relax-only");
+    let idx = 0, phaseStart = 0, tense = true, timer = null, relaxOnly = false;
+    const relaxDur = () => (relaxOnly ? RELAX_ONLY : RELAX);
+    function idle() {
+      howEl.textContent = relaxOnly ? `긴장 없이 이완만: 부위마다 ${RELAX_ONLY}초 동안 숨을 내쉬며 힘을 뺍니다.` : `긴장 ${TENSE}초 → 이완 ${RELAX}초. 아프지 않을 정도(70~80% 힘)로만 조입니다.`;
+    }
     function show() {
       const p = parts[idx];
       stepEl.textContent = `${idx + 1} / ${parts.length}`;
       partEl.innerHTML = `<b>${p.name}</b><span>${p.how}</span>`;
       el.querySelector(".pmr").classList.toggle("tense", tense);
-      howEl.textContent = tense ? "숨을 들이쉬며 힘껏 조입니다" : "'후—' 하고 내쉬며 한 번에 힘을 풉니다. 풀린 느낌을 음미하세요";
+      howEl.textContent = tense ? "숨을 들이쉬며 힘껏 조입니다 (숨은 참지 않기)" : relaxOnly ? "조이지 않습니다. 숨을 길게 내쉴 때마다 이 부위의 힘이 조금씩 더 빠진다고 느껴보세요" : "'후—' 하고 내쉬며 한 번에 힘을 풉니다. 무겁고 따뜻해지는 느낌을 음미하세요";
     }
+    function beginPart(i) { idx = i; tense = !relaxOnly; phaseStart = Date.now(); show(); }
     function tick() {
-      const dur = tense ? TENSE : RELAX, t = (Date.now() - phaseStart) / 1000;
+      const dur = tense ? TENSE : relaxDur(), t = (Date.now() - phaseStart) / 1000;
       countEl.textContent = `${tense ? "긴장" : "이완"} ${Math.max(0, Math.ceil(dur - t))}`;
       bar.style.width = `${Math.min(100, (t / dur) * 100)}%`;
       if (t >= dur) {
         if (tense) { tense = false; phaseStart = Date.now(); show(); }
-        else if (idx < parts.length - 1) { idx++; tense = true; phaseStart = Date.now(); show(); }
+        else if (idx < parts.length - 1) beginPart(idx + 1);
         else finish(true);
       }
     }
@@ -146,19 +154,21 @@
       clearInterval(timer); timer = null;
       el.querySelector(".pmr").classList.remove("tense");
       countEl.textContent = ""; bar.style.width = "0%";
-      partEl.innerHTML = done ? "<b>모든 부위를 마쳤습니다</b><span>1~2분간 천천히 복식호흡을 하며 전신이 무겁고 따뜻해진 느낌을 그대로 느껴보세요. 일어날 때는 천천히.</span>" : "시작을 누르면 한 부위씩 안내합니다";
-      howEl.textContent = done ? "오늘 일기에 '근육이완' 체크가 자동으로 표시되었습니다. 메모란에 전후 긴장도를 적고 저장해 주세요." : `긴장 ${TENSE}초 → 이완 ${RELAX}초.`;
-      stepEl.textContent = `전신 ${parts.length}부위`;
-      start.hidden = false; next.hidden = true; stop.hidden = true;
+      partEl.innerHTML = done ? "<b>모든 부위를 마쳤습니다</b><span>1~2분간 천천히 복식호흡을 하며 전신이 무겁고 따뜻해진 느낌을 그대로 느껴보세요. 머리부터 발끝까지 훑어보며 아직 긴장이 남은 곳이 있으면 내쉬는 숨과 함께 놓아줍니다. 일어날 때는 천천히.</span>" : "시작을 누르면 한 부위씩 안내합니다";
+      if (done) howEl.textContent = "오늘 일기에 '근육이완' 체크가 자동으로 표시되었습니다. 메모란에 전후 긴장도(0~10)를 적고 저장해 주세요."; else idle();
+      stepEl.textContent = `${label} ${parts.length}부위`;
+      start.hidden = false; again.hidden = true; next.hidden = true; stop.hidden = true; modeBox.disabled = false;
       if (done && opts.onDone) opts.onDone();
     }
-    start.onclick = () => { idx = 0; tense = true; phaseStart = Date.now(); start.hidden = true; next.hidden = false; stop.hidden = false; show(); tick(); timer = setInterval(tick, 200); };
-    next.onclick = () => { if (idx < parts.length - 1) { idx++; tense = true; phaseStart = Date.now(); show(); } else finish(true); };
+    modeBox.onchange = () => { relaxOnly = modeBox.checked; idle(); };
+    start.onclick = () => { start.hidden = true; again.hidden = false; next.hidden = false; stop.hidden = false; modeBox.disabled = true; beginPart(0); tick(); timer = setInterval(tick, 200); };
+    again.onclick = () => beginPart(idx);
+    next.onclick = () => { if (idx < parts.length - 1) beginPart(idx + 1); else finish(true); };
     stop.onclick = () => finish(false);
     return () => clearInterval(timer);
   };
 
-  // 주차 5 원고의 14부위 (원고 텍스트에서 파싱)
+  // 주차 5 원고의 부위 목록 (원고 텍스트 '1. 부위 — 방법' 줄에서 파싱)
   A.parsePMRParts = function (body) {
     return (body || "").split("\n").map((l) => /^(\d+)\. (.+?) — (.+)$/.exec(l.trim())).filter(Boolean).map((m) => ({ name: m[2], how: m[3] }));
   };

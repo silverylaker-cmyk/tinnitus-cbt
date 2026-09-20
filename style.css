@@ -340,6 +340,7 @@ td.num { font-variant-numeric: tabular-nums; }
 .pmr-part b { display: block; font-family: var(--serif); font-size: 1.6rem; font-weight: 400; }
 .pmr-part span { display: block; color: var(--ink-2); }
 .pmr-how { color: var(--ink-3); font-size: .95rem; margin-bottom: 12px; }
+.pmr-mode { margin: 12px 0 4px; color: var(--ink-2); font-size: .95rem; }
 .pmr-bar { height: 8px; background: var(--bg-2); border-radius: 4px; overflow: hidden; }
 .pmr-bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .2s linear; }
 
