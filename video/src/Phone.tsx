@@ -10,7 +10,7 @@ const SOUNDS = (window as any).SOUNDS;
 const KIND_LABEL: Record<string, string> = { learn: "학습", write: "작성", homework: "숙제", assess: "확인", summary: "정리" };
 // app.js 의 EXTRAS 와 같게 유지
 const EXTRAS: Record<string, string> = {
-  "week1_psychoeducation:1": "cycle", "week3_training:0": "breath", "week5_training:1": "pmr-video", "week5_training:2": "pmr", "week6_psychoeducation:1": "breath-cue", "week7_psychoeducation:2": "img:night",
+  "week1_psychoeducation:1": "cycle", "week3_training:0": "breath", "week5_training:1": "pmr", "week6_psychoeducation:1": "breath-cue", "week7_psychoeducation:2": "img:night",
   "week1_worksheet:0": "img:cycle", "week1_homework:0": "img:diary", "week2_psychoeducation:2": "img:thought-record",
   "week7_psychoeducation:1": "img:sleep-hygiene", "week8_psychoeducation:0": "img:toolbox", "week8_psychoeducation:1": "img:wave",
 };
@@ -145,7 +145,6 @@ const ModuleView: React.FC<{ program: any; mod: any; index: number; screen: any;
         <div className="tts"><button className={"btn ghost sm" + tapCls("#tts-btn")} id="tts-btn" type="button">🔈 소리로 듣기</button></div>
         <Body blocks={blocks} st={st} />
         {extraHtml && <div id="extra" dangerouslySetInnerHTML={{ __html: extraHtml }} />}
-        {extra === "pmr-video" && <div id="extra"><h3 className="extra-title">영상으로 따라 하기</h3><div className="video-embed" style={{ position: "relative" }}><Img src={ASSET("img/week5-pmr-video.webp")} style={{ display: "block", width: "100%" }} /><div className="play" style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%,-50%)", width: 96, height: 68, borderRadius: 18, background: "rgba(20,20,19,.72)", display: "grid", placeItems: "center", color: "#fff", fontSize: 34 }}>▶</div></div></div>}
         {conceptImg && <div id="extra"><figure className="concept"><Img src={ASSET(conceptImg)} /><figcaption>{ART.CAPTIONS?.[conceptKey!] || ""}</figcaption></figure></div>}
         <div id="fields">
           {screen.type === "worksheet" && (

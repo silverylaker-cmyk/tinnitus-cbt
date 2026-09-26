@@ -349,8 +349,7 @@ let viewer = null;
 const EXTRAS = {
   "week1_psychoeducation:1": "cycle",
   "week3_training:0": "breath",
-  "week5_training:1": "pmr-video",
-  "week5_training:2": "pmr",
+  "week5_training:1": "pmr",
   "week6_psychoeducation:1": "breath-cue",
   "week7_psychoeducation:2": "img:night",
   "week1_worksheet:0": "img:cycle",
@@ -444,24 +443,6 @@ function mountExtra(kind, el, screen) {
     const cue = kind === "breath-cue" ? (state.worksheets.week6_worksheet?.single?.cue_word || "") : "";
     el.innerHTML = `<h3 class="extra-title">${kind === "breath-cue" ? "호흡–단서어 연습" : "지금 바로 연습하기"}</h3><p class="muted">${kind === "breath-cue" ? (cue ? `내쉴 때 단서어 <b>'${esc(cue)}'</b>가 표시됩니다.` : "다음 워크시트에서 단서어를 정하면 내쉴 때 그 단어가 표시됩니다.") : "원이 커질 때 들이쉬고, 작아질 때 내쉽니다. 이명이 들려도 그대로 두고 호흡으로 돌아오면 됩니다."}</p><div id="breath"></div>`;
     cleanup = ART.mountBreath($("#breath"), { cue, onDone: () => markPractice("mindfulness", el) });
-  } else if (kind === "pmr-video") {
-    // 복지부 근육이완 영상(편집본). youtubeId 는 content/week5/training.json 에 넣습니다 (미등록 업로드)
-    const id = screen.youtubeId || "";
-    el.innerHTML = `<h3 class="extra-title">영상으로 따라 하기</h3>` + (id
-      ? `<div class="video-embed"><div id="pmr-yt"></div></div>`
-      : `<figure class="video-embed poster"><img src="img/week5-pmr-video.webp" alt="근육이완 영상 미리보기"><figcaption>영상은 준비 중입니다. 그동안 다음 화면의 타이머로 연습해 주세요.</figcaption></figure>`);
-    if (id) {
-      let player = null, alive = true;
-      loadYouTubeAPI().then(() => {
-        if (!alive || !$("#pmr-yt")) return;
-        player = new YT.Player("pmr-yt", {
-          host: "https://www.youtube-nocookie.com", videoId: id,
-          playerVars: { rel: 0, modestbranding: 1, playsinline: 1, origin: location.origin },
-          events: { onStateChange: (e) => { if (e.data === YT.PlayerState.ENDED) markPractice("pmr", el); } },
-        });
-      });
-      cleanup = () => { alive = false; try { if (player) player.destroy(); } catch (e) { /* 이미 사라짐 */ } };
-    }
   } else if (kind === "pmr") {
     const parts = ART.parsePMRParts(screen.body);
     el.innerHTML = `<h3 class="extra-title">안내에 따라 해보기</h3><p class="muted">시작을 누르면 위 순서대로 부위마다 긴장 7초 → 이완 15초를 세어 주고, 장면 안내를 보여 줍니다. 바뀔 때 소리가 나니 눈을 감고 해도 됩니다.</p><div id="pmr"></div>`;

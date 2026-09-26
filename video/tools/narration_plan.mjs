@@ -50,7 +50,7 @@ export const META = {
     week4_homework: { drama: "—", mode: "상세" },
     week4_summary: { drama: "W4-A/B", mode: "요약" },
     week5_psychoeducation: { drama: "W5-A", mode: "요약" },
-    week5_training: { drama: "—", mode: "상세", note: "준비, 기본 동작, 호흡은 상세. 복지부 영상 화면은 보는 법만 안내(영상이 동작을 직접 보여 줌). 10단계 목록은 요약, 타이머 도구(시작, 소리 알림, 자동 체크)는 상세" },
+    week5_training: { drama: "—", mode: "상세", note: "준비, 기본 동작, 호흡, 발→이마 10단계(장면 떠올리기), 타이머 도구(시작, 소리 알림, 자동 체크)" },
     week5_homework: { drama: "—", mode: "상세", note: "전후 긴장도를 일기 메모에 적는 예시" },
     week5_summary: { drama: "W5-A", mode: "요약" },
     week6_psychoeducation: { drama: "W6-A", mode: "혼합", note: "첫 화면 요약. 축약 이완 3단계와 어깨·턱·이마, 호흡–단서어 도구는 상세" },
@@ -410,25 +410,20 @@ export const PLAN = {
   week5_training(b) {
     b.screen(0, (t) => {
       t.intro();
-      t.raw("lead", "드라마 영상에서는 원리만 다루었고, 실제 방법은 이 모듈에 있습니다. 먼저 준비와 기본 동작을 보겠습니다.");
+      t.raw("lead", "영상에서는 원리만 다루었고, 실제 방법은 이 화면과 다음 화면에 있습니다. 자세히 보겠습니다.");
       t.readAll();
       t.next();
     });
     b.screen(1, (t) => {
-      t.raw("lead", "이 화면에는 보건복지부 마음허그의 근육이완 훈련 영상이 들어 있습니다. 처음 한두 번은 이 영상을 보며 따라 하시면 됩니다.");
-      t.raw("v1", "영상을 누르면 재생됩니다. 오른쪽 위 카드에 지금 부위와 몇 번째인지, 힘을 줄 때와 풀 때의 남은 시간이 나옵니다.", { point: "#extra .video-embed", tap: true });
-      t.raw("v2", "영상에서는 힘을 주는 시간이 조금 깁니다. 칠십에서 팔십 퍼센트 힘으로 조인 채 유지만 하고, 아프면 바로 힘을 푸세요.");
-      t.raw("v3", "영상을 끝까지 보면 오늘 일기에 '근육이완' 체크가 자동으로 표시됩니다.");
-      t.next();
-    });
-    b.screen(2, (t) => {
-      t.skim("영상과 같은 순서를 글로 정리한 화면입니다. 발, 배, 왼손, 오른손, 어깨, 고개 돌리기, 목 뒤, 입꼬리 양쪽, 이마까지 열 단계입니다. 떠올릴 장면과 푸는 방법이 함께 적혀 있으니 천천히 읽어 보세요.");
-      t.raw("tool1", "익숙해지면 영상 없이 혼자 연습합니다. 본문 아래 '안내에 따라 해보기'에서 '시작'을 누르면 부위마다 긴장 칠 초, 이완 십오 초를 세어 줍니다.", { point: "#pmr .btn", tap: true });
-      t.raw("tool2", "화면에 지금 어느 부위인지, 힘을 줄 때인지 풀 때인지가 크게 표시됩니다. 바뀔 때마다 작은 소리로 알려 주니 눈을 감고도 할 수 있습니다. 전체 약 칠 분입니다.", { point: "#pmr" });
+      t.raw("lead", "이제 순서입니다. 발에서 시작해 배, 팔, 어깨, 목을 지나 얼굴까지 올라갑니다. 모두 열 단계이고, 부위마다 떠올릴 장면이 있습니다.");
+      t.readAll();
+      t.raw("tool1", "본문 아래 '안내에 따라 해보기'에서 '시작'을 누르면 부위마다 긴장 칠 초, 이완 십오 초를 세어 줍니다.", { point: "#pmr .btn", tap: true });
+      t.raw("tool2", "화면에 지금 어느 부위인지, 힘을 줄 때인지 풀 때인지가 크게 표시됩니다. 바뀔 때마다 작은 소리로 알려 주니 눈을 감고도 할 수 있습니다.", { point: "#pmr" });
       t.raw("tool3", "끝까지 마치면 오늘 일기에 '근육이완' 체크가 자동으로 표시됩니다.");
       t.next();
-    });
+    }, { image: img("concept-pmr-body.webp", "5주차 근육이완 전신 순서 화면", "A simplified standing human outline drawn with one continuous thin ink line, front view, no face. Along the body, fourteen small terracotta dots mark the sequence points: both hands, both upper arms, forehead, eyes, jaw, shoulders, chest, belly, both thighs, both calves. A faint dotted ink path connects the dots from the right hand down to the left foot, suggesting order. Lots of cream space. Concept: tense and release, one part at a time, top to bottom.") });
   },
+
   week5_homework(b) {
     b.screen(0, (t) => {
       t.intro();
