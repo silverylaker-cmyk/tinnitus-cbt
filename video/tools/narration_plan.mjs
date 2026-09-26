@@ -50,7 +50,7 @@ export const META = {
     week4_homework: { drama: "—", mode: "상세" },
     week4_summary: { drama: "W4-A/B", mode: "요약" },
     week5_psychoeducation: { drama: "W5-A", mode: "요약" },
-    week5_training: { drama: "—", mode: "상세", note: "준비, 기본 동작, 호흡, 14부위 순서, 타이머 도구(시작, 자동 체크)" },
+    week5_training: { drama: "—", mode: "상세", note: "준비, 기본 동작, 호흡, 발→이마 10단계(장면 떠올리기), 타이머 도구(시작, 소리 알림, 자동 체크)" },
     week5_homework: { drama: "—", mode: "상세", note: "전후 긴장도를 일기 메모에 적는 예시" },
     week5_summary: { drama: "W5-A", mode: "요약" },
     week6_psychoeducation: { drama: "W6-A", mode: "혼합", note: "첫 화면 요약. 축약 이완 3단계와 어깨·턱·이마, 호흡–단서어 도구는 상세" },
@@ -415,10 +415,10 @@ export const PLAN = {
       t.next();
     });
     b.screen(1, (t) => {
-      t.raw("lead", "이제 전신 순서입니다. 팔에서 시작해 얼굴, 몸통, 다리로 내려갑니다. 모두 열네 부위입니다.");
+      t.raw("lead", "이제 순서입니다. 발에서 시작해 배, 팔, 어깨, 목을 지나 얼굴까지 올라갑니다. 모두 열 단계이고, 부위마다 떠올릴 장면이 있습니다.");
       t.readAll();
-      t.raw("tool1", "본문 아래 '안내에 따라 해보기'에서 '시작'을 누르면 부위마다 긴장과 이완 시간을 세어 줍니다.", { point: "#pmr .btn", tap: true });
-      t.raw("tool2", "화면에 지금 어느 부위인지, 힘을 줄 때인지 풀 때인지가 크게 표시됩니다. 소리로 듣기와 함께 쓰면 눈을 감고도 할 수 있습니다.", { point: "#pmr" });
+      t.raw("tool1", "본문 아래 '안내에 따라 해보기'에서 '시작'을 누르면 부위마다 긴장 칠 초, 이완 십오 초를 세어 줍니다.", { point: "#pmr .btn", tap: true });
+      t.raw("tool2", "화면에 지금 어느 부위인지, 힘을 줄 때인지 풀 때인지가 크게 표시됩니다. 바뀔 때마다 작은 소리로 알려 주니 눈을 감고도 할 수 있습니다.", { point: "#pmr" });
       t.raw("tool3", "끝까지 마치면 오늘 일기에 '근육이완' 체크가 자동으로 표시됩니다.");
       t.next();
     }, { image: img("concept-pmr-body.webp", "5주차 근육이완 전신 순서 화면", "A simplified standing human outline drawn with one continuous thin ink line, front view, no face. Along the body, fourteen small terracotta dots mark the sequence points: both hands, both upper arms, forehead, eyes, jaw, shoulders, chest, belly, both thighs, both calves. A faint dotted ink path connects the dots from the right hand down to the left foot, suggesting order. Lots of cream space. Concept: tense and release, one part at a time, top to bottom.") });
