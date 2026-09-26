@@ -445,7 +445,7 @@ function mountExtra(kind, el, screen) {
     cleanup = ART.mountBreath($("#breath"), { cue, onDone: () => markPractice("mindfulness", el) });
   } else if (kind === "pmr") {
     const parts = ART.parsePMRParts(screen.body);
-    el.innerHTML = `<h3 class="extra-title">안내에 따라 해보기</h3><p class="muted">시작을 누르면 부위마다 긴장·이완 시간을 세어 줍니다. 순서는 위 목록과 같습니다.</p><div id="pmr"></div>`;
+    el.innerHTML = `<h3 class="extra-title">안내에 따라 해보기</h3><p class="muted">시작을 누르면 위 순서대로 부위마다 긴장 7초 → 이완 15초를 세어 주고, 장면 안내를 보여 줍니다. 바뀔 때 소리가 나니 눈을 감고 해도 됩니다.</p><div id="pmr"></div>`;
     cleanup = ART.mountPMR($("#pmr"), parts, { onDone: () => markPractice("pmr", el) });
   }
 }
@@ -699,7 +699,7 @@ function renderToday(main, [dateArg]) {
       <label class="check"><input type="checkbox" id="in-pmr" ${d.pmr ? "checked" : ""}> 근육이완을 했어요</label>
       <hr class="divider">
       <label class="field"><span class="label">이명이 더 심해진 계기 <span class="muted">(선택)</span></span><input type="text" id="in-trigger" value="${esc(d.trigger || "")}" placeholder="예: 시끄러운 곳, 피로, 커피"></label>
-      <label class="field"><span class="label">메모 <span class="muted">(선택)</span></span><span class="hint">오늘 느낀 점을 자유롭게. 연습한 것(이완 전후 긴장도, 잠든 시간 등)을 적어 두면 진료 때 도움이 됩니다.</span><textarea id="in-memo" placeholder="예: 근육이완 20분, 긴장도 7 → 3">${esc(d.memo || "")}</textarea></label>
+      <label class="field"><span class="label">메모 <span class="muted">(선택)</span></span><span class="hint">오늘 느낀 점을 자유롭게. 연습한 것(이완 전후 긴장도, 잠든 시간 등)을 적어 두면 진료 때 도움이 됩니다.</span><textarea id="in-memo" placeholder="예: 근육이완 7분, 긴장도 7 → 3">${esc(d.memo || "")}</textarea></label>
       <div class="btn-row between sticky-actions">${dateArg ? `<button class="btn ghost" type="button" id="diary-cancel">취소</button>` : `<a class="btn link" href="#/records">지난 기록 보기</a>`}<button class="btn accent big" type="submit">${saved ? "고친 내용 저장" : "저장"}</button></div>
       <p id="diary-status" class="status-line" ${saved ? "" : "hidden"}>${saved ? `마지막 저장 ${fmtDateTime(d.at)}` : ""}</p>
     </form>`;
