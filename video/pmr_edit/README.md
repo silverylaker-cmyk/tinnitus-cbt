@@ -1,7 +1,7 @@
 # 복지부(마음허그) 근육이완 영상 편집
 
 원본: Google Drive `CBT/나레이션영상/Screen_Recording_20260926_134739_YouTube.mp4` (11:51, 1078×608)
-결과: 1920×1080 30fps, `video/out/` (gitignore) — 저장소에는 올리지 않습니다.
+결과(확정 B안): 1920×1080 30fps, `video/out/` (gitignore) — 저장소에는 올리지 않습니다.
 
 ## 하는 일
 - 앞 1.5초(유튜브 재생 버튼이 찍힌 부분) 삭제
