@@ -7,6 +7,7 @@ import { buildTimeline, TCue, TRANSITION } from "./lib/timeline";
 
 const KIND_LABEL: Record<string, string> = { learn: "학습", write: "작성", homework: "숙제", assess: "확인", summary: "정리" };
 const VIEW_H = 880 - 56 - 72; // 폰 화면에서 본문이 보이는 높이
+const PHONE_SCALE = 1.5;     // .phone-wrap scale
 const SCROLL_T = 22;           // 스크롤 이동 프레임
 const MIN_SCROLL = 90;         // 이보다 적게 움직일 목표면 스크롤하지 않는다 (미세 떨림 방지)
 const TAP_AT = 28;             // 큐 시작 후 몇 프레임 뒤에 누르는지
@@ -50,7 +51,9 @@ export const Narration: React.FC<{ moduleId: string }> = ({ moduleId }) => {
     if (t >= 0 && Math.abs(t - curT) >= MIN_SCROLL) { prevT = curT; curT = t; if (i === cueIdx) break; }
     if (i === cueIdx) prevT = curT;
   }
-  const scroll = cueNow ? interpolate(frame, [cueNow.from, cueNow.from + SCROLL_T], [prevT, curT], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.inOut(Easing.cubic) }) : 0;
+  const rawScroll = cueNow ? interpolate(frame, [cueNow.from, cueNow.from + SCROLL_T], [prevT, curT], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.inOut(Easing.cubic) }) : 0;
+  // 폰은 1.5배로 그려진다. 스크롤이 기기 픽셀 사이(예: 550.008px)에 걸리면 렌더 탭마다 글자가 1px 위아래로 달리 찍혀 떨림이 생긴다 → 기기 픽셀 단위로 맞춘다
+  const scroll = Math.round(rawScroll * PHONE_SCALE) / PHONE_SCALE;
 
   // ---- 타이핑 상태 (이 화면에서 지금까지 나온 타이핑 큐 누적)
   const typed: PhoneState["typed"] = {};
