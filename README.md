@@ -28,6 +28,11 @@
 `data/sounds.js`의 각 항목 `youtubeId`에 영상 ID를 넣습니다. 주소가 `https://www.youtube.com/watch?v=AbCdEfGhIjK` 라면 ID는 `AbCdEfGhIjK` 입니다.
 ID가 하나도 없으면 소리 화면에 "준비 중"만 표시됩니다. 영상은 **미등록(unlisted)** 으로 올리면 재생됩니다 (비공개는 안 됨). 공개 저장소이므로 ID는 누구나 볼 수 있습니다.
 
+## 근육이완 영상 연결하기 (5주차)
+
+편집한 복지부 근육이완 영상(`video/pmr_edit/`, B안)을 유튜브에 **미등록**으로 올린 뒤, `content/week5/training.json` 두 번째 화면의 `"youtubeId": ""` 에 영상 ID를 넣고 `python3 tools/build_content.py` 를 실행합니다.
+ID가 비어 있으면 미리보기 그림과 "영상은 준비 중" 문구만 보입니다. 영상을 끝까지 보면 오늘 일기에 '근육이완'이 자동 체크됩니다.
+
 ## 원고 수정하기
 
 `content/weekN/*.json`을 수정한 뒤:
