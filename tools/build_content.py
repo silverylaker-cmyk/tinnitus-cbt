@@ -4,11 +4,10 @@
 원고를 고치려면 ../pwa/content/ 의 JSON을 수정한 뒤 이 스크립트를 다시 실행하세요.
     python3 tools/build_content.py
 """
-import json, pathlib
+import json, pathlib, subprocess, sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SRC = ROOT / "content"
-OUT = ROOT / "data" / "program.js"
 
 # (week, kind, title, content file)  — backend/scripts/seed_program.py 의 순서 그대로
 MODULES = [
@@ -73,8 +72,8 @@ program = {
     "modules": modules,
     "questionnaires": {"THI": thi},
 }
-OUT.write_text("// 자동 생성 파일 — tools/build_content.py 로 다시 만듭니다. 직접 수정하지 마세요.\n"
-               "window.PROGRAM = " + json.dumps(program, ensure_ascii=False, indent=1) + ";\n",
-               encoding="utf-8")
-(ROOT / "data" / "program.json").write_text(json.dumps(program, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")  # 영상(리모션) 프로젝트용
-print(f"wrote {OUT} ({OUT.stat().st_size:,} bytes, {len(modules)} modules)")
+(ROOT / "data" / "program.json").write_text(json.dumps(program, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")  # 영상(리모션) 프로젝트용 평문
+# 앱이 읽는 data/program.js 는 주차 원고를 암호화해서 만든다 (코드: unlock-codes.json, 비공개)
+r = subprocess.run(["node", str(ROOT / "tools" / "lock_weeks.mjs")])
+if r.returncode:
+    sys.exit("주차 잠금(암호화) 단계가 실패했습니다. data/program.js 는 바뀌지 않았습니다.")

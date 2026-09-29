@@ -455,3 +455,8 @@ input[type=date], select { -webkit-appearance: none; appearance: none; }
   .week-title { min-width: 120px; }
   .viewer-top { flex-wrap: wrap; gap: 8px; }
 }
+
+/* 주차 열기 코드 입력 */
+.unlock-row { display: flex; gap: 8px; margin-top: 10px; }
+.unlock-row input { flex: 1; min-width: 0; font-size: 1.15em; letter-spacing: .08em; text-align: center; }
+.unlock-row .btn { flex: none; }

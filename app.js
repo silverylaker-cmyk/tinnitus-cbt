@@ -9,7 +9,7 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const newId = () => Math.random().toString(36).slice(2, 8).toUpperCase();
 const DEFAULT_STATE = () => ({
   version: 1,
-  profile: { id: newId(), startDate: null, nickname: "", unlockAll: false, fontScale: 1 },
+  profile: { id: newId(), startDate: null, nickname: "", keys: {}, fontScale: 1 }, // keys: 진료 때 받은 코드로 연 주차의 열쇠
   progress: {},        // moduleId -> "in_progress" | "completed"
   resume: {},          // moduleId -> 마지막으로 보던 화면 번호
   drafts: {},          // moduleId -> {key: 작성 중인 글} (저장 전 임시 보관)
@@ -41,6 +41,8 @@ function normalize(s) {
   st.profile = Object.assign(DEFAULT_STATE().profile, s.profile || {});
   if (!st.profile.id) st.profile.id = newId();
   if (st.profile.startDate && !DATE_RE.test(st.profile.startDate)) st.profile.startDate = null;
+  if (!st.profile.keys || typeof st.profile.keys !== "object") st.profile.keys = {};
+  delete st.profile.unlockAll; // 예전 "모든 주차 열기" — 이제는 코드로만 열린다
   for (const k of ["progress", "resume", "drafts", "worksheets", "diary"]) if (!st[k] || typeof st[k] !== "object") st[k] = {};
   for (const k of ["questionnaires", "soundSessions"]) if (!Array.isArray(st[k])) st[k] = [];
   for (const [id, w] of Object.entries(st.worksheets)) { if (!w || typeof w !== "object") { delete st.worksheets[id]; continue; } w.single ||= {}; w.entries = Array.isArray(w.entries) ? w.entries.filter((e) => e && e.at && e.responses) : []; }
@@ -113,18 +115,47 @@ function renderBody(text) {
 // =====================================================================
 //  프로그램 진행 상태
 // =====================================================================
-function daysSinceStart() {
-  if (!state.profile.startDate) return null;
-  const start = new Date(state.profile.startDate + "T00:00:00");
-  return Math.floor((new Date() - start) / 86400000);
-}
-function currentWeek() {
-  const d = daysSinceStart();
-  if (d === null || d < 0) return 1;
-  return Math.min(P.totalWeeks, Math.floor(d / 7) + 1);
-}
-function isWeekOpen(w) { return state.profile.unlockAll || w <= currentWeek(); }
+// 주차는 날짜가 아니라 진료 때 받은 코드로 열린다 (lock.js). 원고가 풀려 있으면 열린 주차
 const modulesOfWeek = (w) => P.modules.filter((m) => m.week === w);
+function isWeekOpen(w) { return modulesOfWeek(w).every((m) => m.screens); }
+const openWeeks = () => P.weeks.map((x) => x.week).filter(isWeekOpen);
+const nextLockedWeek = () => P.weeks.map((x) => x.week).find((w) => !isWeekOpen(w)) || null;
+function currentWeek() { return Math.max(1, ...openWeeks()); } // 열린 주차 중 가장 뒤
+
+// 코드 입력 카드 — 프로그램 목록·홈·설정에서 함께 쓴다
+function unlockCardHTML(tint = true) {
+  const next = nextLockedWeek();
+  if (!next) return "";
+  if (!Lock.supported()) return `<div class="card"><p class="muted" style="margin:0">이 브라우저에서는 주차 열기 코드를 확인할 수 없습니다. 보안 주소(https)로 열어 주세요.</p></div>`;
+  return `<div class="card ${tint ? "tint" : ""}">
+    <h3>${next}주차 열기</h3>
+    <p class="muted small">진료 때 받은 코드를 넣으면 다음 주차가 하나 열립니다.</p>
+    <form class="unlock-row" id="unlock-form">
+      <label class="sr-only" for="unlock-code">주차 열기 코드</label>
+      <input id="unlock-code" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="코드 입력" maxlength="30">
+      <button class="btn accent" type="submit">열기</button>
+    </form></div>`;
+}
+function bindUnlock() {
+  const f = $("#unlock-form"); if (!f) return;
+  f.onsubmit = async (e) => {
+    e.preventDefault();
+    const inp = $("#unlock-code"), btn = $("button", f);
+    if (!inp.value.trim()) return toast("코드를 입력해 주세요.");
+    btn.disabled = true; btn.textContent = "확인 중…";
+    const before = openWeeks();
+    const keys = await Lock.tryCode(inp.value).catch(() => null);
+    btn.disabled = false; btn.textContent = "열기";
+    if (!keys) { toast("코드가 맞지 않습니다. 다시 확인해 주세요."); inp.select(); return; }
+    state.profile.keys = await Lock.restore({ ...state.profile.keys, ...keys });
+    if (!save()) return;
+    const opened = openWeeks().filter((w) => !before.includes(w));
+    toast(opened.length ? `${opened.join(", ")}주차가 열렸습니다 ✓` : "이미 열려 있는 주차의 코드입니다.");
+    route();
+  };
+}
+// 기록을 가져오거나 지운 뒤, 그 기록의 열쇠에 맞게 원고를 다시 잠그고 푼다
+async function reapplyKeys() { Lock.relock(); state.profile.keys = await Lock.restore(state.profile.keys); save(); }
 const moduleById = (id) => P.modules.find((m) => m.id === id);
 const modStatus = (id) => state.progress[id] || "not_started";
 function setStatus(id, st) {
@@ -166,8 +197,13 @@ function route() {
   if (!reduceMotion()) { const m = $("#main"); m.classList.remove("enter"); void m.offsetWidth; m.classList.add("enter"); }
 }
 window.addEventListener("hashchange", route);
-window.addEventListener("load", () => {
-  applyFontScale(); paint();
+window.addEventListener("load", async () => {
+  applyFontScale();
+  try {
+    const good = await Lock.restore(state.profile.keys);
+    if (Object.keys(good).length !== Object.keys(state.profile.keys).length) { state.profile.keys = good; save(); } // 코드가 바뀐 주차는 다시 잠김
+  } catch (e) {}
+  paint();
   $("#font-btn").onclick = () => {
     const steps = [1, 1.15, 1.3], cur = steps.indexOf(Number(state.profile.fontScale || 1));
     state.profile.fontScale = steps[(cur + 1) % steps.length]; save(); applyFontScale();
@@ -199,7 +235,7 @@ function renderHome(main) {
       <div class="card tint" style="margin-bottom:24px">
         <h3>프로그램 시작</h3>
         <div class="notice">기록을 이어 보려면 앞으로도 <b>같은 기기와 브라우저</b>로 열어 주세요. 기기를 바꾸기 전에는 설정에서 기록을 파일로 내보내 두세요.</div>
-        <p class="muted">시작일을 기준으로 매주 다음 내용이 열립니다. 클리닉에서 안내받은 날짜가 있다면 그 날짜로 맞춰 주세요.</p>
+        <p class="muted">다음 주차는 진료 때 받는 코드로 하나씩 열립니다. 클리닉에서 안내받은 시작일이 있다면 그 날짜로 맞춰 주세요.</p>
         <label class="field"><span class="label">시작일</span><input type="date" id="start-date" value="${dateKey()}"></label>
         <label class="field"><span class="label">이름 또는 별칭 <span class="muted">(진료 때 기록을 전달할 때 표시됩니다)</span></span><input type="text" id="nickname" placeholder="예: 홍길동" maxlength="20"></label>
         <button class="btn accent big" id="start-btn">시작하기</button>
@@ -213,7 +249,7 @@ function renderHome(main) {
     $("#start-btn").onclick = () => {
       const v = $("#start-date").value;
       if (!v || !DATE_RE.test(v)) return toast("시작일을 선택해 주세요.");
-      if (v > dateKey() && !confirm("시작일이 오늘보다 뒤입니다. 그날까지는 1주차만 열립니다. 계속할까요?")) return;
+      if (v > dateKey() && !confirm("시작일이 오늘보다 뒤입니다. 계속할까요?")) return;
       state.profile.startDate = v;
       state.profile.nickname = $("#nickname").value.trim();
       if (!save()) return; route();
@@ -248,7 +284,7 @@ function renderHome(main) {
       <a class="card" href="#/${next ? "module/" + next.id + (resumeIdx ? "/" + resumeIdx : "") : "program"}">
         <div class="eyebrow">${behind ? `${next.week}주차에 남은 것` : "이번 주 프로그램"}</div>
         <h3>${next ? esc(next.title) : "이번 주 내용을 모두 마쳤습니다"}</h3>
-        <p class="muted small">${next ? KIND_LABEL[next.kind] + (resumable ? " · 하던 곳부터 이어서" : " · 시작하기") : "프로그램 목록에서 지난 내용을 다시 볼 수 있습니다"}</p>
+        <p class="muted small">${next ? KIND_LABEL[next.kind] + (resumable ? " · 하던 곳부터 이어서" : " · 시작하기") : nextLockedWeek() ? "다음 주차는 진료 때 받는 코드로 열립니다" : "프로그램 목록에서 지난 내용을 다시 볼 수 있습니다"}</p>
         <div class="progress"><i style="width:${pct}%"></i></div>
         <div class="small muted">전체 ${done} / ${P.modules.length} 완료</div>
       </a>
@@ -269,6 +305,8 @@ function renderHome(main) {
       </a>
     </div>
 
+    ${!next && nextLockedWeek() ? `<section class="section">${unlockCardHTML()}</section>` : ""}
+
     ${crisis && Object.keys(crisis).length ? `
     <section class="section">
       <div class="section-head"><h2>나의 위기 대응 카드</h2><a class="more" href="#/module/week8_worksheet/0/back">수정하기</a></div>
@@ -279,6 +317,7 @@ function renderHome(main) {
       <div class="section-head"><h2>${w}주차 · ${esc(weekInfo.title)}</h2><a class="more" href="#/program">전체 프로그램</a></div>
       <div class="card">${renderModuleList(mods)}</div>
     </section>`;
+  bindUnlock();
 }
 
 function renderCrisisCard(c) {
@@ -316,9 +355,11 @@ function renderProgram(main) {
     <section class="hero" style="padding-bottom:20px">
       <div class="eyebrow">8주 프로그램</div>
       <h1>프로그램 목록</h1>
-      <p class="lead">시작일 ${fmtDate(state.profile.startDate)} 기준, 지금은 ${cw}주차입니다. ${state.profile.unlockAll ? "모든 주차가 열려 있습니다." : "다음 주차는 7일마다 자동으로 열립니다."}</p>
+      <p class="lead">${nextLockedWeek() ? `지금 ${cw}주차까지 열려 있습니다. 다음 주차는 진료 때 받는 코드로 열립니다.` : "모든 주차가 열려 있습니다."}</p>
     </section>
+    ${unlockCardHTML()}
     <div id="weeks"></div>`;
+  bindUnlock();
   const wrap = $("#weeks");
   P.weeks.forEach((wk) => {
     const open = isWeekOpen(wk.week);
@@ -331,7 +372,7 @@ function renderProgram(main) {
       <h3><button class="week-head" aria-expanded="${expanded}" aria-controls="wb-${wk.week}" ${open ? "" : "disabled"}>
         ${ART.week(wk.week, "week-art")}
         <span class="week-title"><span class="week-num">${wk.week}주차</span><span class="week-h">${esc(wk.title)}</span><span class="sub">${esc(wk.subtitle)}</span></span>
-        <span class="week-status">${open ? (doneN === mods.length ? "완료 ✓" : `${doneN}/${mods.length}`) : `🔒 잠김<span class="week-open">${fmtDate(shiftDate(state.profile.startDate, (wk.week - 1) * 7)).slice(6)}에 열림</span>`}</span>
+        <span class="week-status">${open ? (doneN === mods.length ? "완료 ✓" : `${doneN}/${mods.length}`) : `🔒 잠김<span class="week-open">진료 때 코드로 열림</span>`}</span>
       </button></h3>
       <div class="week-body" id="wb-${wk.week}" ${expanded ? "" : "hidden"}>${renderModuleList(mods)}</div>`;
     const head = $(".week-head", div), body = $(".week-body", div);
@@ -997,7 +1038,7 @@ function renderRecords(main) {
     <section class="section">
       <div class="section-head"><h2>워크시트</h2></div>
       ${wsList.map((m) => {
-        const d = state.worksheets[m.id]; if (!d) return "";
+        const d = state.worksheets[m.id]; if (!d || !m.screens) return "";
         const fields = m.screens.filter((s) => s.type === "worksheet").flatMap((s) => s.fields);
         const single = Object.keys(d.single || {}).length ? `<div class="entry">${fields.filter((f) => d.single[f.key]).map((f) => `<p><span class="q">${esc(f.label)}</span>${esc(d.single[f.key])}</p>`).join("")}</div>` : "";
         const entries = (d.entries || []).slice().reverse().map((en) => `<div class="entry"><div class="when">${fmtDateTime(en.at)}</div>${fields.filter((f) => en.responses[f.key]).map((f) => `<p><span class="q">${esc(f.label)}</span>${esc(en.responses[f.key])}</p>`).join("")}</div>`).join("");
@@ -1126,10 +1167,14 @@ function renderSettings(main) {
       <h3>프로그램</h3>
       <label class="field"><span class="label">시작일</span><input type="date" id="s-start" value="${p.startDate || ""}"></label>
       <label class="field"><span class="label">이름 또는 별칭</span><input type="text" id="s-name" value="${esc(p.nickname)}" maxlength="20"></label>
-      <label class="check"><input type="checkbox" id="s-unlock" ${p.unlockAll ? "checked" : ""}> 모든 주차 열기 <span class="muted small">(클리닉 안내에 따라 필요할 때만)</span></label>
       <p class="muted small">기록 번호: <b>${esc(p.id)}</b> — 진료 때 기록을 구분하는 번호입니다.</p>
       <div class="btn-row"><button class="btn" id="s-save" type="button">저장</button></div>
     </div>
+    <div class="card">
+      <h3>주차 열기</h3>
+      <p class="muted" style="margin:0">${nextLockedWeek() ? `지금 ${openWeeks().length ? openWeeks().at(-1) + "주차까지" : "아무 주차도"} 열려 있습니다.` : "모든 주차가 열려 있습니다."}</p>
+    </div>
+    ${unlockCardHTML(false)}
     <div class="card">
       <h3>데이터 내보내기 · 가져오기</h3>
       <p class="muted">내보낸 파일(JSON)에는 일기, 워크시트, 설문, 소리 사용 기록이 모두 담깁니다. 새 기기로 옮기거나 담당 선생님께 전달할 때 씁니다.</p>
@@ -1146,9 +1191,10 @@ function renderSettings(main) {
   });
   $("#s-save").onclick = () => {
     const sd = $("#s-start").value; if (sd && !DATE_RE.test(sd)) return toast("시작일 형식이 올바르지 않습니다.");
-    p.startDate = sd || p.startDate; p.nickname = $("#s-name").value.trim(); p.unlockAll = $("#s-unlock").checked;
+    p.startDate = sd || p.startDate; p.nickname = $("#s-name").value.trim();
     if (!save()) return; toast("저장했습니다 ✓");
   };
+  bindUnlock();
   $("#s-export").onclick = () => {
     const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
@@ -1165,12 +1211,12 @@ function renderSettings(main) {
       else if (data && data.compact) next = stateFromCompact(data.compact); // 병원 태블릿에서 내려받은 사본
       if (!next) throw new Error();
       if (!confirm("현재 기기의 기록을 이 파일의 내용으로 바꿀까요?")) return;
-      const previous = state; state = next; if (!save()) { state = previous; return; } applyFontScale(); toast(data.compact ? "병원 사본에서 복원했습니다 ✓ (글자 크기·설정과 소리 사용 상세 기록은 복원되지 않습니다)" : "가져왔습니다 ✓", 6000); location.hash = "#/";
+      const previous = state; state = next; if (!save()) { state = previous; return; } await reapplyKeys(); applyFontScale(); toast(data.compact ? "병원 사본에서 복원했습니다 ✓ (글자 크기·설정과 소리 사용 상세 기록은 복원되지 않습니다)" : "가져왔습니다 ✓", 6000); location.hash = "#/";
     } catch (err) { toast("파일을 읽을 수 없습니다."); }
   };
-  $("#s-reset").onclick = () => {
+  $("#s-reset").onclick = async () => {
     if (!confirm("정말 모든 기록을 지울까요? 되돌릴 수 없습니다.")) return;
     if (!confirm("마지막 확인입니다. 지우시겠습니까?")) return;
-    const previous = state; state = DEFAULT_STATE(); if (!save()) { state = previous; return; } location.hash = "#/"; toast("모든 기록을 지웠습니다.");
+    const previous = state; state = DEFAULT_STATE(); if (!save()) { state = previous; return; } await reapplyKeys(); location.hash = "#/"; toast("모든 기록을 지웠습니다.");
   };
 }

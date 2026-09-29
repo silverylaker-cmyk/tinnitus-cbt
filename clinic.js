@@ -41,7 +41,7 @@ function route() {
   window.scrollTo({ top: 0 });
 }
 window.addEventListener("hashchange", route);
-window.addEventListener("load", route);
+window.addEventListener("load", async () => { try { db.keys = await Lock.restore(db.keys || {}); } catch (e) {} route(); });
 
 // ---------- QR 스캔 ----------
 function renderScan(main) {
@@ -216,11 +216,11 @@ function renderPatient(main, [id]) {
 
     <section class="section"><div class="section-head"><h2>워크시트</h2></div>
       ${Object.entries(ex.worksheets).map(([mid, w]) => {
-        const m = modTitle[mid]; const fields = m ? m.screens.filter((s) => s.type === "worksheet").flatMap((s) => s.fields) : [];
+        const m = modTitle[mid]; const fields = m && m.screens ? m.screens.filter((s) => s.type === "worksheet").flatMap((s) => s.fields) : [];
         const lab = (k) => fields.find((f) => f.key === k)?.label || k;
         const single = Object.keys(w.single).length ? `<div class="entry">${Object.entries(w.single).map(([k, v]) => `<p><span class="q">${esc(lab(k))}</span>${esc(v)}</p>`).join("")}</div>` : "";
         const entries = w.entries.slice().reverse().map((en) => `<div class="entry"><div class="when">${fmtDT(en.at)}</div>${Object.entries(en.responses).map(([k, v]) => `<p><span class="q">${esc(lab(k))}</span>${esc(v)}</p>`).join("")}</div>`).join("");
-        return `<div class="card"><h3>${esc(m ? m.title : mid)}</h3>${single}${entries}</div>`;
+        return `<div class="card"><h3>${esc(m ? m.title : mid)}</h3>${m && !m.screens ? `<p class="muted small">원고가 잠겨 있어 질문 대신 항목 이름으로 보입니다. <a href="#/data">백업</a> 화면에서 마스터 코드를 넣으면 질문이 보입니다.</p>` : ""}${single}${entries}</div>`;
       }).join("") || `<div class="card"><p class="muted" style="margin:0">작성한 워크시트가 없습니다.</p></div>`}
     </section>
 
@@ -294,12 +294,23 @@ function renderData(main) {
     <section class="hero" style="padding-bottom:12px"><div class="eyebrow">진료실</div><h1>백업과 가져오기</h1>
       <p class="lead">받은 기록은 이 태블릿의 브라우저에만 있습니다. 정기적으로 전체 백업 파일을 내려받아 안전한 곳에 보관하세요.</p></section>
     ${backupBanner()}
+    <div class="card"><h3>주차 원고 열기</h3>
+      <p class="muted">워크시트의 질문 문구를 보려면 이 태블릿에서 한 번만 마스터 코드를 넣어 주세요. (코드 목록: 관리 컴퓨터의 unlock-codes.json)</p>
+      ${Lock.lockedWeeks().every((w) => P.modules.filter((m) => m.week === w).every((m) => m.screens)) ? `<p style="margin:0">모든 주차 원고가 열려 있습니다 ✓</p>` : `
+      <form class="unlock-row" id="d-unlock"><label class="sr-only" for="d-code">마스터 코드</label><input id="d-code" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="마스터 코드" maxlength="30"><button class="btn" type="submit">열기</button></form>`}</div>
     <div class="card"><h3>전체 백업</h3><p class="muted">모든 환자 기록과 진료 메모를 하나의 JSON 파일로 내려받습니다.${db.lastBackupAt ? ` 마지막 백업: ${fmtDT(db.lastBackupAt)}` : ""}</p>
       <div class="btn-row"><button class="btn" id="d-export" type="button">백업 파일 내려받기</button></div></div>
     <div class="card"><h3>파일 가져오기</h3><p class="muted">환자가 앱에서 내보낸 파일, 이 페이지의 환자 JSON, 전체 백업 파일 모두 가져올 수 있습니다. 같은 번호의 환자는 최신 내용으로 바뀝니다.</p>
       <div class="btn-row"><button class="btn ghost" id="d-import" type="button">파일 선택</button><input type="file" id="d-file" accept="application/json,.json" multiple hidden></div></div>
     <div class="card"><h3>붙여넣기로 받기</h3><p class="muted">QR 조각 문자열을 직접 붙여넣어 시험할 수 있습니다 (개발·점검용).</p>
       <label class="field"><span class="label">조각 문자열</span><textarea id="d-paste" rows="3" placeholder="T1|...."></textarea></label><div class="btn-row"><button class="btn ghost" id="d-paste-btn" type="button">조각 추가</button><span id="d-paste-st" class="muted"></span></div></div>`;
+  const uf = $("#d-unlock");
+  if (uf) uf.onsubmit = async (e) => {
+    e.preventDefault();
+    const keys = await Lock.tryCode($("#d-code").value).catch(() => null);
+    if (!keys) return toast("코드가 맞지 않습니다.");
+    db.keys = await Lock.restore({ ...(db.keys || {}), ...keys }); save(); toast("원고를 열었습니다 ✓"); route();
+  };
   $("#d-export").onclick = () => { download(`이명클리닉_백업_${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify({ clinicBackup: 1, ...db }, null, 2)); db.lastBackupAt = new Date().toISOString(); save(); toast("백업 파일을 내려받았습니다 ✓"); };
   $("#d-import").onclick = () => $("#d-file").click();
   $("#d-file").onchange = async (e) => {

@@ -8,7 +8,7 @@ const {default:AxeBuilder}=require('@axe-core/playwright');
  await page.goto(process.env.SITE || 'http://127.0.0.1:8765/');
  await page.screenshot({path:artifactDir + '/home-after.png',fullPage:true});
  await page.locator('#start-btn').click();
- await page.evaluate(()=>{state.profile.unlockAll=true;save()});
+ await page.evaluate(async m=>{state.profile.keys=await Lock.restore(await Lock.tryCode(m));save()},JSON.parse(require('fs').readFileSync(require('path').join(__dirname,'..','unlock-codes.json'),'utf8')).master);
  const modules=await page.evaluate(()=>PROGRAM.modules.map(m=>({id:m.id,screens:m.screens.length})));
  const issues=[];
  for(const route of ['/', '/program','/today','/sound','/records','/settings','/share',...modules.flatMap(m=>Array.from({length:m.screens},(_,i)=>`/module/${m.id}/${i}`))]){

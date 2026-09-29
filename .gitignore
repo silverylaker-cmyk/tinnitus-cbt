@@ -9,3 +9,4 @@ video/.env
 video/src/generated/
 video/scripts/*.bak
 video/public/audio/voice/*/
+unlock-codes.json

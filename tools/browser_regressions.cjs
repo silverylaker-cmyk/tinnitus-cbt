@@ -5,7 +5,7 @@ const {chromium}=require('playwright');
 (async()=>{
  const browser=await chromium.launch({...(process.env.CHROMIUM_PATH ? {executablePath:process.env.CHROMIUM_PATH} : {})});
  const page=await browser.newPage();page.setDefaultTimeout(5000);let failed=0;
- async function seed(){await page.goto((process.env.SITE || 'http://127.0.0.1:8765/'));await page.evaluate(()=>{state=DEFAULT_STATE();state.profile.startDate=dateKey();state.profile.unlockAll=true;save();});}
+ async function seed(){await page.goto((process.env.SITE || 'http://127.0.0.1:8765/'));await page.evaluate(()=>{state=DEFAULT_STATE();state.profile.startDate=dateKey();save();});await page.evaluate(async m=>{state.profile.keys=await Lock.restore(await Lock.tryCode(m));save()},JSON.parse(require('fs').readFileSync(require('path').join(__dirname,'..','unlock-codes.json'),'utf8')).master);}
  async function route(r){await page.evaluate(r=>location.hash=r,r);await page.waitForTimeout(80);}
  async function test(name,fn){try{await seed();await fn();console.log('PASS',name)}catch(e){failed++;console.log('FAIL',name,e.message)}}
  await test('THI resubmission preserves all previous answers after leaving',async()=>{
