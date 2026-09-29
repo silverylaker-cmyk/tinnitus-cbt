@@ -342,6 +342,10 @@ td.num { font-variant-numeric: tabular-nums; }
 .pmr-how { color: var(--ink-3); font-size: .95rem; margin-bottom: 12px; }
 .pmr-bar { height: 8px; background: var(--bg-2); border-radius: 4px; overflow: hidden; }
 .pmr-bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .2s linear; }
+.pmr-total { height: 3px; background: var(--bg-2); border-radius: 2px; overflow: hidden; margin-top: 6px; }
+.pmr-total i { display: block; height: 100%; width: 0; background: var(--ink-3); transition: width .2s linear; }
+.pmr-sound { margin: 12px 0 4px; font-size: .95rem; }
+.pmr.paused .pmr-count, .pmr.paused .pmr-part { opacity: .5; }
 
 /* ---------- QR ---------- */
 .share-card { text-align: center; }
