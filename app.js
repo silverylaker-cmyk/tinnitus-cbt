@@ -428,8 +428,10 @@ function renderModule(main, [id, idxStr, flag]) {
   const extra = EXTRAS[`${m.id}:${idx}`];
   const backMode = flag === "back" || flag === "entries";
   const already = modStatus(m.id) === "completed";
-  const singleEdit = screen.type === "worksheet" && screen.mode !== "append" && already; // 이미 마친 워크시트를 고치는 중
-  const nextLabel = singleEdit ? "저장" : (screen.button || (isLast ? "완료" : "다음"));
+  // 기록 화면의 '열어서 고치기'로 들어와 이미 마친 워크시트를 고치는 중 → 저장만 하고 돌아감.
+  // 목록에서 다시 들어온 경우에는 처음처럼 저장한 뒤 다음으로 넘어간다.
+  const editOnly = screen.type === "worksheet" && screen.mode !== "append" && already && backMode;
+  const nextLabel = editOnly ? "저장" : (screen.button || (isLast ? "완료" : "다음"));
   main.innerHTML = `
     <div class="viewer">
       <div class="viewer-top">
@@ -463,7 +465,7 @@ function renderModule(main, [id, idxStr, flag]) {
       if (screen.mode === "append" && $("#next-btn").dataset.mode === "next") { finishModule(m, ""); return; }
       if (!submitWorksheet(m, screen)) return;
       if (screen.mode === "append") return;
-      if (singleEdit) { if (backMode && history.length > 1) history.back(); return; } // 고친 내용만 저장하고 머무름
+      if (editOnly) { if (history.length > 1) history.back(); return; } // 고친 내용만 저장하고 돌아감
     }
     if (screen.type === "questionnaire") { submitQuestionnaire(m, screen); return; }
     if (isLast) finishModule(m, nextLabel);
